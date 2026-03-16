@@ -19,12 +19,15 @@ const signup_dto_1 = require("./dto/signup.dto");
 const login_dto_1 = require("./dto/login.dto");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
 const hkdf_service_1 = require("../crypto/hkdf.service");
+const solana_service_1 = require("../solana/solana.service");
 let AuthController = class AuthController {
     authService;
     hkdfService;
-    constructor(authService, hkdfService) {
+    solanaService;
+    constructor(authService, hkdfService, solanaService) {
         this.authService = authService;
         this.hkdfService = hkdfService;
+        this.solanaService = solanaService;
     }
     signup(body) {
         return this.authService.signup(body);
@@ -43,6 +46,20 @@ let AuthController = class AuthController {
         });
         return {
             permissionKey: key,
+        };
+    }
+    solanaDebug() {
+        return {
+            programId: this.solanaService.getProgramId().toBase58(),
+            wallet: this.solanaService.getWalletPubkey().toBase58(),
+        };
+    }
+    async solanaRegisterUser(req) {
+        const userId = req.user.sub;
+        const result = await this.solanaService.registerUserOnChain(userId);
+        return {
+            message: 'User registered on-chain',
+            ...result,
         };
     }
 };
@@ -75,9 +92,24 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "testHkdf", null);
+__decorate([
+    (0, common_1.Get)('solana-debug'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "solanaDebug", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('solana-register-user'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "solanaRegisterUser", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService,
-        hkdf_service_1.HkdfService])
+        hkdf_service_1.HkdfService,
+        solana_service_1.SolanaService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

@@ -2,10 +2,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GrantPermissionDto } from './dto/grant-permission.dto';
 import { RevokePermissionDto } from './dto/revoke-permission.dto';
 import { HkdfService } from '../crypto/hkdf.service';
+import { SolanaService } from '../solana/solana.service';
 export declare class PermissionsService {
     private readonly prisma;
     private readonly hkdfService;
-    constructor(prisma: PrismaService, hkdfService: HkdfService);
+    private readonly solanaService;
+    constructor(prisma: PrismaService, hkdfService: HkdfService, solanaService: SolanaService);
     grantPermission(userId: string, dto: GrantPermissionDto): Promise<{
         permission: {
             id: string;
@@ -26,6 +28,11 @@ export declare class PermissionsService {
             permissionKey: string;
             permissionKeyHash: string;
         };
+        onChain: {
+            userPda: string;
+            grantTx: string;
+            permissionPda: string;
+        };
     }>;
     revokePermission(userId: string, dto: RevokePermissionDto): Promise<{
         permission: {
@@ -42,6 +49,10 @@ export declare class PermissionsService {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             revokedAt: Date | null;
+        };
+        onChain: {
+            revokeTx: string;
+            permissionPda: string | null;
         };
     }>;
     getMyPermissions(userId: string): Promise<({
@@ -67,4 +78,5 @@ export declare class PermissionsService {
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
         revokedAt: Date | null;
     })[]>;
+    private ensureUserRegisteredOnChain;
 }

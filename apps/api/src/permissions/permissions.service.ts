@@ -4,12 +4,14 @@ import { GrantPermissionDto } from './dto/grant-permission.dto';
 import { RevokePermissionDto } from './dto/revoke-permission.dto';
 import { HkdfService } from '../crypto/hkdf.service';
 import { createHash } from 'crypto';
+import { SolanaService } from '../solana/solana.service';
 
 @Injectable()
 export class PermissionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly hkdfService: HkdfService,
+    private readonly solanaService: SolanaService,
   ) {}
 
   async grantPermission(userId: string, dto: GrantPermissionDto) {
@@ -41,6 +43,8 @@ export class PermissionsService {
     if (!latestVault) {
       throw new BadRequestException('KYC vault entry not found');
     }
+
+    const onChainUser = await this.ensureUserRegisteredOnChain(userId);
 
     const existing = await this.prisma.permission.findUnique({
       where: {
@@ -101,6 +105,20 @@ export class PermissionsService {
       },
     });
 
+    const onChainGrant = await this.solanaService.grantPermissionOnChain({
+      userId,
+      serviceId: permission.serviceId,
+      kycHash: latestVault.kycHash,
+      requiredAmount: dto.requiredTokenAmount ?? 0,
+    });
+
+    const syncedPermission = await this.prisma.permission.update({
+      where: { id: updatedPermission.id },
+      data: {
+        onchainPermissionPda: onChainGrant.permissionPda,
+      },
+    });
+
     await this.prisma.accessLog.create({
       data: {
         permissionId: updatedPermission.id,
@@ -111,10 +129,15 @@ export class PermissionsService {
     });
 
     return {
-      permission: updatedPermission,
+      permission: syncedPermission,
       derived: {
         permissionKey,
         permissionKeyHash,
+      },
+      onChain: {
+        userPda: onChainUser.userPda,
+        grantTx: onChainGrant.tx,
+        permissionPda: onChainGrant.permissionPda,
       },
     };
   }
@@ -144,6 +167,20 @@ export class PermissionsService {
       },
     });
 
+    let revokeTx: string | null = null;
+
+    try {
+      const onChainRevoke = await this.solanaService.revokePermissionOnChain(
+        permission.serviceId,
+      );
+      revokeTx = onChainRevoke.tx;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown on-chain revoke error';
+
+      throw new BadRequestException(`On-chain revoke failed: ${message}`);
+    }
+
     await this.prisma.accessLog.create({
       data: {
         permissionId: updated.id,
@@ -155,6 +192,10 @@ export class PermissionsService {
 
     return {
       permission: updated,
+      onChain: {
+        revokeTx,
+        permissionPda: updated.onchainPermissionPda,
+      },
     };
   }
 
@@ -174,5 +215,32 @@ export class PermissionsService {
         },
       },
     });
+  }
+
+  private async ensureUserRegisteredOnChain(userId: string) {
+    try {
+      return await this.solanaService.registerUserOnChain(userId);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown on-chain user registration error';
+
+      if (
+        message.includes('already in use') ||
+        message.includes('custom program error') ||
+        message.includes('Allocate: account') ||
+        message.includes('Account already in use')
+      ) {
+        const authority = this.solanaService.getWalletPubkey();
+        const [userPda] = this.solanaService.deriveUserPda(authority);
+
+        return {
+          tx: null,
+          userPda: userPda.toBase58(),
+          alreadyExisted: true,
+        };
+      }
+
+      throw error;
+    }
   }
 }

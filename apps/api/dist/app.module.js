@@ -21,6 +21,7 @@ const auth_module_1 = require("./auth/auth.module");
 const services_module_1 = require("./services/services.module");
 const permissions_module_1 = require("./permissions/permissions.module");
 const service_api_module_1 = require("./service-api/service-api.module");
+const solana_module_1 = require("./solana/solana.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,6 +38,7 @@ exports.AppModule = AppModule = __decorate([
             permissions_module_1.PermissionsModule,
             services_module_1.ServicesModule,
             service_api_module_1.ServiceApiModule,
+            solana_module_1.SolanaModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, dev_bootstrap_service_1.DevBootstrapService],

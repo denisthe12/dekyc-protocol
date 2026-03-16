@@ -3,10 +3,12 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request } from 'express';
 import { HkdfService } from '../crypto/hkdf.service';
+import { SolanaService } from '../solana/solana.service';
 export declare class AuthController {
     private readonly authService;
     private readonly hkdfService;
-    constructor(authService: AuthService, hkdfService: HkdfService);
+    private readonly solanaService;
+    constructor(authService: AuthService, hkdfService: HkdfService, solanaService: SolanaService);
     signup(body: SignupDto): Promise<{
         accessToken: string;
         user: {
@@ -36,4 +38,13 @@ export declare class AuthController {
     testHkdf(): {
         permissionKey: string;
     };
+    solanaDebug(): {
+        programId: string;
+        wallet: string;
+    };
+    solanaRegisterUser(req: any): Promise<{
+        tx: string;
+        userPda: string;
+        message: string;
+    }>;
 }

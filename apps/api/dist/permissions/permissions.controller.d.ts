@@ -30,6 +30,11 @@ export declare class PermissionsController {
             permissionKey: string;
             permissionKeyHash: string;
         };
+        onChain: {
+            userPda: string;
+            grantTx: string;
+            permissionPda: string;
+        };
     }>;
     revoke(req: Request & {
         user: {
@@ -51,6 +56,10 @@ export declare class PermissionsController {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             revokedAt: Date | null;
+        };
+        onChain: {
+            revokeTx: string;
+            permissionPda: string | null;
         };
     }>;
     getMy(req: Request & {

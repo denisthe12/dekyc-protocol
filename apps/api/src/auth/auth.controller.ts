@@ -12,12 +12,14 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Request } from 'express';
 import { HkdfService } from '../crypto/hkdf.service';
+import { SolanaService } from '../solana/solana.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly hkdfService: HkdfService,
+    private readonly solanaService: SolanaService,
   ) {}
 
   @Post('signup')
@@ -48,4 +50,25 @@ export class AuthController {
       permissionKey: key,
     };
   }
+
+  @Get('solana-debug')
+  solanaDebug() {
+    return {
+      programId: this.solanaService.getProgramId().toBase58(),
+      wallet: this.solanaService.getWalletPubkey().toBase58(),
+    };
+  }
+  
+  @UseGuards(JwtAuthGuard)
+  @Post('solana-register-user')
+  async solanaRegisterUser(@Req() req: any) {
+  const userId: string = req.user.sub;
+
+  const result = await this.solanaService.registerUserOnChain(userId);
+
+  return {
+    message: 'User registered on-chain',
+    ...result,
+  };
+}
 }
