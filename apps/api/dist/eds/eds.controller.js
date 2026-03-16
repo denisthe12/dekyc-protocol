@@ -17,6 +17,8 @@ const common_1 = require("@nestjs/common");
 const eds_service_1 = require("./eds.service");
 const attest_signature_dto_1 = require("./dto/attest-signature.dto");
 const save_analysis_dto_1 = require("./dto/save-analysis.dto");
+const common_2 = require("@nestjs/common");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let EdsController = class EdsController {
     edsService;
     constructor(edsService) {
@@ -32,8 +34,8 @@ let EdsController = class EdsController {
     createChallenge() {
         return this.edsService.createChallenge();
     }
-    attest(body) {
-        return this.edsService.attestSignature(body);
+    attest(body, req) {
+        return this.edsService.attestSignature(body, req.user.sub);
     }
     analyze(body) {
         return this.edsService.saveAnalysis(body);
@@ -53,10 +55,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], EdsController.prototype, "createChallenge", null);
 __decorate([
+    (0, common_2.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('attest'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_2.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [attest_signature_dto_1.AttestSignatureDto]),
+    __metadata("design:paramtypes", [attest_signature_dto_1.AttestSignatureDto, Object]),
     __metadata("design:returntype", void 0)
 ], EdsController.prototype, "attest", null);
 __decorate([

@@ -17,6 +17,10 @@ import { SaveAnalysisDto } from './dto/save-analysis.dto';
 import { analyzeCertificatePem } from './eds-certificate-lab';
 import { Console } from 'console';
 import { extractCertificateIdentity } from './eds-certificate-extractor';
+import { PrismaService } from '../prisma/prisma.service';
+import { UserCertService } from '../user-cert/user-cert.service';
+import { KycProfileService } from '../kyc-profile/kyc-profile.service';
+import { KycVaultService } from '../kyc-vault/kyc-vault.service';
 
 export interface EdsChallengeResponse {
   challengeId: string;
@@ -40,6 +44,13 @@ type NormalizedCmsInput = {
 export class EdsService {
   private readonly challenges = new Map<string, StoredChallenge>();
 
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userCertService: UserCertService,
+    private readonly kycProfileService: KycProfileService,
+    private readonly kycVaultService: KycVaultService,
+  ) {}
+
   createChallenge(): EdsChallengeResponse {
     const challengeId = randomUUID();
     const challengeBytes = randomBytes(32);
@@ -59,7 +70,7 @@ export class EdsService {
     };
   }
 
-  attestSignature(payload: AttestSignatureDto) {
+  async attestSignature(payload: AttestSignatureDto, userId: string) {
     const stored = this.challenges.get(payload.challengeId);
 
     if (!stored) {
@@ -78,6 +89,47 @@ export class EdsService {
     const result = this.extractCertificateInfoFromCms(payload.cmsSignatureBase64);
     const extractedIdentity = extractCertificateIdentity(result.certificateLab);
 
+
+    const savedUserCert = await this.userCertService.saveUserCert({
+      userId: userId,
+      fullName: extractedIdentity.fullName,
+      firstName: extractedIdentity.firstName,
+      lastName: extractedIdentity.lastName,
+      middleName: extractedIdentity.middleName,
+      iin: extractedIdentity.iin,
+      email: extractedIdentity.email,
+      birthDate: extractedIdentity.birthDate,
+      gender: extractedIdentity.gender,
+      birthCentury: extractedIdentity.birthCentury,
+      certificateSerialNumber: extractedIdentity.certificateSerialNumber,
+      certificateFingerprint256: extractedIdentity.certificateFingerprint256,
+      certificateIssuer: extractedIdentity.certificateIssuer,
+      certificateSubject: extractedIdentity.certificateSubject,
+      certificateValidFrom: extractedIdentity.certificateValidFrom,
+      certificateValidTo: extractedIdentity.certificateValidTo,
+    });
+
+    const savedKycProfile = await this.kycProfileService.upsertKycProfile({
+      userId: userId,
+      fullName: extractedIdentity.fullName,
+      firstName: extractedIdentity.firstName,
+      lastName: extractedIdentity.lastName,
+      middleName: extractedIdentity.middleName,
+      iin: extractedIdentity.iin,
+      email: extractedIdentity.email,
+      birthDate: extractedIdentity.birthDate,
+      gender: extractedIdentity.gender,
+      country: 'KZ',
+      source: 'eds_and_derived',
+      status: 'draft',
+    });
+
+    const savedKycVaultEntry = await this.kycVaultService.saveVaultEntry({
+      userId: userId,
+      kycProfileId: savedKycProfile.id,
+      profileJson: savedKycProfile.profileJson,
+    });
+
     return {
       ok: true,
       message: 'CMS signature received and certificate parsed',
@@ -85,6 +137,9 @@ export class EdsService {
       challengeBase64: payload.challengeBase64,
       cmsSignatureLength: payload.cmsSignatureBase64.length,
       parsedCertificate: result.parsedCertificate,
+      savedUserCertId: savedUserCert.id,
+      savedKycProfileId: savedKycProfile.id,
+      savedKycVaultEntryId: savedKycVaultEntry.id,
       cmsDebug: result.cmsDebug,
       receivedAt: new Date().toISOString(),
       extractedIdentity,

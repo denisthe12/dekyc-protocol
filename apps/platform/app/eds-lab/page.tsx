@@ -38,6 +38,7 @@ type AttestResponse = {
     probableIin: string | null;
   };
   certificateLab: any;
+  savedUserCertId: string;
   cmsDebug: {
     normalizedFormat: string;
     detectedKind: string;
@@ -66,6 +67,8 @@ type AttestResponse = {
     rawSubjectFields: Record<string, string>;
     rawIssuerFields: Record<string, string>;
   };
+  savedKycProfileId: string;
+  savedKycVaultEntryId: string;
   
 };
 
@@ -80,6 +83,11 @@ export default function EdsLabPage() {
   const [attestResult, setAttestResult] = useState<AttestResponse | null>(null);
   const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResponse | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [meData, setMeData] = useState<{ id: string; email: string } | null>(null);
 
   const [connectionStatus, setConnectionStatus] = useState<
     'idle' | 'connected' | 'failed'
@@ -114,6 +122,92 @@ export default function EdsLabPage() {
     }
   };
 
+    const signup = async () => {
+    try {
+      setAuthLoading(true);
+      setError(null);
+
+      const response = await fetch('http://localhost:3001/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const rawText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(`Signup failed: ${response.status}. Response: ${rawText}`);
+      }
+
+      const data = JSON.parse(rawText);
+      setAccessToken(data.accessToken);
+      setMeData(data.user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup error');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const login = async () => {
+    try {
+      setAuthLoading(true);
+      setError(null);
+
+      const response = await fetch('http://localhost:3001/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const rawText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(`Login failed: ${response.status}. Response: ${rawText}`);
+      }
+
+      const data = JSON.parse(rawText);
+      setAccessToken(data.accessToken);
+      setMeData(data.user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login error');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const loadMe = async () => {
+    if (!accessToken) {
+      setError('Сначала выполни signup или login.');
+      return;
+    }
+
+    try {
+      setAuthLoading(true);
+      setError(null);
+
+      const response = await fetch('http://localhost:3001/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const rawText = await response.text();
+
+      if (!response.ok) {
+        throw new Error(`Load me failed: ${response.status}. Response: ${rawText}`);
+      }
+
+      const data = JSON.parse(rawText);
+      console.log('loadMe response:', data);
+      setMeData(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Load me error');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const connectNCALayer = async () => {
     try {
       setConnecting(true);
@@ -139,6 +233,11 @@ export default function EdsLabPage() {
       return;
     }
 
+    if (!accessToken) {
+      setError('Сначала выполни signup или login.');
+      return;
+    }
+
     try {
       setSigning(true);
       setError(null);
@@ -160,6 +259,7 @@ export default function EdsLabPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           challengeId: challenge.challengeId,
@@ -247,6 +347,72 @@ export default function EdsLabPage() {
           Лабораторная страница для проверки NCALayer → CMS challenge → backend.
         </p>
       </div>
+
+          <div className="rounded-2xl border p-6 shadow-sm">
+      <h2 className="text-lg font-semibold">Platform Auth</h2>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="rounded-xl border px-3 py-2 text-sm"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="rounded-xl border px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <button
+          onClick={signup}
+          disabled={authLoading}
+          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
+        >
+          {authLoading ? 'Подождите...' : 'Signup'}
+        </button>
+
+        <button
+          onClick={login}
+          disabled={authLoading}
+          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
+        >
+          {authLoading ? 'Подождите...' : 'Login'}
+        </button>
+
+        <button
+          onClick={loadMe}
+          disabled={authLoading || !accessToken}
+          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
+        >
+          {authLoading ? 'Подождите...' : 'Load me'}
+        </button>
+      </div>
+
+      {accessToken && (
+        <div className="mt-4 text-sm">
+          <div className="font-medium">Access token</div>
+          <div className="break-all rounded-lg bg-gray-100 p-2">
+            {accessToken}
+          </div>
+        </div>
+      )}
+
+      {meData && (
+        <div className="mt-4 text-sm">
+          <div className="font-medium">Current user</div>
+          <div className="rounded-lg bg-gray-100 p-2">
+            {meData.email} ({meData.id})
+          </div>
+        </div>
+      )}
+    </div>
 
         <div className="grid gap-4 md:grid-cols-4">
         <button
@@ -520,6 +686,32 @@ export default function EdsLabPage() {
               <div className="font-medium">birthDate</div>
               <div className="rounded-lg bg-gray-100 p-2">
                 {attestResult.extractedIdentity.birthDate ?? 'null'}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-base font-semibold">Database result</h3>
+
+              <div className="mt-3 text-sm">
+                <div>
+                  <div className="font-medium">savedUserCertId</div>
+                  <div className="break-all rounded-lg bg-gray-100 p-2">
+                    {attestResult.savedUserCertId}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <div className="font-medium">savedKycProfileId</div>
+                <div className="break-all rounded-lg bg-gray-100 p-2">
+                  {attestResult.savedKycProfileId}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium">savedKycVaultEntryId</div>
+                <div className="break-all rounded-lg bg-gray-100 p-2">
+                  {attestResult.savedKycVaultEntryId}
+                </div>
               </div>
             </div>
 

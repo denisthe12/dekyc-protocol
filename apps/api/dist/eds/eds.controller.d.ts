@@ -1,6 +1,7 @@
 import { EdsService } from './eds.service';
 import { AttestSignatureDto } from './dto/attest-signature.dto';
 import { SaveAnalysisDto } from './dto/save-analysis.dto';
+import { Request } from 'express';
 export declare class EdsController {
     private readonly edsService;
     constructor(edsService: EdsService);
@@ -10,17 +11,25 @@ export declare class EdsController {
         timestamp: string;
     };
     createChallenge(): import("./eds.service").EdsChallengeResponse;
-    attest(body: AttestSignatureDto): {
+    attest(body: AttestSignatureDto, req: Request & {
+        user: {
+            sub: string;
+            email: string;
+        };
+    }): Promise<{
         ok: boolean;
         message: string;
         challengeId: string;
         challengeBase64: string;
         cmsSignatureLength: number;
         parsedCertificate: import("./eds.types").ParsedCertificateInfo;
+        savedUserCertId: string;
+        savedKycProfileId: string;
+        savedKycVaultEntryId: string;
         cmsDebug: Record<string, string>;
         receivedAt: string;
         extractedIdentity: import("./eds-certificate-extractor").ExtractedCertificateIdentity;
-    };
+    }>;
     analyze(body: SaveAnalysisDto): {
         ok: boolean;
         filePath: string;

@@ -10,11 +10,15 @@ exports.EdsModule = void 0;
 const common_1 = require("@nestjs/common");
 const eds_controller_1 = require("./eds.controller");
 const eds_service_1 = require("./eds.service");
+const user_cert_module_1 = require("../user-cert/user-cert.module");
+const kyc_profile_module_1 = require("../kyc-profile/kyc-profile.module");
+const kyc_vault_module_1 = require("../kyc-vault/kyc-vault.module");
 let EdsModule = class EdsModule {
 };
 exports.EdsModule = EdsModule;
 exports.EdsModule = EdsModule = __decorate([
     (0, common_1.Module)({
+        imports: [user_cert_module_1.UserCertModule, kyc_profile_module_1.KycProfileModule, kyc_vault_module_1.KycVaultModule],
         controllers: [eds_controller_1.EdsController],
         providers: [eds_service_1.EdsService],
     })

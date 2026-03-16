@@ -5,6 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EdsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -16,8 +19,22 @@ const child_process_1 = require("child_process");
 const fs_2 = require("fs");
 const eds_certificate_lab_1 = require("./eds-certificate-lab");
 const eds_certificate_extractor_1 = require("./eds-certificate-extractor");
+const prisma_service_1 = require("../prisma/prisma.service");
+const user_cert_service_1 = require("../user-cert/user-cert.service");
+const kyc_profile_service_1 = require("../kyc-profile/kyc-profile.service");
+const kyc_vault_service_1 = require("../kyc-vault/kyc-vault.service");
 let EdsService = class EdsService {
+    prisma;
+    userCertService;
+    kycProfileService;
+    kycVaultService;
     challenges = new Map();
+    constructor(prisma, userCertService, kycProfileService, kycVaultService) {
+        this.prisma = prisma;
+        this.userCertService = userCertService;
+        this.kycProfileService = kycProfileService;
+        this.kycVaultService = kycVaultService;
+    }
     createChallenge() {
         const challengeId = (0, crypto_1.randomUUID)();
         const challengeBytes = (0, crypto_1.randomBytes)(32);
@@ -34,7 +51,7 @@ let EdsService = class EdsService {
             expiresAt: new Date(expiresAtMs).toISOString(),
         };
     }
-    attestSignature(payload) {
+    async attestSignature(payload, userId) {
         const stored = this.challenges.get(payload.challengeId);
         if (!stored) {
             throw new common_1.BadRequestException('Challenge not found');
@@ -48,6 +65,43 @@ let EdsService = class EdsService {
         }
         const result = this.extractCertificateInfoFromCms(payload.cmsSignatureBase64);
         const extractedIdentity = (0, eds_certificate_extractor_1.extractCertificateIdentity)(result.certificateLab);
+        const savedUserCert = await this.userCertService.saveUserCert({
+            userId: userId,
+            fullName: extractedIdentity.fullName,
+            firstName: extractedIdentity.firstName,
+            lastName: extractedIdentity.lastName,
+            middleName: extractedIdentity.middleName,
+            iin: extractedIdentity.iin,
+            email: extractedIdentity.email,
+            birthDate: extractedIdentity.birthDate,
+            gender: extractedIdentity.gender,
+            birthCentury: extractedIdentity.birthCentury,
+            certificateSerialNumber: extractedIdentity.certificateSerialNumber,
+            certificateFingerprint256: extractedIdentity.certificateFingerprint256,
+            certificateIssuer: extractedIdentity.certificateIssuer,
+            certificateSubject: extractedIdentity.certificateSubject,
+            certificateValidFrom: extractedIdentity.certificateValidFrom,
+            certificateValidTo: extractedIdentity.certificateValidTo,
+        });
+        const savedKycProfile = await this.kycProfileService.upsertKycProfile({
+            userId: userId,
+            fullName: extractedIdentity.fullName,
+            firstName: extractedIdentity.firstName,
+            lastName: extractedIdentity.lastName,
+            middleName: extractedIdentity.middleName,
+            iin: extractedIdentity.iin,
+            email: extractedIdentity.email,
+            birthDate: extractedIdentity.birthDate,
+            gender: extractedIdentity.gender,
+            country: 'KZ',
+            source: 'eds_and_derived',
+            status: 'draft',
+        });
+        const savedKycVaultEntry = await this.kycVaultService.saveVaultEntry({
+            userId: userId,
+            kycProfileId: savedKycProfile.id,
+            profileJson: savedKycProfile.profileJson,
+        });
         return {
             ok: true,
             message: 'CMS signature received and certificate parsed',
@@ -55,6 +109,9 @@ let EdsService = class EdsService {
             challengeBase64: payload.challengeBase64,
             cmsSignatureLength: payload.cmsSignatureBase64.length,
             parsedCertificate: result.parsedCertificate,
+            savedUserCertId: savedUserCert.id,
+            savedKycProfileId: savedKycProfile.id,
+            savedKycVaultEntryId: savedKycVaultEntry.id,
             cmsDebug: result.cmsDebug,
             receivedAt: new Date().toISOString(),
             extractedIdentity,
@@ -364,6 +421,10 @@ let EdsService = class EdsService {
 };
 exports.EdsService = EdsService;
 exports.EdsService = EdsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        user_cert_service_1.UserCertService,
+        kyc_profile_service_1.KycProfileService,
+        kyc_vault_service_1.KycVaultService])
 ], EdsService);
 //# sourceMappingURL=eds.service.js.map

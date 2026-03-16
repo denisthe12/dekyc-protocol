@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: dekyc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dekyc
+      POSTGRES_USER: dekyc
+      POSTGRES_PASSWORD: dekyc_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

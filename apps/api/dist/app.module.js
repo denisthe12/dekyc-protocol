@@ -11,14 +11,29 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const eds_module_1 = require("./eds/eds.module");
+const prisma_module_1 = require("./prisma/prisma.module");
+const user_cert_module_1 = require("./user-cert/user-cert.module");
+const dev_bootstrap_service_1 = require("./dev/dev-bootstrap.service");
+const kyc_profile_module_1 = require("./kyc-profile/kyc-profile.module");
+const crypto_module_1 = require("./crypto/crypto.module");
+const kyc_vault_module_1 = require("./kyc-vault/kyc-vault.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [eds_module_1.EdsModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            crypto_module_1.CryptoModule,
+            auth_module_1.AuthModule,
+            user_cert_module_1.UserCertModule,
+            kyc_profile_module_1.KycProfileModule,
+            kyc_vault_module_1.KycVaultModule,
+            eds_module_1.EdsModule,
+        ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, dev_bootstrap_service_1.DevBootstrapService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

@@ -1,0 +1,140 @@
+{
+  "savedAt": "2026-03-16T00:01:36.659Z",
+  "challengeId": "603634ba-4e2c-494f-886f-b81b48c16569",
+  "parsedCertificate": {
+    "subjectString": "CN=СНИМЩИКОВ ДЕНИС\nSN=СНИМЩИКОВ\nserialNumber=IIN001212550054\nC=KZ\nGN=АНДРЕЕВИЧ",
+    "issuerString": "CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022\nC=KZ",
+    "serialNumberHex": "66A2EFE287A7068EE5FC43E966A3C1BE30E9D42B",
+    "notBefore": "2025-11-27T14:23:33.000Z",
+    "notAfter": "2026-11-27T14:23:33.000Z",
+    "fingerprintSha256": "80c15b0927fbf7f568c34d4d6495c51b86897bbbf7466de79d2613c5ecd4bf05",
+    "subjectCommonName": "СНИМЩИКОВ ДЕНИС",
+    "subjectOrganization": null,
+    "subjectOrgUnit": null,
+    "subjectCountry": "KZ",
+    "probableIin": null
+  },
+  "cmsDebug": {
+    "normalizedFormat": "PEM",
+    "detectedKind": "direct-pem-text",
+    "firstBytesHex": "2d2d2d2d2d424547494e20434d532d2d2d2d2d0d0a4d49494e4e67594a4b6f5a",
+    "firstTextPreview": "-----BEGIN CMS-----\r\nMIINNgYJKoZIhvcNAQcCoIINJzCCDSMCAQExDjAMBggqgw4DCgEDAwUAMAsGCSqG\r\nSIb3DQEHAaCCBFAwggRMMIIDtKADAgECA",
+    "originalLength": "4698",
+    "trimmedLength": "4696"
+  },
+  "mvpFieldMatrix": [
+    {
+      "field": "full_name",
+      "source": "subjectString / CN",
+      "found": true,
+      "value": "СНИМЩИКОВ ДЕНИС",
+      "useInMvp": true,
+      "note": "Основной кандидат на ФИО для MVP"
+    },
+    {
+      "field": "iin",
+      "source": "subjectString regex(12 digits)",
+      "found": false,
+      "value": null,
+      "useInMvp": true,
+      "note": "Использовать только если стабильно извлекается"
+    },
+    {
+      "field": "certificate_fingerprint",
+      "source": "X509 raw cert -> sha256",
+      "found": true,
+      "value": "80c15b0927fbf7f568c34d4d6495c51b86897bbbf7466de79d2613c5ecd4bf05",
+      "useInMvp": true,
+      "note": "Надёжный технический идентификатор сертификата"
+    },
+    {
+      "field": "certificate_serial",
+      "source": "X509 serial",
+      "found": true,
+      "value": "66A2EFE287A7068EE5FC43E966A3C1BE30E9D42B",
+      "useInMvp": true,
+      "note": "Подходит для UserCert и аудита"
+    },
+    {
+      "field": "certificate_valid_from",
+      "source": "X509 validFrom",
+      "found": true,
+      "value": "2025-11-27T14:23:33.000Z",
+      "useInMvp": true,
+      "note": "Полезно для профиля и валидации сертификата"
+    },
+    {
+      "field": "certificate_valid_to",
+      "source": "X509 validTo",
+      "found": true,
+      "value": "2026-11-27T14:23:33.000Z",
+      "useInMvp": true,
+      "note": "Полезно для проверки срока действия"
+    },
+    {
+      "field": "issuer",
+      "source": "X509 issuer",
+      "found": true,
+      "value": "CN=ҰЛТТЫҚ КУӘЛАНДЫРУШЫ ОРТАЛЫҚ (GOST) 2022\nC=KZ",
+      "useInMvp": true,
+      "note": "Важно для аудита и показа источника сертификата"
+    },
+    {
+      "field": "organization",
+      "source": "subjectString / O",
+      "found": false,
+      "value": null,
+      "useInMvp": false,
+      "note": "Скорее вспомогательное поле"
+    },
+    {
+      "field": "org_unit",
+      "source": "subjectString / OU",
+      "found": false,
+      "value": null,
+      "useInMvp": false,
+      "note": "Скорее вспомогательное поле"
+    },
+    {
+      "field": "country",
+      "source": "subjectString / C",
+      "found": true,
+      "value": "KZ",
+      "useInMvp": false,
+      "note": "Не критично для MVP KYC"
+    },
+    {
+      "field": "birth_date",
+      "source": "not found from current cert parser",
+      "found": false,
+      "value": null,
+      "useInMvp": false,
+      "note": "Нужен manual/mock, если не извлекается отдельно"
+    },
+    {
+      "field": "residential_address",
+      "source": "not found from current cert parser",
+      "found": false,
+      "value": null,
+      "useInMvp": false,
+      "note": "Нужен manual/mock, если не извлекается отдельно"
+    }
+  ],
+  "conclusion": {
+    "realFieldsForMvp": [
+      "full_name",
+      "certificate_fingerprint",
+      "certificate_serial",
+      "certificate_valid_from",
+      "certificate_valid_to",
+      "issuer"
+    ],
+    "missingFieldsForManualOrMock": [
+      "iin",
+      "organization",
+      "org_unit",
+      "birth_date",
+      "residential_address"
+    ]
+  }
+}
