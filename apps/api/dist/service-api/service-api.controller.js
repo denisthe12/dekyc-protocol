@@ -1,0 +1,47 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ServiceApiController = void 0;
+const common_1 = require("@nestjs/common");
+const service_api_service_1 = require("./service-api.service");
+const service_credentials_guard_1 = require("./service-credentials.guard");
+const service_kyc_request_dto_1 = require("./dto/service-kyc-request.dto");
+let ServiceApiController = class ServiceApiController {
+    serviceApiService;
+    constructor(serviceApiService) {
+        this.serviceApiService = serviceApiService;
+    }
+    requestKyc(body, req) {
+        return this.serviceApiService.requestKyc({
+            serviceId: req.serviceAuth.serviceId,
+            userId: body.userId,
+            requestedClaims: body.requestedClaims,
+        });
+    }
+};
+exports.ServiceApiController = ServiceApiController;
+__decorate([
+    (0, common_1.UseGuards)(service_credentials_guard_1.ServiceCredentialsGuard),
+    (0, common_1.Post)('kyc-request'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [service_kyc_request_dto_1.ServiceKycRequestDto, Object]),
+    __metadata("design:returntype", void 0)
+], ServiceApiController.prototype, "requestKyc", null);
+exports.ServiceApiController = ServiceApiController = __decorate([
+    (0, common_1.Controller)('service-api'),
+    __metadata("design:paramtypes", [service_api_service_1.ServiceApiService])
+], ServiceApiController);
+//# sourceMappingURL=service-api.controller.js.map

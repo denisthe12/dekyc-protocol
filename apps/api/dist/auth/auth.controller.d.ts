@@ -2,9 +2,11 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request } from 'express';
+import { HkdfService } from '../crypto/hkdf.service';
 export declare class AuthController {
     private readonly authService;
-    constructor(authService: AuthService);
+    private readonly hkdfService;
+    constructor(authService: AuthService, hkdfService: HkdfService);
     signup(body: SignupDto): Promise<{
         accessToken: string;
         user: {
@@ -31,4 +33,7 @@ export declare class AuthController {
         updatedAt: Date;
         emailVerified: boolean;
     }>;
+    testHkdf(): {
+        permissionKey: string;
+    };
 }

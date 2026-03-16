@@ -1,0 +1,173 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PermissionsService = void 0;
+const common_1 = require("@nestjs/common");
+const prisma_service_1 = require("../prisma/prisma.service");
+const hkdf_service_1 = require("../crypto/hkdf.service");
+const crypto_1 = require("crypto");
+let PermissionsService = class PermissionsService {
+    prisma;
+    hkdfService;
+    constructor(prisma, hkdfService) {
+        this.prisma = prisma;
+        this.hkdfService = hkdfService;
+    }
+    async grantPermission(userId, dto) {
+        const service = await this.prisma.service.findUnique({
+            where: { id: dto.serviceId },
+        });
+        if (!service) {
+            throw new common_1.NotFoundException('Service not found');
+        }
+        const latestKycProfile = await this.prisma.kycProfile.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (!latestKycProfile) {
+            throw new common_1.BadRequestException('KYC profile not found');
+        }
+        const latestVault = await this.prisma.kycVaultEntry.findFirst({
+            where: {
+                userId,
+                kycProfileId: latestKycProfile.id,
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+        if (!latestVault) {
+            throw new common_1.BadRequestException('KYC vault entry not found');
+        }
+        const existing = await this.prisma.permission.findUnique({
+            where: {
+                userId_serviceId: {
+                    userId,
+                    serviceId: dto.serviceId,
+                },
+            },
+        });
+        if (existing && existing.status === 'ACTIVE') {
+            throw new common_1.BadRequestException('Active permission already exists for this service');
+        }
+        let permission = existing;
+        if (permission) {
+            permission = await this.prisma.permission.update({
+                where: { id: permission.id },
+                data: {
+                    status: 'ACTIVE',
+                    version: permission.version + 1,
+                    revokedAt: null,
+                    requiredTokenAmount: dto.requiredTokenAmount ?? null,
+                    kycHashSnapshot: latestVault.kycHash,
+                    allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+                },
+            });
+        }
+        else {
+            permission = await this.prisma.permission.create({
+                data: {
+                    userId,
+                    serviceId: dto.serviceId,
+                    status: 'ACTIVE',
+                    version: 1,
+                    requiredTokenAmount: dto.requiredTokenAmount ?? null,
+                    kycHashSnapshot: latestVault.kycHash,
+                    allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+                },
+            });
+        }
+        const permissionKey = this.hkdfService.derivePermissionKey({
+            permissionId: permission.id,
+            serviceId: permission.serviceId,
+            userId,
+            version: permission.version,
+        });
+        const permissionKeyHash = (0, crypto_1.createHash)('sha256')
+            .update(permissionKey)
+            .digest('hex');
+        const updatedPermission = await this.prisma.permission.update({
+            where: { id: permission.id },
+            data: {
+                permissionKeyHash,
+            },
+        });
+        await this.prisma.accessLog.create({
+            data: {
+                permissionId: updatedPermission.id,
+                serviceId: updatedPermission.serviceId,
+                decision: 'allowed',
+                reason: 'permission_granted',
+            },
+        });
+        return {
+            permission: updatedPermission,
+            derived: {
+                permissionKey,
+                permissionKeyHash,
+            },
+        };
+    }
+    async revokePermission(userId, dto) {
+        const permission = await this.prisma.permission.findUnique({
+            where: { id: dto.permissionId },
+        });
+        if (!permission) {
+            throw new common_1.NotFoundException('Permission not found');
+        }
+        if (permission.userId !== userId) {
+            throw new common_1.BadRequestException('Permission does not belong to current user');
+        }
+        if (permission.status === 'REVOKED') {
+            throw new common_1.BadRequestException('Permission already revoked');
+        }
+        const updated = await this.prisma.permission.update({
+            where: { id: permission.id },
+            data: {
+                status: 'REVOKED',
+                revokedAt: new Date(),
+            },
+        });
+        await this.prisma.accessLog.create({
+            data: {
+                permissionId: updated.id,
+                serviceId: updated.serviceId,
+                decision: 'denied',
+                reason: 'permission_revoked',
+            },
+        });
+        return {
+            permission: updated,
+        };
+    }
+    async getMyPermissions(userId) {
+        return this.prisma.permission.findMany({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                service: {
+                    select: {
+                        id: true,
+                        name: true,
+                        description: true,
+                        clientId: true,
+                        status: true,
+                    },
+                },
+            },
+        });
+    }
+};
+exports.PermissionsService = PermissionsService;
+exports.PermissionsService = PermissionsService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        hkdf_service_1.HkdfService])
+], PermissionsService);
+//# sourceMappingURL=permissions.service.js.map

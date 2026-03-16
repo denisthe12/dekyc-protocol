@@ -18,6 +18,9 @@ const kyc_profile_module_1 = require("./kyc-profile/kyc-profile.module");
 const crypto_module_1 = require("./crypto/crypto.module");
 const kyc_vault_module_1 = require("./kyc-vault/kyc-vault.module");
 const auth_module_1 = require("./auth/auth.module");
+const services_module_1 = require("./services/services.module");
+const permissions_module_1 = require("./permissions/permissions.module");
+const service_api_module_1 = require("./service-api/service-api.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +34,9 @@ exports.AppModule = AppModule = __decorate([
             kyc_profile_module_1.KycProfileModule,
             kyc_vault_module_1.KycVaultModule,
             eds_module_1.EdsModule,
+            permissions_module_1.PermissionsModule,
+            services_module_1.ServicesModule,
+            service_api_module_1.ServiceApiModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, dev_bootstrap_service_1.DevBootstrapService],

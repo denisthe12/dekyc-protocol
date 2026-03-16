@@ -9,14 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CryptoModule = void 0;
 const common_1 = require("@nestjs/common");
 const crypto_service_1 = require("./crypto.service");
+const hkdf_service_1 = require("./hkdf.service");
 let CryptoModule = class CryptoModule {
 };
 exports.CryptoModule = CryptoModule;
 exports.CryptoModule = CryptoModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
-        providers: [crypto_service_1.CryptoService],
-        exports: [crypto_service_1.CryptoService],
+        providers: [crypto_service_1.CryptoService, hkdf_service_1.HkdfService],
+        exports: [crypto_service_1.CryptoService, hkdf_service_1.HkdfService],
     })
 ], CryptoModule);
 //# sourceMappingURL=crypto.module.js.map

@@ -90,48 +90,61 @@ model KycVaultEntry {
 }
 
 model Service {
-  id               String   @id @default(uuid())
-  name             String
-  clientId         String   @unique
-  clientSecretHash String
+  id                 String       @id @default(cuid())
+  name               String
+  clientId           String       @unique
+  clientSecretHash   String
+  description        String?
+  status             String       @default("active")
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
-  createdAt        DateTime @default(now())
-
-  permissions      Permission[]
-  accessLogs       AccessLog[]
+  permissions        Permission[]
+  accessLogs         AccessLog[]
 }
 
 model Permission {
-  id            String   @id @default(uuid())
+  id                    String       @id @default(cuid())
+  userId                String
+  serviceId             String
 
-  userId        String
-  serviceId     String
+  status                String
+  version               Int          @default(1)
 
-  status        String
-  requiredTokenAmount Int?
+  requiredTokenAmount   Int?
+  onchainPermissionPda  String?
+  permissionKeyHash     String?
+  kycHashSnapshot       String?
+  allowedClaims         Json?
 
-  onchainPermissionPda String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  revokedAt             DateTime?
 
-  createdAt     DateTime @default(now())
-  revokedAt     DateTime?
+  user                  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service               Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-  user          User     @relation(fields: [userId], references: [id])
-  service       Service  @relation(fields: [serviceId], references: [id])
+  accessLogs            AccessLog[]
 
-  accessLogs    AccessLog[]
+  @@index([userId])
+  @@index([serviceId])
+  @@index([status])
+  @@unique([userId, serviceId])
 }
 
 model AccessLog {
-  id           String   @id @default(uuid())
+  id            String      @id @default(cuid())
+  permissionId  String
+  serviceId     String
 
-  permissionId String
-  serviceId    String
+  decision      String
+  reason        String?
+  createdAt     DateTime    @default(now())
 
-  decision     String
-  reason       String?
+  permission    Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  service       Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now())
-
-  permission   Permission @relation(fields: [permissionId], references: [id])
-  service      Service    @relation(fields: [serviceId], references: [id])
+  @@index([permissionId])
+  @@index([serviceId])
+  @@index([createdAt])
 }

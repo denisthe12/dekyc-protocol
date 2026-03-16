@@ -9,6 +9,9 @@ import { KycProfileModule } from './kyc-profile/kyc-profile.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { KycVaultModule } from './kyc-vault/kyc-vault.module';
 import { AuthModule } from './auth/auth.module';
+import { ServicesModule } from './services/services.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { ServiceApiModule } from './service-api/service-api.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { AuthModule } from './auth/auth.module';
     KycProfileModule,
     KycVaultModule,
     EdsModule,
+    PermissionsModule,
+    ServicesModule,
+    ServiceApiModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],
