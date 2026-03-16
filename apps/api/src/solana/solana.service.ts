@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { createHash } from 'crypto';
 import { getRequiredEnv } from '../config/env';
 import { existsSync } from 'fs';
+import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
 
 type ProgramAccountNamespace = {
   registerUser: (
@@ -18,6 +19,9 @@ type ProgramAccountNamespace = {
     serviceIdHash: number[],
     kycHash: number[],
     requiredAmount: BN,
+    mint: PublicKey,
+    tokenAccount: PublicKey,
+    tokenProgram: PublicKey,
   ) => {
     accounts: (args: Record<string, PublicKey>) => {
       rpc: () => Promise<string>;
@@ -127,6 +131,8 @@ export class SolanaService {
     serviceId: string;
     kycHash: string;
     requiredAmount: number;
+    mint: string;
+    tokenAccount: string;
   }) {
     if (!this.program) {
       throw new Error('Program IDL is not loaded');
@@ -139,11 +145,17 @@ export class SolanaService {
     const kycHash32 = this.hashTo32Bytes(params.kycHash);
     const [permissionPda] = this.derivePermissionPda(userPda, serviceIdHash);
 
+    const mintPubkey = new PublicKey(params.mint);
+    const tokenAccountPubkey = new PublicKey(params.tokenAccount);
+
     const tx = await this.program.methods
       .grantPermission(
         Array.from(serviceIdHash),
         Array.from(kycHash32),
         new BN(params.requiredAmount),
+        mintPubkey,
+        tokenAccountPubkey,
+        TOKEN_2022_PROGRAM_ID,
       )
       .accounts({
         authority,
@@ -157,6 +169,9 @@ export class SolanaService {
       tx,
       userPda: userPda.toBase58(),
       permissionPda: permissionPda.toBase58(),
+      mint: mintPubkey.toBase58(),
+      tokenAccount: tokenAccountPubkey.toBase58(),
+      tokenProgram: TOKEN_2022_PROGRAM_ID.toBase58(),
     };
   }
 

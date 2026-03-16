@@ -33,6 +33,9 @@ pub fn grant_permission(
     service_id_hash: [u8; 32],
     kyc_hash: [u8; 32],
     required_amount: u64,
+    mint: Pubkey,
+    token_account: Pubkey,
+    token_program: Pubkey,
 ) -> Result<()> {
     let permission = &mut ctx.accounts.permission_pda;
 
@@ -40,6 +43,9 @@ pub fn grant_permission(
     permission.service_id_hash = service_id_hash;
     permission.kyc_hash = kyc_hash;
     permission.required_amount = required_amount;
+    permission.mint = mint;
+    permission.token_account = token_account;
+    permission.token_program = token_program;
     permission.state = PermissionState::Active;
     permission.bump = ctx.bumps.permission_pda;
     permission.created_at = Clock::get()?.unix_timestamp;

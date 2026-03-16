@@ -1,5 +1,5 @@
 {
-  "address": "AtVhWaetjy4n2X7v68DnjFmkWdoRhNGqcfvtoBJJMd1Z",
+  "address": "2hSnMJEbng1ZzW4NKQx2YmTxBpWaUf145ZU6bcZ85hAA",
   "metadata": {
     "name": "permission_protocol",
     "version": "0.1.0",
@@ -106,6 +106,18 @@
         {
           "name": "required_amount",
           "type": "u64"
+        },
+        {
+          "name": "mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "token_account",
+          "type": "pubkey"
+        },
+        {
+          "name": "token_program",
+          "type": "pubkey"
         }
       ]
     },
@@ -280,6 +292,18 @@
           {
             "name": "required_amount",
             "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_program",
+            "type": "pubkey"
           },
           {
             "name": "state",

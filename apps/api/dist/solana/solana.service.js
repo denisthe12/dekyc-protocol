@@ -17,6 +17,7 @@ const fs_1 = require("fs");
 const crypto_1 = require("crypto");
 const env_1 = require("../config/env");
 const fs_2 = require("fs");
+const spl_token_1 = require("@solana/spl-token");
 let SolanaService = class SolanaService {
     connection;
     walletKeypair;
@@ -89,8 +90,10 @@ let SolanaService = class SolanaService {
         const serviceIdHash = this.hashTo32Bytes(params.serviceId);
         const kycHash32 = this.hashTo32Bytes(params.kycHash);
         const [permissionPda] = this.derivePermissionPda(userPda, serviceIdHash);
+        const mintPubkey = new web3_js_1.PublicKey(params.mint);
+        const tokenAccountPubkey = new web3_js_1.PublicKey(params.tokenAccount);
         const tx = await this.program.methods
-            .grantPermission(Array.from(serviceIdHash), Array.from(kycHash32), new anchor_1.BN(params.requiredAmount))
+            .grantPermission(Array.from(serviceIdHash), Array.from(kycHash32), new anchor_1.BN(params.requiredAmount), mintPubkey, tokenAccountPubkey, spl_token_1.TOKEN_2022_PROGRAM_ID)
             .accounts({
             authority,
             userPda,
@@ -102,6 +105,9 @@ let SolanaService = class SolanaService {
             tx,
             userPda: userPda.toBase58(),
             permissionPda: permissionPda.toBase58(),
+            mint: mintPubkey.toBase58(),
+            tokenAccount: tokenAccountPubkey.toBase58(),
+            tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID.toBase58(),
         };
     }
     async revokePermissionOnChain(serviceId) {

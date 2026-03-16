@@ -15,6 +15,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const hkdf_service_1 = require("../crypto/hkdf.service");
 const crypto_1 = require("crypto");
 const solana_service_1 = require("../solana/solana.service");
+const web3_js_1 = require("@solana/web3.js");
 let PermissionsService = class PermissionsService {
     prisma;
     hkdfService;
@@ -102,16 +103,23 @@ let PermissionsService = class PermissionsService {
                 permissionKeyHash,
             },
         });
+        const mintKeypair = web3_js_1.Keypair.generate();
+        const tokenAccountKeypair = web3_js_1.Keypair.generate();
         const onChainGrant = await this.solanaService.grantPermissionOnChain({
             userId,
             serviceId: permission.serviceId,
             kycHash: latestVault.kycHash,
             requiredAmount: dto.requiredTokenAmount ?? 0,
+            mint: mintKeypair.publicKey.toBase58(),
+            tokenAccount: tokenAccountKeypair.publicKey.toBase58(),
         });
         const syncedPermission = await this.prisma.permission.update({
             where: { id: updatedPermission.id },
             data: {
                 onchainPermissionPda: onChainGrant.permissionPda,
+                mintAddress: onChainGrant.mint,
+                tokenAccountAddress: onChainGrant.tokenAccount,
+                tokenProgram: onChainGrant.tokenProgram,
             },
         });
         await this.prisma.accessLog.create({

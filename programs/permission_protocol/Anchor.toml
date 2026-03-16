@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-permission_protocol = "AtVhWaetjy4n2X7v68DnjFmkWdoRhNGqcfvtoBJJMd1Z"
+permission_protocol = "2hSnMJEbng1ZzW4NKQx2YmTxBpWaUf145ZU6bcZ85hAA"
 
 [registry]
 url = "https://api.apr.dev"

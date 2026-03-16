@@ -5,6 +5,7 @@ import { RevokePermissionDto } from './dto/revoke-permission.dto';
 import { HkdfService } from '../crypto/hkdf.service';
 import { createHash } from 'crypto';
 import { SolanaService } from '../solana/solana.service';
+import { Keypair } from '@solana/web3.js';
 
 @Injectable()
 export class PermissionsService {
@@ -105,17 +106,25 @@ export class PermissionsService {
       },
     });
 
+    const mintKeypair = Keypair.generate();
+    const tokenAccountKeypair = Keypair.generate();
+
     const onChainGrant = await this.solanaService.grantPermissionOnChain({
       userId,
       serviceId: permission.serviceId,
       kycHash: latestVault.kycHash,
       requiredAmount: dto.requiredTokenAmount ?? 0,
+      mint: mintKeypair.publicKey.toBase58(),
+      tokenAccount: tokenAccountKeypair.publicKey.toBase58(),
     });
 
     const syncedPermission = await this.prisma.permission.update({
       where: { id: updatedPermission.id },
       data: {
         onchainPermissionPda: onChainGrant.permissionPda,
+        mintAddress: onChainGrant.mint,
+        tokenAccountAddress: onChainGrant.tokenAccount,
+        tokenProgram: onChainGrant.tokenProgram,
       },
     });
 

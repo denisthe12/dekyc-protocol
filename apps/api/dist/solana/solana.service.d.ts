@@ -22,10 +22,15 @@ export declare class SolanaService {
         serviceId: string;
         kycHash: string;
         requiredAmount: number;
+        mint: string;
+        tokenAccount: string;
     }): Promise<{
         tx: string;
         userPda: string;
         permissionPda: string;
+        mint: string;
+        tokenAccount: string;
+        tokenProgram: string;
     }>;
     revokePermissionOnChain(serviceId: string): Promise<{
         tx: string;

@@ -7,7 +7,7 @@ pub mod state;
 
 use instructions::*;
 
-declare_id!("AtVhWaetjy4n2X7v68DnjFmkWdoRhNGqcfvtoBJJMd1Z");
+declare_id!("2hSnMJEbng1ZzW4NKQx2YmTxBpWaUf145ZU6bcZ85hAA");
 
 #[program]
 pub mod permission_protocol {
@@ -22,8 +22,19 @@ pub mod permission_protocol {
         service_id_hash: [u8; 32],
         kyc_hash: [u8; 32],
         required_amount: u64,
+        mint: Pubkey,
+        token_account: Pubkey,
+        token_program: Pubkey,
     ) -> Result<()> {
-        instructions::grant_permission(ctx, service_id_hash, kyc_hash, required_amount)
+        instructions::grant_permission(
+            ctx,
+            service_id_hash,
+            kyc_hash,
+            required_amount,
+            mint,
+            token_account,
+            token_program,
+        )
     }
 
     pub fn revoke_permission(ctx: Context<RevokePermission>) -> Result<()> {

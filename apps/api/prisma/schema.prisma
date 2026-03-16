@@ -117,6 +117,10 @@ model Permission {
   kycHashSnapshot       String?
   allowedClaims         Json?
 
+  mintAddress           String?
+  tokenAccountAddress   String?
+  tokenProgram          String?
+
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
   revokedAt             DateTime?

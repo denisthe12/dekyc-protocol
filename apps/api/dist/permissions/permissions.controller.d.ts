@@ -24,6 +24,9 @@ export declare class PermissionsController {
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
             revokedAt: Date | null;
         };
         derived: {
@@ -55,6 +58,9 @@ export declare class PermissionsController {
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
             revokedAt: Date | null;
         };
         onChain: {
@@ -88,6 +94,9 @@ export declare class PermissionsController {
         permissionKeyHash: string | null;
         kycHashSnapshot: string | null;
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+        mintAddress: string | null;
+        tokenAccountAddress: string | null;
+        tokenProgram: string | null;
         revokedAt: Date | null;
     })[]>;
 }
