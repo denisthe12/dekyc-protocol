@@ -18,14 +18,17 @@ const solana_service_1 = require("../solana/solana.service");
 const web3_js_1 = require("@solana/web3.js");
 const permission_scopes_1 = require("./permission-scopes");
 const permission_scope_hash_1 = require("./permission-scope-hash");
+const permission_scope_grants_service_1 = require("../permission-scope-grants/permission-scope-grants.service");
 let PermissionsService = class PermissionsService {
     prisma;
     hkdfService;
     solanaService;
-    constructor(prisma, hkdfService, solanaService) {
+    permissionScopeGrantsService;
+    constructor(prisma, hkdfService, solanaService, permissionScopeGrantsService) {
         this.prisma = prisma;
         this.hkdfService = hkdfService;
         this.solanaService = solanaService;
+        this.permissionScopeGrantsService = permissionScopeGrantsService;
     }
     async grantPermission(userId, dto) {
         const service = await this.prisma.service.findUnique({
@@ -132,6 +135,13 @@ let PermissionsService = class PermissionsService {
                 tokenProgram: onChainGrant.tokenProgram,
             },
         });
+        const scopeGrants = await this.permissionScopeGrantsService.replaceScopeGrants({
+            permissionId: syncedPermission.id,
+            serviceId: syncedPermission.serviceId,
+            scopes: allowedScopes,
+            requiredAmount: dto.requiredTokenAmount ?? 1,
+            tokenProgram: onChainGrant.tokenProgram,
+        });
         await this.prisma.accessLog.create({
             data: {
                 permissionId: updatedPermission.id,
@@ -142,6 +152,7 @@ let PermissionsService = class PermissionsService {
         });
         return {
             permission: syncedPermission,
+            scopeGrants,
             derived: {
                 permissionKey,
                 permissionKeyHash,
@@ -242,6 +253,7 @@ exports.PermissionsService = PermissionsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         hkdf_service_1.HkdfService,
-        solana_service_1.SolanaService])
+        solana_service_1.SolanaService,
+        permission_scope_grants_service_1.PermissionScopeGrantsService])
 ], PermissionsService);
 //# sourceMappingURL=permissions.service.js.map

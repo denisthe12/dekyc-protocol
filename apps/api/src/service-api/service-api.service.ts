@@ -48,6 +48,16 @@ export class ServiceApiService {
       };
     }
 
+    const activeScopeGrants = await this.prisma.permissionScopeGrant.findMany({
+      where: {
+        permissionId: permission.id,
+        revokedAt: null,
+      },
+      orderBy: {
+        scope: 'asc',
+      },
+    });
+
     const profile = await this.prisma.kycProfile.findFirst({
       where: {
         userId: input.userId,
@@ -107,6 +117,13 @@ export class ServiceApiService {
       claims: scoped.claims,
       grantedClaims: scoped.grantedClaims,
       grantedScopes: scoped.grantedScopes,
+      scopeGrantRefs: activeScopeGrants.map((row) => ({
+        scope: row.scope,
+        mintAddress: row.mintAddress,
+        tokenAccountAddress: row.tokenAccountAddress,
+        requiredAmount: row.requiredAmount,
+        balanceCheckMode: row.balanceCheckMode,
+      })),
       policy: {
         allowedClaims,
         requestedClaims: input.requestedClaims ?? allowedClaims,

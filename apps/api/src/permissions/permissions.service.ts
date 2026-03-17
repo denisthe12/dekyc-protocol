@@ -8,6 +8,7 @@ import { SolanaService } from '../solana/solana.service';
 import { Keypair } from '@solana/web3.js';
 import { CLAIM_TO_SCOPE } from './permission-scopes';
 import { computeScopesHash } from './permission-scope-hash';
+import { PermissionScopeGrantsService } from '../permission-scope-grants/permission-scope-grants.service';
 
 @Injectable()
 export class PermissionsService {
@@ -15,6 +16,7 @@ export class PermissionsService {
     private readonly prisma: PrismaService,
     private readonly hkdfService: HkdfService,
     private readonly solanaService: SolanaService,
+    private readonly permissionScopeGrantsService: PermissionScopeGrantsService,
   ) {}
 
   async grantPermission(userId: string, dto: GrantPermissionDto) {
@@ -141,6 +143,14 @@ export class PermissionsService {
       },
     });
 
+    const scopeGrants = await this.permissionScopeGrantsService.replaceScopeGrants({
+      permissionId: syncedPermission.id,
+      serviceId: syncedPermission.serviceId,
+      scopes: allowedScopes,
+      requiredAmount: dto.requiredTokenAmount ?? 1,
+      tokenProgram: onChainGrant.tokenProgram,
+    });
+
     await this.prisma.accessLog.create({
       data: {
         permissionId: updatedPermission.id,
@@ -152,6 +162,7 @@ export class PermissionsService {
 
     return {
       permission: syncedPermission,
+      scopeGrants,
       derived: {
         permissionKey,
         permissionKeyHash,

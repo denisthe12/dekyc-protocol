@@ -16,6 +16,7 @@ export declare class ServiceApiController {
         claims: null;
         grantedClaims?: undefined;
         grantedScopes?: undefined;
+        scopeGrantRefs?: undefined;
         policy?: undefined;
     } | {
         allowed: boolean;
@@ -23,6 +24,13 @@ export declare class ServiceApiController {
         claims: Record<string, unknown>;
         grantedClaims: string[];
         grantedScopes: ("kyc.full_name" | "kyc.email" | "kyc.iin" | "kyc.birth_date" | "kyc.gender" | "kyc.country" | "kyc.verified" | "kyc.age_18_plus")[];
+        scopeGrantRefs: {
+            scope: string;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            requiredAmount: number;
+            balanceCheckMode: string;
+        }[];
         policy: {
             allowedClaims: string[];
             requestedClaims: string[];

@@ -13,6 +13,7 @@ import { ServicesModule } from './services/services.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ServiceApiModule } from './service-api/service-api.module';
 import { SolanaModule } from './solana/solana.module';
+import { PermissionScopeGrantsModule } from './permission-scope-grants/permission-scope-grants.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SolanaModule } from './solana/solana.module';
     ServicesModule,
     ServiceApiModule,
     SolanaModule,
+    PermissionScopeGrantsModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],

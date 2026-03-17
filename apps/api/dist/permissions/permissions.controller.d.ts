@@ -18,6 +18,10 @@ export declare class PermissionsController {
             updatedAt: Date;
             status: string;
             serviceId: string;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
+            revokedAt: Date | null;
             version: number;
             requiredTokenAmount: number | null;
             onchainPermissionPda: string | null;
@@ -25,11 +29,21 @@ export declare class PermissionsController {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
+        };
+        scopeGrants: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            permissionId: string;
+            serviceId: string;
+            scope: string;
+            requiredAmount: number;
             mintAddress: string | null;
             tokenAccountAddress: string | null;
             tokenProgram: string | null;
+            balanceCheckMode: string;
             revokedAt: Date | null;
-        };
+        }[];
         derived: {
             permissionKey: string;
             permissionKeyHash: string;
@@ -53,6 +67,10 @@ export declare class PermissionsController {
             updatedAt: Date;
             status: string;
             serviceId: string;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
+            revokedAt: Date | null;
             version: number;
             requiredTokenAmount: number | null;
             onchainPermissionPda: string | null;
@@ -60,10 +78,6 @@ export declare class PermissionsController {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
-            mintAddress: string | null;
-            tokenAccountAddress: string | null;
-            tokenProgram: string | null;
-            revokedAt: Date | null;
         };
         onChain: {
             revokeTx: string;
@@ -90,6 +104,10 @@ export declare class PermissionsController {
         updatedAt: Date;
         status: string;
         serviceId: string;
+        mintAddress: string | null;
+        tokenAccountAddress: string | null;
+        tokenProgram: string | null;
+        revokedAt: Date | null;
         version: number;
         requiredTokenAmount: number | null;
         onchainPermissionPda: string | null;
@@ -97,9 +115,5 @@ export declare class PermissionsController {
         kycHashSnapshot: string | null;
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
         scopesHash: string | null;
-        mintAddress: string | null;
-        tokenAccountAddress: string | null;
-        tokenProgram: string | null;
-        revokedAt: Date | null;
     })[]>;
 }

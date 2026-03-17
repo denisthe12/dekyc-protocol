@@ -3,11 +3,13 @@ import { GrantPermissionDto } from './dto/grant-permission.dto';
 import { RevokePermissionDto } from './dto/revoke-permission.dto';
 import { HkdfService } from '../crypto/hkdf.service';
 import { SolanaService } from '../solana/solana.service';
+import { PermissionScopeGrantsService } from '../permission-scope-grants/permission-scope-grants.service';
 export declare class PermissionsService {
     private readonly prisma;
     private readonly hkdfService;
     private readonly solanaService;
-    constructor(prisma: PrismaService, hkdfService: HkdfService, solanaService: SolanaService);
+    private readonly permissionScopeGrantsService;
+    constructor(prisma: PrismaService, hkdfService: HkdfService, solanaService: SolanaService, permissionScopeGrantsService: PermissionScopeGrantsService);
     grantPermission(userId: string, dto: GrantPermissionDto): Promise<{
         permission: {
             id: string;
@@ -16,6 +18,10 @@ export declare class PermissionsService {
             updatedAt: Date;
             status: string;
             serviceId: string;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
+            revokedAt: Date | null;
             version: number;
             requiredTokenAmount: number | null;
             onchainPermissionPda: string | null;
@@ -23,11 +29,21 @@ export declare class PermissionsService {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
+        };
+        scopeGrants: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            permissionId: string;
+            serviceId: string;
+            scope: string;
+            requiredAmount: number;
             mintAddress: string | null;
             tokenAccountAddress: string | null;
             tokenProgram: string | null;
+            balanceCheckMode: string;
             revokedAt: Date | null;
-        };
+        }[];
         derived: {
             permissionKey: string;
             permissionKeyHash: string;
@@ -46,6 +62,10 @@ export declare class PermissionsService {
             updatedAt: Date;
             status: string;
             serviceId: string;
+            mintAddress: string | null;
+            tokenAccountAddress: string | null;
+            tokenProgram: string | null;
+            revokedAt: Date | null;
             version: number;
             requiredTokenAmount: number | null;
             onchainPermissionPda: string | null;
@@ -53,10 +73,6 @@ export declare class PermissionsService {
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
-            mintAddress: string | null;
-            tokenAccountAddress: string | null;
-            tokenProgram: string | null;
-            revokedAt: Date | null;
         };
         onChain: {
             revokeTx: string;
@@ -78,6 +94,10 @@ export declare class PermissionsService {
         updatedAt: Date;
         status: string;
         serviceId: string;
+        mintAddress: string | null;
+        tokenAccountAddress: string | null;
+        tokenProgram: string | null;
+        revokedAt: Date | null;
         version: number;
         requiredTokenAmount: number | null;
         onchainPermissionPda: string | null;
@@ -85,10 +105,6 @@ export declare class PermissionsService {
         kycHashSnapshot: string | null;
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
         scopesHash: string | null;
-        mintAddress: string | null;
-        tokenAccountAddress: string | null;
-        tokenProgram: string | null;
-        revokedAt: Date | null;
     })[]>;
     private ensureUserRegisteredOnChain;
 }

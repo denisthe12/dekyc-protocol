@@ -101,6 +101,7 @@ model Service {
 
   permissions        Permission[]
   accessLogs         AccessLog[]
+  permissionScopeGrants PermissionScopeGrant[]
 }
 
 model Permission {
@@ -130,6 +131,7 @@ model Permission {
   service               Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   accessLogs            AccessLog[]
+  scopeGrants           PermissionScopeGrant[]
 
   @@index([userId])
   @@index([serviceId])
@@ -152,4 +154,31 @@ model AccessLog {
   @@index([permissionId])
   @@index([serviceId])
   @@index([createdAt])
+}
+
+model PermissionScopeGrant {
+  id                  String      @id @default(cuid())
+  permissionId        String
+  serviceId           String
+
+  scope               String
+  requiredAmount      Int         @default(1)
+
+  mintAddress         String?
+  tokenAccountAddress String?
+  tokenProgram        String?
+  balanceCheckMode    String      @default("gte")
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  revokedAt           DateTime?
+
+  permission          Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  service             Service     @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([permissionId])
+  @@index([serviceId])
+  @@index([scope])
+  @@unique([permissionId, scope], name: "permissionId_scope")
+  
 }
