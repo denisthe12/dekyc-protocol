@@ -1,12 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildScopedClaims = buildScopedClaims;
+const permission_scopes_1 = require("../permissions/permission-scopes");
 function buildScopedClaims(params) {
     const { profile, allowedClaims, requestedClaims } = params;
-    const requested = requestedClaims && requestedClaims.length > 0
-        ? requestedClaims
-        : allowedClaims;
-    const finalClaims = requested.filter((claim) => allowedClaims.includes(claim));
     const fullName = [profile.lastName, profile.firstName, profile.middleName]
         .filter(Boolean)
         .join(' ');
@@ -23,8 +20,19 @@ function buildScopedClaims(params) {
         verified: true,
         age18Plus: deriveAge18Plus(profile.birthDate),
     };
+    const allowedScopes = allowedClaims
+        .map((claim) => permission_scopes_1.CLAIM_TO_SCOPE[claim])
+        .filter(Boolean);
+    const requested = requestedClaims && requestedClaims.length > 0
+        ? requestedClaims
+        : allowedClaims;
+    const requestedScopes = requested
+        .map((claim) => permission_scopes_1.CLAIM_TO_SCOPE[claim])
+        .filter(Boolean);
+    const finalScopes = requestedScopes.filter((scope) => allowedScopes.includes(scope));
     const claims = {};
-    for (const claim of finalClaims) {
+    for (const scope of finalScopes) {
+        const claim = permission_scopes_1.SCOPE_TO_CLAIM[scope];
         if (claim in source) {
             claims[claim] = source[claim];
         }
@@ -32,6 +40,9 @@ function buildScopedClaims(params) {
     return {
         claims,
         grantedClaims: Object.keys(claims),
+        grantedScopes: finalScopes,
+        allowedScopes,
+        requestedScopes,
     };
 }
 function deriveAge18Plus(birthDate) {

@@ -130,6 +130,7 @@ export class SolanaService {
     userId: string;
     serviceId: string;
     kycHash: string;
+    scopesHash: string;
     requiredAmount: number;
     mint: string;
     tokenAccount: string;
@@ -142,7 +143,11 @@ export class SolanaService {
     const [userPda] = this.deriveUserPda(authority);
 
     const serviceIdHash = this.hashTo32Bytes(params.serviceId);
-    const kycHash32 = this.hashTo32Bytes(params.kycHash);
+    const combinedHash = createHash('sha256')
+      .update(`${params.kycHash}:${params.scopesHash}`)
+      .digest('hex');
+
+    const kycHash32 = this.hashTo32Bytes(combinedHash);
     const [permissionPda] = this.derivePermissionPda(userPda, serviceIdHash);
 
     const mintPubkey = new PublicKey(params.mint);

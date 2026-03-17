@@ -22,6 +22,7 @@ export declare class PermissionsService {
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+            scopesHash: string | null;
             mintAddress: string | null;
             tokenAccountAddress: string | null;
             tokenProgram: string | null;
@@ -51,6 +52,7 @@ export declare class PermissionsService {
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
             allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+            scopesHash: string | null;
             mintAddress: string | null;
             tokenAccountAddress: string | null;
             tokenProgram: string | null;
@@ -82,6 +84,7 @@ export declare class PermissionsService {
         permissionKeyHash: string | null;
         kycHashSnapshot: string | null;
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+        scopesHash: string | null;
         mintAddress: string | null;
         tokenAccountAddress: string | null;
         tokenProgram: string | null;

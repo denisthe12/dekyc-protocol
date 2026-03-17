@@ -103,9 +103,12 @@ let ServiceApiService = class ServiceApiService {
             reason: 'permission_active',
             claims: scoped.claims,
             grantedClaims: scoped.grantedClaims,
+            grantedScopes: scoped.grantedScopes,
             policy: {
                 allowedClaims,
                 requestedClaims: input.requestedClaims ?? allowedClaims,
+                allowedScopes: scoped.allowedScopes,
+                requestedScopes: scoped.requestedScopes,
             },
         };
     }

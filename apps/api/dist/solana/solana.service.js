@@ -88,7 +88,10 @@ let SolanaService = class SolanaService {
         const authority = this.walletKeypair.publicKey;
         const [userPda] = this.deriveUserPda(authority);
         const serviceIdHash = this.hashTo32Bytes(params.serviceId);
-        const kycHash32 = this.hashTo32Bytes(params.kycHash);
+        const combinedHash = (0, crypto_1.createHash)('sha256')
+            .update(`${params.kycHash}:${params.scopesHash}`)
+            .digest('hex');
+        const kycHash32 = this.hashTo32Bytes(combinedHash);
         const [permissionPda] = this.derivePermissionPda(userPda, serviceIdHash);
         const mintPubkey = new web3_js_1.PublicKey(params.mint);
         const tokenAccountPubkey = new web3_js_1.PublicKey(params.tokenAccount);

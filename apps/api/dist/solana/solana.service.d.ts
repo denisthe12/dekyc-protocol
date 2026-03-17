@@ -21,6 +21,7 @@ export declare class SolanaService {
         userId: string;
         serviceId: string;
         kycHash: string;
+        scopesHash: string;
         requiredAmount: number;
         mint: string;
         tokenAccount: string;

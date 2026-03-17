@@ -1,3 +1,5 @@
+import { CLAIM_TO_SCOPE, SCOPE_TO_CLAIM } from '../permissions/permission-scopes';
+
 type KycProfileLike = {
   fullName: string | null;
   firstName: string | null;
@@ -17,13 +19,6 @@ export function buildScopedClaims(params: {
 }) {
   const { profile, allowedClaims, requestedClaims } = params;
 
-  const requested =
-    requestedClaims && requestedClaims.length > 0
-      ? requestedClaims
-      : allowedClaims;
-
-  const finalClaims = requested.filter((claim) => allowedClaims.includes(claim));
-
   const fullName = [profile.lastName, profile.firstName, profile.middleName]
     .filter(Boolean)
     .join(' ');
@@ -42,9 +37,26 @@ export function buildScopedClaims(params: {
     age18Plus: deriveAge18Plus(profile.birthDate),
   };
 
+  const allowedScopes = allowedClaims
+    .map((claim) => CLAIM_TO_SCOPE[claim])
+    .filter(Boolean);
+
+  const requested = requestedClaims && requestedClaims.length > 0
+    ? requestedClaims
+    : allowedClaims;
+
+  const requestedScopes = requested
+    .map((claim) => CLAIM_TO_SCOPE[claim])
+    .filter(Boolean);
+
+  const finalScopes = requestedScopes.filter((scope) =>
+    allowedScopes.includes(scope),
+  );
+
   const claims: Record<string, unknown> = {};
 
-  for (const claim of finalClaims) {
+  for (const scope of finalScopes) {
+    const claim = SCOPE_TO_CLAIM[scope];
     if (claim in source) {
       claims[claim] = source[claim];
     }
@@ -53,6 +65,9 @@ export function buildScopedClaims(params: {
   return {
     claims,
     grantedClaims: Object.keys(claims),
+    grantedScopes: finalScopes,
+    allowedScopes,
+    requestedScopes,
   };
 }
 

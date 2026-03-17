@@ -6,6 +6,8 @@ import { HkdfService } from '../crypto/hkdf.service';
 import { createHash } from 'crypto';
 import { SolanaService } from '../solana/solana.service';
 import { Keypair } from '@solana/web3.js';
+import { CLAIM_TO_SCOPE } from './permission-scopes';
+import { computeScopesHash } from './permission-scope-hash';
 
 @Injectable()
 export class PermissionsService {
@@ -32,6 +34,14 @@ export class PermissionsService {
     if (!latestKycProfile) {
       throw new BadRequestException('KYC profile not found');
     }
+
+    const allowedClaims = dto.allowedClaims ?? ['fullName', 'iin', 'email'];
+
+    const allowedScopes = allowedClaims
+      .map((claim) => CLAIM_TO_SCOPE[claim])
+      .filter(Boolean);
+
+    const scopesHash = computeScopesHash(allowedScopes);
 
     const latestVault = await this.prisma.kycVaultEntry.findFirst({
       where: {
@@ -71,7 +81,8 @@ export class PermissionsService {
             revokedAt: null,
             requiredTokenAmount: dto.requiredTokenAmount ?? null,
             kycHashSnapshot: latestVault.kycHash,
-            allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+            allowedClaims,
+            scopesHash,
         },
       });
     } else {
@@ -83,7 +94,8 @@ export class PermissionsService {
             version: 1,
             requiredTokenAmount: dto.requiredTokenAmount ?? null,
             kycHashSnapshot: latestVault.kycHash,
-            allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+            allowedClaims,
+            scopesHash,
         },
       });
     }
@@ -113,6 +125,7 @@ export class PermissionsService {
       userId,
       serviceId: permission.serviceId,
       kycHash: latestVault.kycHash,
+      scopesHash,
       requiredAmount: dto.requiredTokenAmount ?? 0,
       mint: mintKeypair.publicKey.toBase58(),
       tokenAccount: tokenAccountKeypair.publicKey.toBase58(),

@@ -16,6 +16,8 @@ const hkdf_service_1 = require("../crypto/hkdf.service");
 const crypto_1 = require("crypto");
 const solana_service_1 = require("../solana/solana.service");
 const web3_js_1 = require("@solana/web3.js");
+const permission_scopes_1 = require("./permission-scopes");
+const permission_scope_hash_1 = require("./permission-scope-hash");
 let PermissionsService = class PermissionsService {
     prisma;
     hkdfService;
@@ -39,6 +41,11 @@ let PermissionsService = class PermissionsService {
         if (!latestKycProfile) {
             throw new common_1.BadRequestException('KYC profile not found');
         }
+        const allowedClaims = dto.allowedClaims ?? ['fullName', 'iin', 'email'];
+        const allowedScopes = allowedClaims
+            .map((claim) => permission_scopes_1.CLAIM_TO_SCOPE[claim])
+            .filter(Boolean);
+        const scopesHash = (0, permission_scope_hash_1.computeScopesHash)(allowedScopes);
         const latestVault = await this.prisma.kycVaultEntry.findFirst({
             where: {
                 userId,
@@ -71,7 +78,8 @@ let PermissionsService = class PermissionsService {
                     revokedAt: null,
                     requiredTokenAmount: dto.requiredTokenAmount ?? null,
                     kycHashSnapshot: latestVault.kycHash,
-                    allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+                    allowedClaims,
+                    scopesHash,
                 },
             });
         }
@@ -84,7 +92,8 @@ let PermissionsService = class PermissionsService {
                     version: 1,
                     requiredTokenAmount: dto.requiredTokenAmount ?? null,
                     kycHashSnapshot: latestVault.kycHash,
-                    allowedClaims: dto.allowedClaims ?? ['fullName', 'iin', 'email'],
+                    allowedClaims,
+                    scopesHash,
                 },
             });
         }
@@ -109,6 +118,7 @@ let PermissionsService = class PermissionsService {
             userId,
             serviceId: permission.serviceId,
             kycHash: latestVault.kycHash,
+            scopesHash,
             requiredAmount: dto.requiredTokenAmount ?? 0,
             mint: mintKeypair.publicKey.toBase58(),
             tokenAccount: tokenAccountKeypair.publicKey.toBase58(),

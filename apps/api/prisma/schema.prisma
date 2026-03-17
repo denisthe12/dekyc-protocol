@@ -116,6 +116,7 @@ model Permission {
   permissionKeyHash     String?
   kycHashSnapshot       String?
   allowedClaims         Json?
+  scopesHash            String?
 
   mintAddress           String?
   tokenAccountAddress   String?
