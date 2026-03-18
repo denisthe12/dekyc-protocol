@@ -84,6 +84,10 @@ export class SolanaService {
     return this.walletKeypair.publicKey;
   }
 
+  getWalletKeypair() {
+    return this.walletKeypair;
+  }
+
   deriveUserPda(authority: PublicKey) {
     return PublicKey.findProgramAddressSync(
       [Buffer.from('user'), authority.toBuffer()],

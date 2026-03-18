@@ -40,7 +40,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, grant_permission_dto_1.GrantPermissionDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PermissionsController.prototype, "grant", null);
 __decorate([
     (0, common_1.Post)('revoke'),
@@ -48,14 +48,14 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, revoke_permission_dto_1.RevokePermissionDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PermissionsController.prototype, "revoke", null);
 __decorate([
     (0, common_1.Get)('my'),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], PermissionsController.prototype, "getMy", null);
 exports.PermissionsController = PermissionsController = __decorate([
     (0, common_1.Controller)('permissions'),

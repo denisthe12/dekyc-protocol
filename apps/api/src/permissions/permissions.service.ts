@@ -9,6 +9,24 @@ import { Keypair } from '@solana/web3.js';
 import { CLAIM_TO_SCOPE } from './permission-scopes';
 import { computeScopesHash } from './permission-scope-hash';
 import { PermissionScopeGrantsService } from '../permission-scope-grants/permission-scope-grants.service';
+import { Token2022Service } from '../solana/token-2022.service';
+
+interface MaterializedScopeGrant {
+  scope: string;
+  requiredAmount: number;
+  mintAddress: string;
+  tokenAccountAddress: string;
+  tokenProgram: string;
+  initTx: string | null;
+  mintTx: string;
+}
+
+interface BurnResult {
+  scope: string;
+  burnTx: string;
+  mintAddress: string;
+  tokenAccountAddress: string;
+}
 
 @Injectable()
 export class PermissionsService {
@@ -17,6 +35,7 @@ export class PermissionsService {
     private readonly hkdfService: HkdfService,
     private readonly solanaService: SolanaService,
     private readonly permissionScopeGrantsService: PermissionScopeGrantsService,
+    private readonly token2022Service: Token2022Service,
   ) {}
 
   async grantPermission(userId: string, dto: GrantPermissionDto) {
@@ -151,6 +170,43 @@ export class PermissionsService {
       tokenProgram: onChainGrant.tokenProgram,
     });
 
+    const materializedScopeGrants: MaterializedScopeGrant[] = [];
+
+    for (const scopeGrant of scopeGrants) {
+      const serviceOwner = this.solanaService.getWalletPubkey();
+
+      const scopeTokenSetup = await this.token2022Service.createScopeMintAndAccount({
+        serviceId: syncedPermission.serviceId,
+        scope: scopeGrant.scope,
+        serviceOwner,
+        decimals: 0,
+      });
+
+      await this.permissionScopeGrantsService.attachTokenRefs({
+        permissionId: syncedPermission.id,
+        scope: scopeGrant.scope,
+        mintAddress: scopeTokenSetup.mint,
+        tokenAccountAddress: scopeTokenSetup.tokenAccount,
+        tokenProgram: scopeTokenSetup.tokenProgram,
+      });
+
+      const mintResult = await this.token2022Service.mintScopeTokens({
+        mint: scopeTokenSetup.mint,
+        tokenAccount: scopeTokenSetup.tokenAccount,
+        amount: scopeGrant.requiredAmount,
+      });
+
+      materializedScopeGrants.push({
+        scope: scopeGrant.scope,
+        requiredAmount: scopeGrant.requiredAmount,
+        mintAddress: scopeTokenSetup.mint,
+        tokenAccountAddress: scopeTokenSetup.tokenAccount,
+        tokenProgram: scopeTokenSetup.tokenProgram,
+        initTx: scopeTokenSetup.initTx,
+        mintTx: mintResult.tx,
+      });
+    }
+
     await this.prisma.accessLog.create({
       data: {
         permissionId: updatedPermission.id,
@@ -162,7 +218,7 @@ export class PermissionsService {
 
     return {
       permission: syncedPermission,
-      scopeGrants,
+      scopeGrants: materializedScopeGrants,
       derived: {
         permissionKey,
         permissionKeyHash,
@@ -223,8 +279,39 @@ export class PermissionsService {
       },
     });
 
+    const activeScopeGrants = await this.permissionScopeGrantsService.getActiveScopeGrants(
+      permission.id,
+    );
+
+    const burnResults: BurnResult[] = [];
+
+    for (const scopeGrant of activeScopeGrants) {
+      if (scopeGrant.mintAddress && scopeGrant.tokenAccountAddress) {
+        const burn = await this.token2022Service.burnScopeTokens({
+          mint: scopeGrant.mintAddress,
+          tokenAccount: scopeGrant.tokenAccountAddress,
+          amount: scopeGrant.requiredAmount,
+        });
+
+        await this.prisma.permissionScopeGrant.update({
+          where: { id: scopeGrant.id },
+          data: {
+            revokedAt: new Date(),
+          },
+        });
+
+        burnResults.push({
+          scope: scopeGrant.scope,
+          burnTx: burn.tx,
+          mintAddress: scopeGrant.mintAddress,
+          tokenAccountAddress: scopeGrant.tokenAccountAddress,
+        });
+      }
+    }
+
     return {
       permission: updated,
+      burnedScopeGrants: burnResults,
       onChain: {
         revokeTx,
         permissionPda: updated.onchainPermissionPda,

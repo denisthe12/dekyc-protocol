@@ -9,14 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SolanaModule = void 0;
 const common_1 = require("@nestjs/common");
 const solana_service_1 = require("./solana.service");
+const token_2022_service_1 = require("./token-2022.service");
 let SolanaModule = class SolanaModule {
 };
 exports.SolanaModule = SolanaModule;
 exports.SolanaModule = SolanaModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
-        providers: [solana_service_1.SolanaService],
-        exports: [solana_service_1.SolanaService],
+        providers: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service],
+        exports: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service],
     })
 ], SolanaModule);
 //# sourceMappingURL=solana.module.js.map

@@ -10,110 +10,17 @@ export declare class PermissionsController {
             sub: string;
             email: string;
         };
-    }, body: GrantPermissionDto): Promise<{
-        permission: {
-            id: string;
-            userId: string;
-            createdAt: Date;
-            updatedAt: Date;
-            status: string;
-            serviceId: string;
-            mintAddress: string | null;
-            tokenAccountAddress: string | null;
-            tokenProgram: string | null;
-            revokedAt: Date | null;
-            version: number;
-            requiredTokenAmount: number | null;
-            onchainPermissionPda: string | null;
-            permissionKeyHash: string | null;
-            kycHashSnapshot: string | null;
-            allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
-            scopesHash: string | null;
-        };
-        scopeGrants: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            permissionId: string;
-            serviceId: string;
-            scope: string;
-            requiredAmount: number;
-            mintAddress: string | null;
-            tokenAccountAddress: string | null;
-            tokenProgram: string | null;
-            balanceCheckMode: string;
-            revokedAt: Date | null;
-        }[];
-        derived: {
-            permissionKey: string;
-            permissionKeyHash: string;
-        };
-        onChain: {
-            userPda: string;
-            grantTx: string;
-            permissionPda: string;
-        };
-    }>;
+    }, body: GrantPermissionDto): Promise<unknown>;
     revoke(req: Request & {
         user: {
             sub: string;
             email: string;
         };
-    }, body: RevokePermissionDto): Promise<{
-        permission: {
-            id: string;
-            userId: string;
-            createdAt: Date;
-            updatedAt: Date;
-            status: string;
-            serviceId: string;
-            mintAddress: string | null;
-            tokenAccountAddress: string | null;
-            tokenProgram: string | null;
-            revokedAt: Date | null;
-            version: number;
-            requiredTokenAmount: number | null;
-            onchainPermissionPda: string | null;
-            permissionKeyHash: string | null;
-            kycHashSnapshot: string | null;
-            allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
-            scopesHash: string | null;
-        };
-        onChain: {
-            revokeTx: string;
-            permissionPda: string | null;
-        };
-    }>;
+    }, body: RevokePermissionDto): Promise<unknown>;
     getMy(req: Request & {
         user: {
             sub: string;
             email: string;
         };
-    }): Promise<({
-        service: {
-            id: string;
-            name: string;
-            status: string;
-            clientId: string;
-            description: string | null;
-        };
-    } & {
-        id: string;
-        userId: string;
-        createdAt: Date;
-        updatedAt: Date;
-        status: string;
-        serviceId: string;
-        mintAddress: string | null;
-        tokenAccountAddress: string | null;
-        tokenProgram: string | null;
-        revokedAt: Date | null;
-        version: number;
-        requiredTokenAmount: number | null;
-        onchainPermissionPda: string | null;
-        permissionKeyHash: string | null;
-        kycHashSnapshot: string | null;
-        allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
-        scopesHash: string | null;
-    })[]>;
+    }): Promise<unknown>;
 }

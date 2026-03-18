@@ -52,6 +52,9 @@ let SolanaService = class SolanaService {
     getWalletPubkey() {
         return this.walletKeypair.publicKey;
     }
+    getWalletKeypair() {
+        return this.walletKeypair;
+    }
     deriveUserPda(authority) {
         return web3_js_1.PublicKey.findProgramAddressSync([Buffer.from('user'), authority.toBuffer()], this.programId);
     }

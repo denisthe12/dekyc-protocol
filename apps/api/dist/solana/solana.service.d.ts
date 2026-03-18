@@ -10,6 +10,7 @@ export declare class SolanaService {
     getConnection(): web3.Connection;
     getProgramId(): web3.PublicKey;
     getWalletPubkey(): web3.PublicKey;
+    getWalletKeypair(): web3.Keypair;
     deriveUserPda(authority: PublicKey): [web3.PublicKey, number];
     derivePermissionPda(userPda: PublicKey, serviceIdHash: Uint8Array): [web3.PublicKey, number];
     hashTo32Bytes(value: string): Uint8Array;

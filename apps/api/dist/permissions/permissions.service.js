@@ -19,16 +19,19 @@ const web3_js_1 = require("@solana/web3.js");
 const permission_scopes_1 = require("./permission-scopes");
 const permission_scope_hash_1 = require("./permission-scope-hash");
 const permission_scope_grants_service_1 = require("../permission-scope-grants/permission-scope-grants.service");
+const token_2022_service_1 = require("../solana/token-2022.service");
 let PermissionsService = class PermissionsService {
     prisma;
     hkdfService;
     solanaService;
     permissionScopeGrantsService;
-    constructor(prisma, hkdfService, solanaService, permissionScopeGrantsService) {
+    token2022Service;
+    constructor(prisma, hkdfService, solanaService, permissionScopeGrantsService, token2022Service) {
         this.prisma = prisma;
         this.hkdfService = hkdfService;
         this.solanaService = solanaService;
         this.permissionScopeGrantsService = permissionScopeGrantsService;
+        this.token2022Service = token2022Service;
     }
     async grantPermission(userId, dto) {
         const service = await this.prisma.service.findUnique({
@@ -142,6 +145,37 @@ let PermissionsService = class PermissionsService {
             requiredAmount: dto.requiredTokenAmount ?? 1,
             tokenProgram: onChainGrant.tokenProgram,
         });
+        const materializedScopeGrants = [];
+        for (const scopeGrant of scopeGrants) {
+            const serviceOwner = this.solanaService.getWalletPubkey();
+            const scopeTokenSetup = await this.token2022Service.createScopeMintAndAccount({
+                serviceId: syncedPermission.serviceId,
+                scope: scopeGrant.scope,
+                serviceOwner,
+                decimals: 0,
+            });
+            await this.permissionScopeGrantsService.attachTokenRefs({
+                permissionId: syncedPermission.id,
+                scope: scopeGrant.scope,
+                mintAddress: scopeTokenSetup.mint,
+                tokenAccountAddress: scopeTokenSetup.tokenAccount,
+                tokenProgram: scopeTokenSetup.tokenProgram,
+            });
+            const mintResult = await this.token2022Service.mintScopeTokens({
+                mint: scopeTokenSetup.mint,
+                tokenAccount: scopeTokenSetup.tokenAccount,
+                amount: scopeGrant.requiredAmount,
+            });
+            materializedScopeGrants.push({
+                scope: scopeGrant.scope,
+                requiredAmount: scopeGrant.requiredAmount,
+                mintAddress: scopeTokenSetup.mint,
+                tokenAccountAddress: scopeTokenSetup.tokenAccount,
+                tokenProgram: scopeTokenSetup.tokenProgram,
+                initTx: scopeTokenSetup.initTx,
+                mintTx: mintResult.tx,
+            });
+        }
         await this.prisma.accessLog.create({
             data: {
                 permissionId: updatedPermission.id,
@@ -152,7 +186,7 @@ let PermissionsService = class PermissionsService {
         });
         return {
             permission: syncedPermission,
-            scopeGrants,
+            scopeGrants: materializedScopeGrants,
             derived: {
                 permissionKey,
                 permissionKeyHash,
@@ -201,8 +235,32 @@ let PermissionsService = class PermissionsService {
                 reason: 'permission_revoked',
             },
         });
+        const activeScopeGrants = await this.permissionScopeGrantsService.getActiveScopeGrants(permission.id);
+        const burnResults = [];
+        for (const scopeGrant of activeScopeGrants) {
+            if (scopeGrant.mintAddress && scopeGrant.tokenAccountAddress) {
+                const burn = await this.token2022Service.burnScopeTokens({
+                    mint: scopeGrant.mintAddress,
+                    tokenAccount: scopeGrant.tokenAccountAddress,
+                    amount: scopeGrant.requiredAmount,
+                });
+                await this.prisma.permissionScopeGrant.update({
+                    where: { id: scopeGrant.id },
+                    data: {
+                        revokedAt: new Date(),
+                    },
+                });
+                burnResults.push({
+                    scope: scopeGrant.scope,
+                    burnTx: burn.tx,
+                    mintAddress: scopeGrant.mintAddress,
+                    tokenAccountAddress: scopeGrant.tokenAccountAddress,
+                });
+            }
+        }
         return {
             permission: updated,
+            burnedScopeGrants: burnResults,
             onChain: {
                 revokeTx,
                 permissionPda: updated.onchainPermissionPda,
@@ -254,6 +312,7 @@ exports.PermissionsService = PermissionsService = __decorate([
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         hkdf_service_1.HkdfService,
         solana_service_1.SolanaService,
-        permission_scope_grants_service_1.PermissionScopeGrantsService])
+        permission_scope_grants_service_1.PermissionScopeGrantsService,
+        token_2022_service_1.Token2022Service])
 ], PermissionsService);
 //# sourceMappingURL=permissions.service.js.map

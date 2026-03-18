@@ -14,7 +14,7 @@ export class PermissionsController {
   grant(
     @Req() req: Request & { user: { sub: string; email: string } },
     @Body() body: GrantPermissionDto,
-  ) {
+  ): Promise<unknown> {
     return this.permissionsService.grantPermission(req.user.sub, body);
   }
 
@@ -22,14 +22,14 @@ export class PermissionsController {
   revoke(
     @Req() req: Request & { user: { sub: string; email: string } },
     @Body() body: RevokePermissionDto,
-  ) {
+  ): Promise<unknown> {
     return this.permissionsService.revokePermission(req.user.sub, body);
   }
 
   @Get('my')
   getMy(
     @Req() req: Request & { user: { sub: string; email: string } },
-  ) {
+  ): Promise<unknown> {
     return this.permissionsService.getMyPermissions(req.user.sub);
   }
 }
