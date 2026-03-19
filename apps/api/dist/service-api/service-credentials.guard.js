@@ -12,22 +12,35 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceCredentialsGuard = void 0;
 const common_1 = require("@nestjs/common");
 const services_service_1 = require("../services/services.service");
+const service_request_nonce_service_1 = require("./service-request-nonce.service");
 let ServiceCredentialsGuard = class ServiceCredentialsGuard {
     servicesService;
-    constructor(servicesService) {
+    nonceService;
+    constructor(servicesService, nonceService) {
         this.servicesService = servicesService;
+        this.nonceService = nonceService;
     }
     async canActivate(context) {
         const req = context.switchToHttp().getRequest();
         const clientId = req.header('x-client-id');
         const clientSecret = req.header('x-client-secret');
+        const timestamp = req.header('x-timestamp');
+        const nonce = req.header('x-nonce');
         if (!clientId || !clientSecret) {
             throw new common_1.UnauthorizedException('Missing service credentials');
         }
+        if (!timestamp) {
+            throw new common_1.UnauthorizedException('Missing x-timestamp');
+        }
+        if (!nonce) {
+            throw new common_1.UnauthorizedException('Missing x-nonce');
+        }
+        this.assertTimestampFresh(timestamp);
         const service = await this.servicesService.validateServiceCredentials(clientId, clientSecret);
         if (!service) {
             throw new common_1.UnauthorizedException('Invalid service credentials');
         }
+        await this.nonceService.assertNonceUnusedAndStore(service.id, nonce);
         req.serviceAuth = {
             serviceId: service.id,
             clientId: service.clientId,
@@ -35,10 +48,23 @@ let ServiceCredentialsGuard = class ServiceCredentialsGuard {
         };
         return true;
     }
+    assertTimestampFresh(timestamp) {
+        const parsed = Number(timestamp);
+        if (!Number.isFinite(parsed)) {
+            throw new common_1.UnauthorizedException('Invalid x-timestamp');
+        }
+        const now = Date.now();
+        const diff = Math.abs(now - parsed);
+        const maxSkewMs = 5 * 60 * 1000;
+        if (diff > maxSkewMs) {
+            throw new common_1.UnauthorizedException('Request expired or timestamp skew too large');
+        }
+    }
 };
 exports.ServiceCredentialsGuard = ServiceCredentialsGuard;
 exports.ServiceCredentialsGuard = ServiceCredentialsGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [services_service_1.ServicesService])
+    __metadata("design:paramtypes", [services_service_1.ServicesService,
+        service_request_nonce_service_1.ServiceRequestNonceService])
 ], ServiceCredentialsGuard);
 //# sourceMappingURL=service-credentials.guard.js.map

@@ -15,7 +15,6 @@ const spl_token_1 = require("@solana/spl-token");
 const web3_js_1 = require("@solana/web3.js");
 const crypto_1 = require("crypto");
 const solana_service_1 = require("./solana.service");
-const spl_token_2 = require("@solana/spl-token");
 let Token2022Service = class Token2022Service {
     solanaService;
     constructor(solanaService) {
@@ -40,31 +39,24 @@ let Token2022Service = class Token2022Service {
         const decimals = params.decimals ?? 0;
         const mintKeypair = this.deriveDeterministicScopeMint(params.serviceId, params.scope);
         const mintPubkey = mintKeypair.publicKey;
-        const ata = this.deriveServiceScopeTokenAccount(params.serviceOwner, mintPubkey);
-        const tx = new web3_js_1.Transaction();
         const mintInfo = await this.connection.getAccountInfo(mintPubkey);
+        let initTx = null;
         if (!mintInfo) {
             const lamports = await this.connection.getMinimumBalanceForRentExemption(spl_token_1.MINT_SIZE);
-            tx.add(web3_js_1.SystemProgram.createAccount({
+            const tx = new web3_js_1.Transaction().add(web3_js_1.SystemProgram.createAccount({
                 fromPubkey: this.payer.publicKey,
                 newAccountPubkey: mintPubkey,
                 space: spl_token_1.MINT_SIZE,
                 lamports,
                 programId: spl_token_1.TOKEN_2022_PROGRAM_ID,
             }), (0, spl_token_1.createInitializeMint2Instruction)(mintPubkey, decimals, this.payer.publicKey, this.payer.publicKey, spl_token_1.TOKEN_2022_PROGRAM_ID));
+            initTx = await (0, web3_js_1.sendAndConfirmTransaction)(this.connection, tx, [this.payer, mintKeypair], { commitment: 'confirmed' });
         }
-        const ataInfo = await this.connection.getAccountInfo(ata);
-        if (!ataInfo) {
-            tx.add((0, spl_token_1.createAssociatedTokenAccountInstruction)(this.payer.publicKey, ata, params.serviceOwner, mintPubkey, spl_token_1.TOKEN_2022_PROGRAM_ID));
-        }
-        let signature = null;
-        if (tx.instructions.length > 0) {
-            signature = await (0, web3_js_1.sendAndConfirmTransaction)(this.connection, tx, [this.payer, mintKeypair], { commitment: 'confirmed' });
-        }
+        const ata = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(this.connection, this.payer, mintPubkey, params.serviceOwner, false, 'confirmed', undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         return {
             mint: mintPubkey.toBase58(),
-            tokenAccount: ata.toBase58(),
-            initTx: signature,
+            tokenAccount: ata.address.toBase58(),
+            initTx,
             tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID.toBase58(),
         };
     }
@@ -84,8 +76,12 @@ let Token2022Service = class Token2022Service {
     }
     async getScopeTokenBalance(tokenAccountAddress) {
         const tokenAccount = new web3_js_1.PublicKey(tokenAccountAddress);
-        const account = await (0, spl_token_2.getAccount)(this.connection, tokenAccount, 'confirmed', spl_token_1.TOKEN_2022_PROGRAM_ID);
-        return Number(account.amount);
+        const accountInfo = await this.connection.getAccountInfo(tokenAccount, 'confirmed');
+        if (!accountInfo) {
+            throw new Error(`Token account not found: ${tokenAccountAddress}`);
+        }
+        const balance = await this.connection.getTokenAccountBalance(tokenAccount, 'confirmed');
+        return Number(balance.value.amount);
     }
 };
 exports.Token2022Service = Token2022Service;

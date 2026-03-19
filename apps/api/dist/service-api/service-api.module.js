@@ -12,6 +12,7 @@ const service_api_controller_1 = require("./service-api.controller");
 const service_api_service_1 = require("./service-api.service");
 const service_credentials_guard_1 = require("./service-credentials.guard");
 const services_module_1 = require("../services/services.module");
+const service_request_nonce_service_1 = require("./service-request-nonce.service");
 let ServiceApiModule = class ServiceApiModule {
 };
 exports.ServiceApiModule = ServiceApiModule;
@@ -19,7 +20,11 @@ exports.ServiceApiModule = ServiceApiModule = __decorate([
     (0, common_1.Module)({
         imports: [services_module_1.ServicesModule],
         controllers: [service_api_controller_1.ServiceApiController],
-        providers: [service_api_service_1.ServiceApiService, service_credentials_guard_1.ServiceCredentialsGuard],
+        providers: [
+            service_api_service_1.ServiceApiService,
+            service_credentials_guard_1.ServiceCredentialsGuard,
+            service_request_nonce_service_1.ServiceRequestNonceService,
+        ],
     })
 ], ServiceApiModule);
 //# sourceMappingURL=service-api.module.js.map

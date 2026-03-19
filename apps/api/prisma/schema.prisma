@@ -182,3 +182,13 @@ model PermissionScopeGrant {
   @@unique([permissionId, scope], name: "permissionId_scope")
   
 }
+
+model ServiceRequestNonce {
+  id         String   @id @default(cuid())
+  serviceId  String
+  nonce      String
+  createdAt  DateTime @default(now())
+
+  @@index([serviceId])
+  @@unique([serviceId, nonce], name: "serviceId_nonce")
+}

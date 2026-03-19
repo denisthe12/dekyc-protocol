@@ -4,6 +4,7 @@ export interface TokenCheck {
     scope: string;
     ok: boolean;
     reason: string;
+    readError: string | null;
     tokenAccountAddress: string | null;
     mintAddress: string | null;
     balance: number;

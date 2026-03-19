@@ -8,6 +8,7 @@ export interface TokenCheck {
   scope: string;
   ok: boolean;
   reason: string;
+  readError: string | null;
   tokenAccountAddress: string | null;
   mintAddress: string | null;
   balance: number;
@@ -94,6 +95,7 @@ export class ServiceApiService {
           scope,
           ok: false,
           reason: 'scope_grant_not_found',
+          readError: null,
           tokenAccountAddress: null,
           mintAddress: null,
           balance: 0,
@@ -107,6 +109,7 @@ export class ServiceApiService {
           scope,
           ok: false,
           reason: 'token_refs_missing',
+          readError: null,
           tokenAccountAddress: grant.tokenAccountAddress,
           mintAddress: grant.mintAddress,
           balance: 0,
@@ -118,6 +121,7 @@ export class ServiceApiService {
       let balance = 0;
       let ok = false;
       let reason = 'balance_insufficient';
+      let readError: string | null = null;
 
       try {
         balance = await this.token2022Service.getScopeTokenBalance(
@@ -126,15 +130,18 @@ export class ServiceApiService {
 
         ok = balance >= grant.requiredAmount;
         reason = ok ? 'balance_ok' : 'balance_insufficient';
-      } catch {
+      } catch (error) {
         ok = false;
         reason = 'token_account_read_failed';
+        readError =
+          error instanceof Error ? error.message : 'Unknown token read error';
       }
 
       tokenChecks.push({
         scope,
         ok,
         reason,
+        readError,
         tokenAccountAddress: grant.tokenAccountAddress,
         mintAddress: grant.mintAddress,
         balance,

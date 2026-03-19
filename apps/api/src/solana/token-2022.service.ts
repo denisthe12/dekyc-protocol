@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import {
-  createAssociatedTokenAccountInstruction,
   createInitializeMint2Instruction,
   createMintToInstruction,
   createBurnInstruction,
   getAssociatedTokenAddressSync,
+  getOrCreateAssociatedTokenAccount,
   MINT_SIZE,
   TOKEN_2022_PROGRAM_ID,
 } from '@solana/spl-token';
@@ -18,7 +18,6 @@ import {
 } from '@solana/web3.js';
 import { createHash } from 'crypto';
 import { SolanaService } from './solana.service';
-import { getAccount } from '@solana/spl-token';
 
 @Injectable()
 export class Token2022Service {
@@ -62,17 +61,16 @@ export class Token2022Service {
     );
 
     const mintPubkey = mintKeypair.publicKey;
-    const ata = this.deriveServiceScopeTokenAccount(params.serviceOwner, mintPubkey);
-
-    const tx = new Transaction();
 
     const mintInfo = await this.connection.getAccountInfo(mintPubkey);
+    let initTx: string | null = null;
+
     if (!mintInfo) {
       const lamports = await this.connection.getMinimumBalanceForRentExemption(
         MINT_SIZE,
       );
 
-      tx.add(
+      const tx = new Transaction().add(
         SystemProgram.createAccount({
           fromPubkey: this.payer.publicKey,
           newAccountPubkey: mintPubkey,
@@ -88,25 +86,8 @@ export class Token2022Service {
           TOKEN_2022_PROGRAM_ID,
         ),
       );
-    }
 
-    const ataInfo = await this.connection.getAccountInfo(ata);
-    if (!ataInfo) {
-      tx.add(
-        createAssociatedTokenAccountInstruction(
-          this.payer.publicKey,
-          ata,
-          params.serviceOwner,
-          mintPubkey,
-          TOKEN_2022_PROGRAM_ID,
-        ),
-      );
-    }
-
-    let signature: string | null = null;
-
-    if (tx.instructions.length > 0) {
-      signature = await sendAndConfirmTransaction(
+      initTx = await sendAndConfirmTransaction(
         this.connection,
         tx,
         [this.payer, mintKeypair],
@@ -114,10 +95,21 @@ export class Token2022Service {
       );
     }
 
+    const ata = await getOrCreateAssociatedTokenAccount(
+      this.connection,
+      this.payer,
+      mintPubkey,
+      params.serviceOwner,
+      false,
+      'confirmed',
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
     return {
       mint: mintPubkey.toBase58(),
-      tokenAccount: ata.toBase58(),
-      initTx: signature,
+      tokenAccount: ata.address.toBase58(),
+      initTx,
       tokenProgram: TOKEN_2022_PROGRAM_ID.toBase58(),
     };
   }
@@ -183,13 +175,20 @@ export class Token2022Service {
   async getScopeTokenBalance(tokenAccountAddress: string) {
     const tokenAccount = new PublicKey(tokenAccountAddress);
 
-    const account = await getAccount(
-      this.connection,
+    const accountInfo = await this.connection.getAccountInfo(
       tokenAccount,
       'confirmed',
-      TOKEN_2022_PROGRAM_ID,
     );
 
-    return Number(account.amount);
+    if (!accountInfo) {
+      throw new Error(`Token account not found: ${tokenAccountAddress}`);
+    }
+
+    const balance = await this.connection.getTokenAccountBalance(
+      tokenAccount,
+      'confirmed',
+    );
+
+    return Number(balance.value.amount);
   }
 }
