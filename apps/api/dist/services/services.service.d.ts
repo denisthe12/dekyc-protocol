@@ -15,6 +15,7 @@ export declare class ServicesService {
         issuedCredentials: {
             clientId: string;
             clientSecret: string;
+            responseSigningSecret: string;
         };
     }>;
     getAllServices(): Promise<{
@@ -35,6 +36,17 @@ export declare class ServicesService {
         clientId: string;
         description: string | null;
     } | null>;
+    getServiceByClientIdWithSecrets(clientId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        status: string;
+        clientId: string;
+        clientSecretHash: string;
+        responseSigningSecret: string | null;
+        description: string | null;
+    } | null>;
     validateServiceCredentials(clientId: string, clientSecret: string): Promise<{
         id: string;
         clientId: string;
@@ -43,4 +55,5 @@ export declare class ServicesService {
     } | null>;
     private generateClientId;
     private generateClientSecret;
+    private generateResponseSigningSecret;
 }

@@ -15,6 +15,7 @@ export declare class ServicesController {
         issuedCredentials: {
             clientId: string;
             clientSecret: string;
+            responseSigningSecret: string;
         };
     }>;
     getAll(): Promise<{

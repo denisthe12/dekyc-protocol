@@ -15,12 +15,16 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const kyc_claims_policy_1 = require("./kyc-claims-policy");
 const token_2022_service_1 = require("../solana/token-2022.service");
 const permission_scopes_1 = require("../permissions/permission-scopes");
+const services_service_1 = require("../services/services.service");
+const service_response_signature_1 = require("./service-response-signature");
 let ServiceApiService = class ServiceApiService {
     prisma;
     token2022Service;
-    constructor(prisma, token2022Service) {
+    servicesService;
+    constructor(prisma, token2022Service, servicesService) {
         this.prisma = prisma;
         this.token2022Service = token2022Service;
+        this.servicesService = servicesService;
     }
     async requestKyc(input) {
         const permission = await this.prisma.permission.findUnique({
@@ -34,12 +38,30 @@ let ServiceApiService = class ServiceApiService {
                 service: true,
             },
         });
+        const service = await this.servicesService.getServiceByClientIdWithSecrets(input.clientId);
+        if (!service || !service.responseSigningSecret) {
+            return this.buildSignedEnvelope({
+                clientResponseSigningSecret: null,
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+                payload: {
+                    allowed: false,
+                    reason: 'service_signing_secret_not_found',
+                    claims: null,
+                },
+            });
+        }
         if (!permission) {
-            return {
-                allowed: false,
-                reason: 'permission_not_found',
-                claims: null,
-            };
+            return this.buildSignedEnvelope({
+                clientResponseSigningSecret: service.responseSigningSecret,
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+                payload: {
+                    allowed: false,
+                    reason: 'permission_not_found',
+                    claims: null,
+                },
+            });
         }
         if (permission.status !== 'ACTIVE') {
             await this.prisma.accessLog.create({
@@ -50,11 +72,16 @@ let ServiceApiService = class ServiceApiService {
                     reason: 'permission_not_active',
                 },
             });
-            return {
-                allowed: false,
-                reason: 'permission_not_active',
-                claims: null,
-            };
+            return this.buildSignedEnvelope({
+                clientResponseSigningSecret: service.responseSigningSecret,
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+                payload: {
+                    allowed: false,
+                    reason: 'permission_not_active',
+                    claims: null,
+                }
+            });
         }
         const activeScopeGrants = await this.prisma.permissionScopeGrant.findMany({
             where: {
@@ -145,11 +172,16 @@ let ServiceApiService = class ServiceApiService {
                     reason: 'kyc_profile_not_found',
                 },
             });
-            return {
-                allowed: false,
-                reason: 'kyc_profile_not_found',
-                claims: null,
-            };
+            return this.buildSignedEnvelope({
+                clientResponseSigningSecret: service.responseSigningSecret,
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+                payload: {
+                    allowed: false,
+                    reason: 'kyc_profile_not_found',
+                    claims: null,
+                }
+            });
         }
         const fullName = [
             profile.lastName,
@@ -182,14 +214,19 @@ let ServiceApiService = class ServiceApiService {
                     reason: 'token_balance_check_failed',
                 },
             });
-            return {
-                allowed: false,
-                reason: 'token_balance_check_failed',
-                claims: null,
-                grantedClaims: [],
-                grantedScopes: [],
-                tokenChecks,
-            };
+            return this.buildSignedEnvelope({
+                clientResponseSigningSecret: service.responseSigningSecret,
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+                payload: {
+                    allowed: false,
+                    reason: 'token_balance_check_failed',
+                    claims: null,
+                    grantedClaims: [],
+                    grantedScopes: [],
+                    tokenChecks,
+                }
+            });
         }
         await this.prisma.accessLog.create({
             data: {
@@ -199,26 +236,57 @@ let ServiceApiService = class ServiceApiService {
                 reason: 'permission_active',
             },
         });
-        return {
-            allowed: true,
-            reason: 'permission_active',
-            claims: scoped.claims,
-            grantedClaims: scoped.grantedClaims,
-            grantedScopes: scoped.grantedScopes,
-            tokenChecks,
-            scopeGrantRefs: activeScopeGrants.map((row) => ({
-                scope: row.scope,
-                mintAddress: row.mintAddress,
-                tokenAccountAddress: row.tokenAccountAddress,
-                requiredAmount: row.requiredAmount,
-                balanceCheckMode: row.balanceCheckMode,
-            })),
-            policy: {
-                allowedClaims,
-                requestedClaims,
-                allowedScopes: scoped.allowedScopes,
-                requestedScopes: scoped.requestedScopes,
+        return this.buildSignedEnvelope({
+            clientResponseSigningSecret: service.responseSigningSecret,
+            timestamp: input.timestamp,
+            nonce: input.nonce,
+            payload: {
+                allowed: true,
+                reason: 'permission_active',
+                claims: scoped.claims,
+                grantedClaims: scoped.grantedClaims,
+                grantedScopes: scoped.grantedScopes,
+                tokenChecks,
+                scopeGrantRefs: activeScopeGrants.map((row) => ({
+                    scope: row.scope,
+                    mintAddress: row.mintAddress,
+                    tokenAccountAddress: row.tokenAccountAddress,
+                    requiredAmount: row.requiredAmount,
+                    balanceCheckMode: row.balanceCheckMode,
+                })),
+                policy: {
+                    allowedClaims,
+                    requestedClaims,
+                    allowedScopes: scoped.allowedScopes,
+                    requestedScopes: scoped.requestedScopes,
+                },
             },
+        });
+    }
+    buildSignedEnvelope(input) {
+        if (!input.clientResponseSigningSecret) {
+            return {
+                payload: input.payload,
+                meta: {
+                    timestamp: input.timestamp,
+                    nonce: input.nonce,
+                },
+                signature: null,
+            };
+        }
+        const signed = (0, service_response_signature_1.signServiceResponse)({
+            responseSigningSecret: input.clientResponseSigningSecret,
+            payload: input.payload,
+            timestamp: input.timestamp,
+            nonce: input.nonce,
+        });
+        return {
+            payload: input.payload,
+            meta: {
+                timestamp: input.timestamp,
+                nonce: input.nonce,
+            },
+            signature: signed.signature,
         };
     }
 };
@@ -226,6 +294,7 @@ exports.ServiceApiService = ServiceApiService;
 exports.ServiceApiService = ServiceApiService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        token_2022_service_1.Token2022Service])
+        token_2022_service_1.Token2022Service,
+        services_service_1.ServicesService])
 ], ServiceApiService);
 //# sourceMappingURL=service-api.service.js.map

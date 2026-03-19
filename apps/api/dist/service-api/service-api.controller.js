@@ -25,6 +25,9 @@ let ServiceApiController = class ServiceApiController {
     requestKyc(body, req) {
         return this.serviceApiService.requestKyc({
             serviceId: req.serviceAuth.serviceId,
+            clientId: req.serviceAuth.clientId,
+            nonce: req.serviceAuth.nonce,
+            timestamp: req.serviceAuth.timestamp,
             userId: body.userId,
             requestedClaims: body.requestedClaims,
         });

@@ -56,12 +56,14 @@ let ServicesService = class ServicesService {
         const clientId = this.generateClientId();
         const clientSecret = this.generateClientSecret();
         const clientSecretHash = await argon2.hash(clientSecret);
+        const responseSigningSecret = this.generateResponseSigningSecret();
         const service = await this.prisma.service.create({
             data: {
                 name: dto.name.trim(),
                 description: dto.description?.trim() || null,
                 clientId,
                 clientSecretHash,
+                responseSigningSecret,
                 status: 'active',
             },
         });
@@ -77,6 +79,7 @@ let ServicesService = class ServicesService {
             issuedCredentials: {
                 clientId,
                 clientSecret,
+                responseSigningSecret,
             },
         };
     }
@@ -108,6 +111,11 @@ let ServicesService = class ServicesService {
             },
         });
     }
+    async getServiceByClientIdWithSecrets(clientId) {
+        return this.prisma.service.findUnique({
+            where: { clientId },
+        });
+    }
     async validateServiceCredentials(clientId, clientSecret) {
         const service = await this.prisma.service.findUnique({
             where: { clientId },
@@ -134,6 +142,9 @@ let ServicesService = class ServicesService {
     }
     generateClientSecret() {
         return `sk_${(0, crypto_1.randomBytes)(24).toString('hex')}`;
+    }
+    generateResponseSigningSecret() {
+        return `resp_${(0, crypto_1.randomBytes)(32).toString('hex')}`;
     }
 };
 exports.ServicesService = ServicesService;

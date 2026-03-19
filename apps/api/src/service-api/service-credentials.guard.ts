@@ -21,6 +21,8 @@ export class ServiceCredentialsGuard implements CanActivate {
         serviceId: string;
         clientId: string;
         serviceName: string;
+        nonce: string;
+        timestamp: number;
       };
     }>();
 
@@ -58,6 +60,8 @@ export class ServiceCredentialsGuard implements CanActivate {
       serviceId: service.id,
       clientId: service.clientId,
       serviceName: service.name,
+      nonce,
+      timestamp: Number(timestamp),
     };
 
     return true;

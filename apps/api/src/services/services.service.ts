@@ -7,11 +7,12 @@ import * as argon2 from 'argon2';
 @Injectable()
 export class ServicesService {
   constructor(private readonly prisma: PrismaService) {}
-
+  
   async registerService(dto: RegisterServiceDto) {
     const clientId = this.generateClientId();
     const clientSecret = this.generateClientSecret();
     const clientSecretHash = await argon2.hash(clientSecret);
+    const responseSigningSecret = this.generateResponseSigningSecret();
 
     const service = await this.prisma.service.create({
       data: {
@@ -19,6 +20,7 @@ export class ServicesService {
         description: dto.description?.trim() || null,
         clientId,
         clientSecretHash,
+        responseSigningSecret,
         status: 'active',
       },
     });
@@ -35,6 +37,7 @@ export class ServicesService {
       issuedCredentials: {
         clientId,
         clientSecret,
+        responseSigningSecret,
       },
     };
   }
@@ -66,6 +69,12 @@ export class ServicesService {
         createdAt: true,
         updatedAt: true,
       },
+    });
+  }
+  
+  async getServiceByClientIdWithSecrets(clientId: string) {
+    return this.prisma.service.findUnique({
+      where: { clientId },
     });
   }
 
@@ -102,5 +111,9 @@ export class ServicesService {
 
   private generateClientSecret(): string {
     return `sk_${randomBytes(24).toString('hex')}`;
+  }
+
+  private generateResponseSigningSecret(): string {
+    return `resp_${randomBytes(32).toString('hex')}`;
   }
 }

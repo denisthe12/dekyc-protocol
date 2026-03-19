@@ -94,6 +94,7 @@ model Service {
   name               String
   clientId           String       @unique
   clientSecretHash   String
+  responseSigningSecret  String?
   description        String?
   status             String       @default("active")
   createdAt          DateTime     @default(now())

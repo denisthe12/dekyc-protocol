@@ -45,6 +45,8 @@ let ServiceCredentialsGuard = class ServiceCredentialsGuard {
             serviceId: service.id,
             clientId: service.clientId,
             serviceName: service.name,
+            nonce,
+            timestamp: Number(timestamp),
         };
         return true;
     }

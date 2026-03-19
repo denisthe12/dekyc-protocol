@@ -19,11 +19,16 @@ export class ServiceApiController {
         serviceId: string;
         clientId: string;
         serviceName: string;
+        nonce: string;
+        timestamp: number;
       };
     },
   ) {
     return this.serviceApiService.requestKyc({
       serviceId: req.serviceAuth.serviceId,
+      clientId: req.serviceAuth.clientId,
+      nonce: req.serviceAuth.nonce,
+      timestamp: req.serviceAuth.timestamp,
       userId: body.userId,
       requestedClaims: body.requestedClaims,
     });

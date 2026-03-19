@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { buildScopedClaims } from './kyc-claims-policy';
 import { Token2022Service } from '../solana/token-2022.service';
 import { CLAIM_TO_SCOPE } from '../permissions/permission-scopes';
+import { ServicesService } from '../services/services.service';
+import { signServiceResponse } from './service-response-signature';
 
 export interface TokenCheck {
   scope: string;
@@ -20,10 +22,14 @@ export class ServiceApiService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly token2022Service: Token2022Service,
+    private readonly servicesService: ServicesService,
   ) {}
 
   async requestKyc(input: {
     serviceId: string;
+    clientId: string;
+    nonce: string;
+    timestamp: number;
     userId: string;
     requestedClaims?: string[];
   }) {
@@ -39,12 +45,34 @@ export class ServiceApiService {
       },
     });
 
+    const service = await this.servicesService.getServiceByClientIdWithSecrets(
+      input.clientId,
+    );
+
+    if (!service || !service.responseSigningSecret) {
+      return this.buildSignedEnvelope({
+        clientResponseSigningSecret: null,
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+        payload: {
+          allowed: false,
+          reason: 'service_signing_secret_not_found',
+          claims: null,
+        },
+      });
+    }
+
     if (!permission) {
-      return {
-        allowed: false,
-        reason: 'permission_not_found',
-        claims: null,
-      };
+      return this.buildSignedEnvelope({
+        clientResponseSigningSecret: service.responseSigningSecret,
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+        payload: {
+          allowed: false,
+          reason: 'permission_not_found',
+          claims: null,
+        },
+      });
     }
 
     if (permission.status !== 'ACTIVE') {
@@ -57,11 +85,16 @@ export class ServiceApiService {
         },
       });
 
-      return {
-        allowed: false,
-        reason: 'permission_not_active',
-        claims: null,
-      };
+      return this.buildSignedEnvelope({
+        clientResponseSigningSecret: service.responseSigningSecret,
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+        payload: {
+          allowed: false,
+          reason: 'permission_not_active',
+          claims: null,
+        }
+      });
     }
 
     const activeScopeGrants = await this.prisma.permissionScopeGrant.findMany({
@@ -168,11 +201,16 @@ export class ServiceApiService {
         },
       });
 
-      return {
-        allowed: false,
-        reason: 'kyc_profile_not_found',
-        claims: null,
-      };
+      return this.buildSignedEnvelope({
+        clientResponseSigningSecret: service.responseSigningSecret,
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+        payload: {
+          allowed: false,
+          reason: 'kyc_profile_not_found',
+          claims: null,
+        }
+      });
     }
 
     const fullName = [
@@ -212,14 +250,19 @@ export class ServiceApiService {
         },
       });
 
-      return {
-        allowed: false,
-        reason: 'token_balance_check_failed',
-        claims: null,
-        grantedClaims: [],
-        grantedScopes: [],
-        tokenChecks,
-      };
+      return this.buildSignedEnvelope({
+        clientResponseSigningSecret: service.responseSigningSecret,
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+        payload: {
+          allowed: false,
+          reason: 'token_balance_check_failed',
+          claims: null,
+          grantedClaims: [],
+          grantedScopes: [],
+          tokenChecks,
+        }
+      });
     }
 
     await this.prisma.accessLog.create({
@@ -231,26 +274,65 @@ export class ServiceApiService {
       },
     });
 
-    return {
-      allowed: true,
-      reason: 'permission_active',
-      claims: scoped.claims,
-      grantedClaims: scoped.grantedClaims,
-      grantedScopes: scoped.grantedScopes,
-      tokenChecks,
-      scopeGrantRefs: activeScopeGrants.map((row) => ({
-        scope: row.scope,
-        mintAddress: row.mintAddress,
-        tokenAccountAddress: row.tokenAccountAddress,
-        requiredAmount: row.requiredAmount,
-        balanceCheckMode: row.balanceCheckMode,
-      })),
-      policy: {
-        allowedClaims,
-        requestedClaims,
-        allowedScopes: scoped.allowedScopes,
-        requestedScopes: scoped.requestedScopes,
+    return this.buildSignedEnvelope({
+      clientResponseSigningSecret: service.responseSigningSecret,
+      timestamp: input.timestamp,
+      nonce: input.nonce,
+      payload: {
+        allowed: true,
+        reason: 'permission_active',
+        claims: scoped.claims,
+        grantedClaims: scoped.grantedClaims,
+        grantedScopes: scoped.grantedScopes,
+        tokenChecks,
+        scopeGrantRefs: activeScopeGrants.map((row) => ({
+          scope: row.scope,
+          mintAddress: row.mintAddress,
+          tokenAccountAddress: row.tokenAccountAddress,
+          requiredAmount: row.requiredAmount,
+          balanceCheckMode: row.balanceCheckMode,
+        })),
+        policy: {
+          allowedClaims,
+          requestedClaims,
+          allowedScopes: scoped.allowedScopes,
+          requestedScopes: scoped.requestedScopes,
+        },
       },
+    });
+  }
+
+  private buildSignedEnvelope(input: {
+    clientResponseSigningSecret: string | null;
+    timestamp: number;
+    nonce: string;
+    payload: unknown;
+  }) {
+    if (!input.clientResponseSigningSecret) {
+      return {
+        payload: input.payload,
+        meta: {
+          timestamp: input.timestamp,
+          nonce: input.nonce,
+        },
+        signature: null,
+      };
+    }
+
+    const signed = signServiceResponse({
+      responseSigningSecret: input.clientResponseSigningSecret,
+      payload: input.payload,
+      timestamp: input.timestamp,
+      nonce: input.nonce,
+    });
+
+    return {
+      payload: input.payload,
+      meta: {
+        timestamp: input.timestamp,
+        nonce: input.nonce,
+      },
+      signature: signed.signature,
     };
   }
 }
