@@ -15,6 +15,7 @@ const spl_token_1 = require("@solana/spl-token");
 const web3_js_1 = require("@solana/web3.js");
 const crypto_1 = require("crypto");
 const solana_service_1 = require("./solana.service");
+const spl_token_2 = require("@solana/spl-token");
 let Token2022Service = class Token2022Service {
     solanaService;
     constructor(solanaService) {
@@ -80,6 +81,11 @@ let Token2022Service = class Token2022Service {
         const tx = new web3_js_1.Transaction().add((0, spl_token_1.createBurnInstruction)(tokenAccount, mint, this.payer.publicKey, BigInt(params.amount), [], spl_token_1.TOKEN_2022_PROGRAM_ID));
         const signature = await (0, web3_js_1.sendAndConfirmTransaction)(this.connection, tx, [this.payer], { commitment: 'confirmed' });
         return { tx: signature };
+    }
+    async getScopeTokenBalance(tokenAccountAddress) {
+        const tokenAccount = new web3_js_1.PublicKey(tokenAccountAddress);
+        const account = await (0, spl_token_2.getAccount)(this.connection, tokenAccount, 'confirmed', spl_token_1.TOKEN_2022_PROGRAM_ID);
+        return Number(account.amount);
     }
 };
 exports.Token2022Service = Token2022Service;

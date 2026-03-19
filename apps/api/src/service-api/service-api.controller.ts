@@ -3,6 +3,7 @@ import { ServiceApiService } from './service-api.service';
 import { ServiceCredentialsGuard } from './service-credentials.guard';
 import { ServiceKycRequestDto } from './dto/service-kyc-request.dto';
 import { Request } from 'express';
+import type { TokenCheck } from './service-api.service';
 
 @Controller('service-api')
 export class ServiceApiController {

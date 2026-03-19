@@ -32,4 +32,5 @@ export declare class Token2022Service {
     }): Promise<{
         tx: string;
     }>;
+    getScopeTokenBalance(tokenAccountAddress: string): Promise<number>;
 }

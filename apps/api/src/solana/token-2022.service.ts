@@ -18,6 +18,7 @@ import {
 } from '@solana/web3.js';
 import { createHash } from 'crypto';
 import { SolanaService } from './solana.service';
+import { getAccount } from '@solana/spl-token';
 
 @Injectable()
 export class Token2022Service {
@@ -177,5 +178,18 @@ export class Token2022Service {
     );
 
     return { tx: signature };
+  }
+
+  async getScopeTokenBalance(tokenAccountAddress: string) {
+    const tokenAccount = new PublicKey(tokenAccountAddress);
+
+    const account = await getAccount(
+      this.connection,
+      tokenAccount,
+      'confirmed',
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    return Number(account.amount);
   }
 }
