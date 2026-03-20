@@ -1,1 +1,1 @@
-{"version":3,"file":"grant-permission.dto.js","sourceRoot":"","sources":["../../../src/permissions/dto/grant-permission.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,kBAAkB;IAC7B,SAAS,CAAU;IACnB,mBAAmB,CAAU;IAC7B,aAAa,CAAY;CAC1B;AAJD,gDAIC"}
+{"version":3,"file":"grant-permission.dto.js","sourceRoot":"","sources":["../../../src/permissions/dto/grant-permission.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,kBAAkB;IAC7B,SAAS,CAAU;IACnB,aAAa,CAAY;CAC1B;AAHD,gDAGC"}

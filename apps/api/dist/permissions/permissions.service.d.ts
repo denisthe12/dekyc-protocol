@@ -112,5 +112,6 @@ export declare class PermissionsService {
         scopesHash: string | null;
     })[]>;
     private ensureUserRegisteredOnChain;
+    private generateRequiredAmount;
 }
 export {};

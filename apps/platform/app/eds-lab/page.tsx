@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { createNCALayerClient } from '@/lib/ncalayer';
 
 type ChallengeResponse = {
@@ -96,6 +96,14 @@ export default function EdsLabPage() {
   const [cmsSignatureBase64, setCmsSignatureBase64] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const savedToken = window.localStorage.getItem('dekyc_access_token');
+
+    if (savedToken) {
+      setAccessToken(savedToken);
+    }
+  }, []);
+
   const requestChallenge = async () => {
     try {
       setLoadingChallenge(true);
@@ -142,6 +150,7 @@ export default function EdsLabPage() {
       const data = JSON.parse(rawText);
       setAccessToken(data.accessToken);
       setMeData(data.user);
+      window.localStorage.setItem('dekyc_access_token', data.accessToken);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup error');
     } finally {
@@ -169,6 +178,7 @@ export default function EdsLabPage() {
       const data = JSON.parse(rawText);
       setAccessToken(data.accessToken);
       setMeData(data.user);
+      window.localStorage.setItem('dekyc_access_token', data.accessToken);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login error');
     } finally {

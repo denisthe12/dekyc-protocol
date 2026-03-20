@@ -1,65 +1,74 @@
-import Image from "next/image";
+import Link from 'next/link';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-zinc-950 text-white">
+      <div className="mx-auto flex max-w-6xl flex-col items-center px-6 py-20 text-center">
+        {/* Title */}
+        <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
+          Decentralized KYC Access Protocol
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mt-6 max-w-2xl text-lg text-zinc-400">
+          User-controlled identity, scoped data disclosure, and tokenized access
+          permissions powered by Solana and Token-2022.
+        </p>
+
+        {/* Highlights */}
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <Feature
+            title="User-Owned Identity"
+            desc="KYC derived from EDS, stored securely, controlled by the user."
+          />
+          <Feature
+            title="Scoped Access"
+            desc="Services receive only specific claims via explicit user consent."
+          />
+          <Feature
+            title="Tokenized Permissions"
+            desc="Access rights are enforced using on-chain capability tokens."
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* CTA */}
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/permissions"
+            className="rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-zinc-200"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Open Dashboard
+          </Link>
+
+          <Link
+            href="/protocol"
+            className="rounded-2xl border border-zinc-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
           >
-            Documentation
-          </a>
+            View Protocol Monitor
+          </Link>
+
+          <Link
+            href="/demo-flow"
+            className="rounded-2xl border border-zinc-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+          >
+            Open Demo Flow
+          </Link>
         </div>
-      </main>
+
+        {/* Tech line */}
+        <div className="mt-16 text-xs text-zinc-500">
+          Built with Next.js • NestJS • Solana • Anchor • Token-2022
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function Feature({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5 text-left">
+      <div className="text-sm font-semibold text-white">{title}</div>
+      <div className="mt-2 text-sm text-zinc-400">{desc}</div>
     </div>
   );
 }

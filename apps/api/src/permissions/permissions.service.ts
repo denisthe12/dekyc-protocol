@@ -92,6 +92,7 @@ export class PermissionsService {
     }
 
     let permission = existing;
+    const requiredAmount = this.generateRequiredAmount();
 
     if (permission) {
       permission = await this.prisma.permission.update({
@@ -100,7 +101,7 @@ export class PermissionsService {
             status: 'ACTIVE',
             version: permission.version + 1,
             revokedAt: null,
-            requiredTokenAmount: dto.requiredTokenAmount ?? null,
+            requiredTokenAmount: requiredAmount ?? null,
             kycHashSnapshot: latestVault.kycHash,
             allowedClaims,
             scopesHash,
@@ -113,7 +114,7 @@ export class PermissionsService {
             serviceId: dto.serviceId,
             status: 'ACTIVE',
             version: 1,
-            requiredTokenAmount: dto.requiredTokenAmount ?? null,
+            requiredTokenAmount: requiredAmount ?? null,
             kycHashSnapshot: latestVault.kycHash,
             allowedClaims,
             scopesHash,
@@ -147,7 +148,7 @@ export class PermissionsService {
       serviceId: permission.serviceId,
       kycHash: latestVault.kycHash,
       scopesHash,
-      requiredAmount: dto.requiredTokenAmount ?? 0,
+      requiredAmount: requiredAmount ?? 0,
       mint: mintKeypair.publicKey.toBase58(),
       tokenAccount: tokenAccountKeypair.publicKey.toBase58(),
     });
@@ -166,7 +167,7 @@ export class PermissionsService {
       permissionId: syncedPermission.id,
       serviceId: syncedPermission.serviceId,
       scopes: allowedScopes,
-      requiredAmount: dto.requiredTokenAmount ?? 1,
+      requiredAmount: requiredAmount ?? 1,
       tokenProgram: onChainGrant.tokenProgram,
     });
 
@@ -362,5 +363,9 @@ export class PermissionsService {
 
       throw error;
     }
+  }
+
+  private generateRequiredAmount(): number {
+    return Math.floor(Math.random() * 9) + 1; // 1..9
   }
 }
