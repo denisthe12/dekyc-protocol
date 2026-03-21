@@ -20,6 +20,7 @@ const login_dto_1 = require("./dto/login.dto");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
 const hkdf_service_1 = require("../crypto/hkdf.service");
 const solana_service_1 = require("../solana/solana.service");
+const setup_biometric_dto_1 = require("./dto/setup-biometric.dto");
 let AuthController = class AuthController {
     authService;
     hkdfService;
@@ -61,6 +62,21 @@ let AuthController = class AuthController {
             message: 'User registered on-chain',
             ...result,
         };
+    }
+    profileSummary(req) {
+        return this.authService.getProfileSummary(req.user.sub);
+    }
+    setupBiometric(req, body) {
+        return this.authService.setupBiometric(req.user.sub, body.biometricMockId);
+    }
+    issueLoginCode(req) {
+        return this.authService.issueLoginCode(req.user.sub);
+    }
+    rotateLoginCode(req) {
+        return this.authService.rotateLoginCode(req.user.sub);
+    }
+    kycSummary(req) {
+        return this.authService.getKycSummary(req.user.sub);
     }
 };
 exports.AuthController = AuthController;
@@ -106,6 +122,47 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "solanaRegisterUser", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('profile-summary'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "profileSummary", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('biometric/setup'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, setup_biometric_dto_1.SetupBiometricDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "setupBiometric", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('login-code/issue'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "issueLoginCode", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('login-code/rotate'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "rotateLoginCode", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('kyc-summary'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "kycSummary", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService,

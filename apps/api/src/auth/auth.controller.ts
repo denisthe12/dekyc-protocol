@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { Request } from 'express';
 import { HkdfService } from '../crypto/hkdf.service';
 import { SolanaService } from '../solana/solana.service';
+import { SetupBiometricDto } from './dto/setup-biometric.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -62,13 +63,54 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('solana-register-user')
   async solanaRegisterUser(@Req() req: any) {
-  const userId: string = req.user.sub;
+    const userId: string = req.user.sub;
 
-  const result = await this.solanaService.registerUserOnChain(userId);
+    const result = await this.solanaService.registerUserOnChain(userId);
 
-  return {
-    message: 'User registered on-chain',
-    ...result,
-  };
-}
+    return {
+      message: 'User registered on-chain',
+      ...result,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile-summary')
+  profileSummary(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ) {
+    return this.authService.getProfileSummary(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('biometric/setup')
+  setupBiometric(
+    @Req() req: Request & { user: { sub: string; email: string } },
+    @Body() body: SetupBiometricDto,
+  ) {
+    return this.authService.setupBiometric(req.user.sub, body.biometricMockId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('login-code/issue')
+  issueLoginCode(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ) {
+    return this.authService.issueLoginCode(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('login-code/rotate')
+  rotateLoginCode(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ) {
+    return this.authService.rotateLoginCode(req.user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('kyc-summary')
+  kycSummary(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ) {
+    return this.authService.getKycSummary(req.user.sub);
+  }
 }

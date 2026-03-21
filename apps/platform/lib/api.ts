@@ -4,7 +4,7 @@ import {
   ServiceItem,
 } from './types';
 
-import { ProtocolSnapshot } from './types';
+import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse } from './types';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -74,6 +74,50 @@ export async function revokePermission(permissionId: string): Promise<unknown> {
 
 export async function fetchProtocolSnapshot(): Promise<ProtocolSnapshot> {
   return apiFetch<ProtocolSnapshot>('/protocol-monitor/snapshot', {
+    method: 'GET',
+  });
+}
+
+export async function fetchProfileSummary(): Promise<ProfileSummaryResponse> {
+  return apiFetch<ProfileSummaryResponse>('/auth/profile-summary', {
+    method: 'GET',
+  });
+}
+
+export async function setupBiometric(input: {
+  biometricMockId: string;
+}): Promise<{
+  id: string;
+  biometricConfigured: boolean;
+  biometricMockId: string | null;
+  updatedAt: string;
+}> {
+  return apiFetch('/auth/biometric/setup', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+export async function issueLoginCode(): Promise<{
+  loginCode: string;
+  issuedAt: string;
+}> {
+  return apiFetch('/auth/login-code/issue', {
+    method: 'POST',
+  });
+}
+
+export async function rotateLoginCode(): Promise<{
+  loginCode: string;
+  issuedAt: string;
+}> {
+  return apiFetch('/auth/login-code/rotate', {
+    method: 'POST',
+  });
+}
+
+export async function fetchKycSummary(): Promise<KycSummaryResponse> {
+  return apiFetch<KycSummaryResponse>('/auth/kyc-summary', {
     method: 'GET',
   });
 }

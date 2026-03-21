@@ -99,3 +99,83 @@ export type ProtocolSnapshot = {
   permissions: ProtocolPermission[];
   accessLogs: ProtocolAccessLog[];
 };
+
+export type ProfileSummaryResponse = {
+  user: {
+    id: string;
+    email: string;
+    emailVerified: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  profileStatus: {
+    biometricConfigured: boolean;
+    biometricMockId: string | null;
+    loginCodeConfigured: boolean;
+    loginCodeIssuedAt: string | null;
+    edsBound: boolean;
+    kycReady: boolean;
+    vaultReady: boolean;
+  };
+  latestUserCert: {
+    id: string;
+    createdAt: string;
+  } | null;
+  latestKycProfile: {
+    id: string;
+    fullName: string | null;
+    iin: string | null;
+    birthDate: string | null;
+    gender: string | null;
+    country: string | null;
+    email: string | null;
+    status: string;
+    createdAt: string;
+  } | null;
+  latestVaultEntry: {
+    id: string;
+    algorithm: string;
+    keyVersion: string;
+    createdAt: string;
+  } | null;
+};
+
+export type KycSummaryResponse = {
+  gating: {
+    biometricConfigured: boolean;
+    canBindEds: boolean;
+  };
+  eds: {
+    connected: boolean;
+    latestUserCert: {
+      id: string;
+      createdAt: string;
+    } | null;
+  };
+  kyc: {
+    ready: boolean;
+    profile: {
+      id: string;
+      firstName: string | null;
+      lastName: string | null;
+      middleName: string | null;
+      fullName: string | null;
+      iin: string | null;
+      email: string | null;
+      birthDate: string | null;
+      gender: string | null;
+      country: string | null;
+      status: string;
+      createdAt: string;
+    } | null;
+  };
+  vault: {
+    ready: boolean;
+    entry: {
+      id: string;
+      algorithm: string;
+      keyVersion: string;
+      createdAt: string;
+    } | null;
+  };
+};

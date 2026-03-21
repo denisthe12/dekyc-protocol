@@ -12,6 +12,12 @@ model User {
   email          String      @unique
   passwordHash   String
   emailVerified  Boolean     @default(false)
+
+  biometricConfigured     Boolean      @default(false)
+  biometricMockId         String?
+  loginCodeHash           String?
+  loginCodeIssuedAt       DateTime?
+
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 

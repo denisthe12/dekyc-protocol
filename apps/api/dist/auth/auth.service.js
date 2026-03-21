@@ -47,6 +47,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const argon2 = __importStar(require("argon2"));
 const jwt_1 = require("@nestjs/jwt");
+const crypto_1 = require("crypto");
 let AuthService = class AuthService {
     prisma;
     jwtService;
@@ -109,6 +110,205 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException('User not found');
         }
         return user;
+    }
+    async getProfileSummary(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                emailVerified: true,
+                biometricConfigured: true,
+                biometricMockId: true,
+                loginCodeHash: true,
+                loginCodeIssuedAt: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        const latestUserCert = await this.prisma.userCert.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                createdAt: true,
+            },
+        });
+        const latestKycProfile = await this.prisma.kycProfile.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                fullName: true,
+                iin: true,
+                birthDate: true,
+                gender: true,
+                country: true,
+                email: true,
+                status: true,
+                createdAt: true,
+            },
+        });
+        const latestVaultEntry = await this.prisma.kycVaultEntry.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                algorithm: true,
+                keyVersion: true,
+                createdAt: true,
+            },
+        });
+        return {
+            user: {
+                id: user.id,
+                email: user.email,
+                emailVerified: user.emailVerified,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+            },
+            profileStatus: {
+                biometricConfigured: user.biometricConfigured,
+                biometricMockId: user.biometricMockId,
+                loginCodeConfigured: Boolean(user.loginCodeHash),
+                loginCodeIssuedAt: user.loginCodeIssuedAt,
+                edsBound: Boolean(latestUserCert),
+                kycReady: Boolean(latestKycProfile),
+                vaultReady: Boolean(latestVaultEntry),
+            },
+            latestUserCert,
+            latestKycProfile,
+            latestVaultEntry,
+        };
+    }
+    async setupBiometric(userId, biometricMockId) {
+        const normalized = biometricMockId.trim();
+        if (!normalized) {
+            throw new common_1.BadRequestException('biometricMockId is required');
+        }
+        if (normalized.length < 4) {
+            throw new common_1.BadRequestException('biometricMockId must be at least 4 characters');
+        }
+        const user = await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                biometricConfigured: true,
+                biometricMockId: normalized,
+            },
+            select: {
+                id: true,
+                biometricConfigured: true,
+                biometricMockId: true,
+                updatedAt: true,
+            },
+        });
+        return user;
+    }
+    async issueLoginCode(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                biometricConfigured: true,
+            },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        if (!user.biometricConfigured) {
+            throw new common_1.BadRequestException('Configure biometric mock before issuing login code');
+        }
+        const loginCode = this.generateLoginCode();
+        const loginCodeHash = this.hashLoginCode(loginCode);
+        await this.prisma.user.update({
+            where: { id: userId },
+            data: {
+                loginCodeHash,
+                loginCodeIssuedAt: new Date(),
+            },
+        });
+        return {
+            loginCode,
+            issuedAt: new Date().toISOString(),
+        };
+    }
+    async rotateLoginCode(userId) {
+        return this.issueLoginCode(userId);
+    }
+    async getKycSummary(userId) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                biometricConfigured: true,
+            },
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('User not found');
+        }
+        const latestUserCert = await this.prisma.userCert.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                createdAt: true,
+            },
+        });
+        const latestKycProfile = await this.prisma.kycProfile.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                middleName: true,
+                fullName: true,
+                iin: true,
+                email: true,
+                birthDate: true,
+                gender: true,
+                country: true,
+                status: true,
+                createdAt: true,
+            },
+        });
+        const latestVaultEntry = await this.prisma.kycVaultEntry.findFirst({
+            where: { userId },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                algorithm: true,
+                keyVersion: true,
+                createdAt: true,
+            },
+        });
+        return {
+            gating: {
+                biometricConfigured: user.biometricConfigured,
+                canBindEds: user.biometricConfigured,
+            },
+            eds: {
+                connected: Boolean(latestUserCert),
+                latestUserCert,
+            },
+            kyc: {
+                ready: Boolean(latestKycProfile),
+                profile: latestKycProfile,
+            },
+            vault: {
+                ready: Boolean(latestVaultEntry),
+                entry: latestVaultEntry,
+            },
+        };
+    }
+    generateLoginCode() {
+        return `DK-${(0, crypto_1.randomBytes)(4).toString('hex').toUpperCase()}`;
+    }
+    hashLoginCode(value) {
+        return (0, crypto_1.createHash)('sha256').update(value).digest('hex');
     }
     issueAuthResult(userId, email) {
         const payload = {
