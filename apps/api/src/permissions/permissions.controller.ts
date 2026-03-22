@@ -32,4 +32,11 @@ export class PermissionsController {
   ): Promise<unknown> {
     return this.permissionsService.getMyPermissions(req.user.sub);
   }
+    
+  @Get('user-facing')
+  getUserFacing(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ): Promise<unknown> {
+    return this.permissionsService.getUserFacingPermissions(req.user.sub);
+  }
 }

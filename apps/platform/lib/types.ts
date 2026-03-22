@@ -179,3 +179,31 @@ export type KycSummaryResponse = {
     } | null;
   };
 };
+
+export type UserFacingServiceCatalogItem = {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  requiredClaims: string[] | null;
+  optionalClaims: string[] | null;
+  status: string;
+};
+
+export type UserFacingPermissionItem = {
+  id: string;
+  status: string;
+  createdAt: string;
+  revokedAt: string | null;
+  allowedClaims: string[] | null;
+  requiredTokenAmount: number | null;
+  service: {
+    id: string;
+    name: string;
+    description: string | null;
+    category: string | null;
+    requiredClaims: string[] | null;
+    optionalClaims: string[] | null;
+    status: string;
+  };
+};

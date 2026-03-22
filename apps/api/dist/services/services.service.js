@@ -61,9 +61,12 @@ let ServicesService = class ServicesService {
             data: {
                 name: dto.name.trim(),
                 description: dto.description?.trim() || null,
+                category: dto.category?.trim() || null,
                 clientId,
                 clientSecretHash,
                 responseSigningSecret,
+                requiredClaims: dto.requiredClaims ?? ['fullName', 'iin', 'birthDate'],
+                optionalClaims: dto.optionalClaims ?? ['email', 'verified', 'age18Plus'],
                 status: 'active',
             },
         });
@@ -72,6 +75,7 @@ let ServicesService = class ServicesService {
                 id: service.id,
                 name: service.name,
                 description: service.description,
+                category: service.category,
                 clientId: service.clientId,
                 status: service.status,
                 createdAt: service.createdAt,
@@ -90,6 +94,9 @@ let ServicesService = class ServicesService {
                 id: true,
                 name: true,
                 description: true,
+                category: true,
+                requiredClaims: true,
+                optionalClaims: true,
                 clientId: true,
                 status: true,
                 createdAt: true,
@@ -104,6 +111,9 @@ let ServicesService = class ServicesService {
                 id: true,
                 name: true,
                 description: true,
+                category: true,
+                requiredClaims: true,
+                optionalClaims: true,
                 clientId: true,
                 status: true,
                 createdAt: true,
@@ -136,6 +146,23 @@ let ServicesService = class ServicesService {
             name: service.name,
             status: service.status,
         };
+    }
+    async getUserFacingCatalog() {
+        return this.prisma.service.findMany({
+            where: {
+                status: 'active',
+            },
+            orderBy: { createdAt: 'desc' },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                category: true,
+                requiredClaims: true,
+                optionalClaims: true,
+                status: true,
+            },
+        });
     }
     generateClientId() {
         return `svc_${(0, crypto_1.randomBytes)(12).toString('hex')}`;

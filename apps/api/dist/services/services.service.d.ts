@@ -8,6 +8,7 @@ export declare class ServicesService {
             id: string;
             name: string;
             description: string | null;
+            category: string | null;
             clientId: string;
             status: string;
             createdAt: Date;
@@ -26,6 +27,9 @@ export declare class ServicesService {
         status: string;
         clientId: string;
         description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
     }[]>;
     getServiceById(serviceId: string): Promise<{
         id: string;
@@ -35,6 +39,9 @@ export declare class ServicesService {
         status: string;
         clientId: string;
         description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
     } | null>;
     getServiceByClientIdWithSecrets(clientId: string): Promise<{
         id: string;
@@ -46,6 +53,9 @@ export declare class ServicesService {
         clientSecretHash: string;
         responseSigningSecret: string | null;
         description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue | null;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue | null;
     } | null>;
     validateServiceCredentials(clientId: string, clientSecret: string): Promise<{
         id: string;
@@ -53,6 +63,15 @@ export declare class ServicesService {
         name: string;
         status: string;
     } | null>;
+    getUserFacingCatalog(): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+    }[]>;
     private generateClientId;
     private generateClientSecret;
     private generateResponseSigningSecret;

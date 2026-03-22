@@ -18,9 +18,12 @@ export class ServicesService {
       data: {
         name: dto.name.trim(),
         description: dto.description?.trim() || null,
+        category: dto.category?.trim() || null,
         clientId,
         clientSecretHash,
         responseSigningSecret,
+        requiredClaims: dto.requiredClaims ?? ['fullName', 'iin', 'birthDate'],
+        optionalClaims: dto.optionalClaims ?? ['email', 'verified', 'age18Plus'],
         status: 'active',
       },
     });
@@ -30,6 +33,7 @@ export class ServicesService {
         id: service.id,
         name: service.name,
         description: service.description,
+        category: service.category,
         clientId: service.clientId,
         status: service.status,
         createdAt: service.createdAt,
@@ -49,6 +53,9 @@ export class ServicesService {
         id: true,
         name: true,
         description: true,
+        category: true,
+        requiredClaims: true,
+        optionalClaims: true,
         clientId: true,
         status: true,
         createdAt: true,
@@ -64,6 +71,9 @@ export class ServicesService {
         id: true,
         name: true,
         description: true,
+        category: true,
+        requiredClaims: true,
+        optionalClaims: true,
         clientId: true,
         status: true,
         createdAt: true,
@@ -103,6 +113,24 @@ export class ServicesService {
       name: service.name,
       status: service.status,
     };
+  }
+
+  async getUserFacingCatalog() {
+    return this.prisma.service.findMany({
+      where: {
+        status: 'active',
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        category: true,
+        requiredClaims: true,
+        optionalClaims: true,
+        status: true,
+      },
+    });
   }
 
   private generateClientId(): string {

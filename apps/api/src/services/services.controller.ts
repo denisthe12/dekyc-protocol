@@ -18,4 +18,10 @@ export class ServicesController {
   getAll() {
     return this.servicesService.getAllServices();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('catalog')
+  getCatalog() {
+    return this.servicesService.getUserFacingCatalog();
+  }
 }

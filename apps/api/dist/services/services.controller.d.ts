@@ -8,6 +8,7 @@ export declare class ServicesController {
             id: string;
             name: string;
             description: string | null;
+            category: string | null;
             clientId: string;
             status: string;
             createdAt: Date;
@@ -26,5 +27,17 @@ export declare class ServicesController {
         status: string;
         clientId: string;
         description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+    }[]>;
+    getCatalog(): Promise<{
+        id: string;
+        name: string;
+        status: string;
+        description: string | null;
+        category: string | null;
+        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
     }[]>;
 }

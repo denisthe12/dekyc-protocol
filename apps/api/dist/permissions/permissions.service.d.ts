@@ -111,6 +111,23 @@ export declare class PermissionsService {
         allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
         scopesHash: string | null;
     })[]>;
+    getUserFacingPermissions(userId: string): Promise<{
+        service: {
+            id: string;
+            name: string;
+            status: string;
+            description: string | null;
+            category: string | null;
+            requiredClaims: import("@prisma/client/runtime/library").JsonValue;
+            optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+        };
+        id: string;
+        createdAt: Date;
+        status: string;
+        revokedAt: Date | null;
+        requiredTokenAmount: number | null;
+        allowedClaims: import("@prisma/client/runtime/library").JsonValue;
+    }[]>;
     private ensureUserRegisteredOnChain;
     private generateRequiredAmount;
 }

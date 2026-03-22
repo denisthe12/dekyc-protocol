@@ -13,5 +13,6 @@ import { ServiceRequestNonceService } from './service-request-nonce.service';
     ServiceCredentialsGuard,
     ServiceRequestNonceService,
   ],
+  exports: [ServiceApiService, ServiceCredentialsGuard],
 })
 export class ServiceApiModule {}

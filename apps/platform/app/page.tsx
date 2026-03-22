@@ -53,6 +53,13 @@ export default function HomePage() {
           >
             Open Demo Flow
           </Link>
+
+          <Link
+            href="/service-login"
+            className="rounded-2xl border border-zinc-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+          >
+            Open Consumer Service
+          </Link>
         </div>
 
         {/* Tech line */}

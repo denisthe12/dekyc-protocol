@@ -15,6 +15,7 @@ import { ServiceApiModule } from './service-api/service-api.module';
 import { SolanaModule } from './solana/solana.module';
 import { PermissionScopeGrantsModule } from './permission-scope-grants/permission-scope-grants.module';
 import { ProtocolMonitorModule } from './protocol-monitor/protocol-monitor.module';
+import { ServiceAuthModule } from './service-auth/service-auth.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ProtocolMonitorModule } from './protocol-monitor/protocol-monitor.modul
     SolanaModule,
     PermissionScopeGrantsModule,
     ProtocolMonitorModule,
+    ServiceAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],

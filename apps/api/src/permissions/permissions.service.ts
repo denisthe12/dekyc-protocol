@@ -338,6 +338,32 @@ export class PermissionsService {
     });
   }
 
+  async getUserFacingPermissions(userId: string) {
+    return this.prisma.permission.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        revokedAt: true,
+        allowedClaims: true,
+        requiredTokenAmount: true,
+        service: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            category: true,
+            requiredClaims: true,
+            optionalClaims: true,
+            status: true,
+          },
+        },
+      },
+    });
+  }
+
   private async ensureUserRegisteredOnChain(userId: string) {
     try {
       return await this.solanaService.registerUserOnChain(userId);

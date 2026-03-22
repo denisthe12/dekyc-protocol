@@ -102,6 +102,9 @@ model Service {
   clientSecretHash   String
   responseSigningSecret  String?
   description        String?
+  category             String?
+  requiredClaims       Json?
+  optionalClaims       Json?
   status             String       @default("active")
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt

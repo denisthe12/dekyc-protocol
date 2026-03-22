@@ -32,6 +32,9 @@ let PermissionsController = class PermissionsController {
     getMy(req) {
         return this.permissionsService.getMyPermissions(req.user.sub);
     }
+    getUserFacing(req) {
+        return this.permissionsService.getUserFacingPermissions(req.user.sub);
+    }
 };
 exports.PermissionsController = PermissionsController;
 __decorate([
@@ -57,6 +60,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PermissionsController.prototype, "getMy", null);
+__decorate([
+    (0, common_1.Get)('user-facing'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "getUserFacing", null);
 exports.PermissionsController = PermissionsController = __decorate([
     (0, common_1.Controller)('permissions'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

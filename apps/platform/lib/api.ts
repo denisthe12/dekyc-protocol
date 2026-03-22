@@ -4,7 +4,7 @@ import {
   ServiceItem,
 } from './types';
 
-import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse } from './types';
+import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse, UserFacingPermissionItem, UserFacingServiceCatalogItem } from './types';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -118,6 +118,22 @@ export async function rotateLoginCode(): Promise<{
 
 export async function fetchKycSummary(): Promise<KycSummaryResponse> {
   return apiFetch<KycSummaryResponse>('/auth/kyc-summary', {
+    method: 'GET',
+  });
+}
+
+export async function fetchUserFacingServiceCatalog(): Promise<
+  UserFacingServiceCatalogItem[]
+> {
+  return apiFetch<UserFacingServiceCatalogItem[]>('/services/catalog', {
+    method: 'GET',
+  });
+}
+
+export async function fetchUserFacingPermissions(): Promise<
+  UserFacingPermissionItem[]
+> {
+  return apiFetch<UserFacingPermissionItem[]>('/permissions/user-facing', {
     method: 'GET',
   });
 }

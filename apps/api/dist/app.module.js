@@ -24,6 +24,7 @@ const service_api_module_1 = require("./service-api/service-api.module");
 const solana_module_1 = require("./solana/solana.module");
 const permission_scope_grants_module_1 = require("./permission-scope-grants/permission-scope-grants.module");
 const protocol_monitor_module_1 = require("./protocol-monitor/protocol-monitor.module");
+const service_auth_module_1 = require("./service-auth/service-auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -43,6 +44,7 @@ exports.AppModule = AppModule = __decorate([
             solana_module_1.SolanaModule,
             permission_scope_grants_module_1.PermissionScopeGrantsModule,
             protocol_monitor_module_1.ProtocolMonitorModule,
+            service_auth_module_1.ServiceAuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, dev_bootstrap_service_1.DevBootstrapService],

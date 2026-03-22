@@ -23,4 +23,10 @@ export declare class PermissionsController {
             email: string;
         };
     }): Promise<unknown>;
+    getUserFacing(req: Request & {
+        user: {
+            sub: string;
+            email: string;
+        };
+    }): Promise<unknown>;
 }

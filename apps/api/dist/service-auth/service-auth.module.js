@@ -6,26 +6,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ServiceApiModule = void 0;
+exports.ServiceAuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const service_api_controller_1 = require("./service-api.controller");
-const service_api_service_1 = require("./service-api.service");
-const service_credentials_guard_1 = require("./service-credentials.guard");
+const service_auth_controller_1 = require("./service-auth.controller");
+const service_auth_service_1 = require("./service-auth.service");
+const service_api_module_1 = require("../service-api/service-api.module");
 const services_module_1 = require("../services/services.module");
-const service_request_nonce_service_1 = require("./service-request-nonce.service");
-let ServiceApiModule = class ServiceApiModule {
+const service_credentials_guard_1 = require("../service-api/service-credentials.guard");
+const service_request_nonce_service_1 = require("../service-api/service-request-nonce.service");
+let ServiceAuthModule = class ServiceAuthModule {
 };
-exports.ServiceApiModule = ServiceApiModule;
-exports.ServiceApiModule = ServiceApiModule = __decorate([
+exports.ServiceAuthModule = ServiceAuthModule;
+exports.ServiceAuthModule = ServiceAuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [services_module_1.ServicesModule],
-        controllers: [service_api_controller_1.ServiceApiController],
+        imports: [service_api_module_1.ServiceApiModule, services_module_1.ServicesModule],
+        controllers: [service_auth_controller_1.ServiceAuthController],
         providers: [
-            service_api_service_1.ServiceApiService,
+            service_auth_service_1.ServiceAuthService,
             service_credentials_guard_1.ServiceCredentialsGuard,
             service_request_nonce_service_1.ServiceRequestNonceService,
         ],
-        exports: [service_api_service_1.ServiceApiService, service_credentials_guard_1.ServiceCredentialsGuard],
     })
-], ServiceApiModule);
-//# sourceMappingURL=service-api.module.js.map
+], ServiceAuthModule);
+//# sourceMappingURL=service-auth.module.js.map
