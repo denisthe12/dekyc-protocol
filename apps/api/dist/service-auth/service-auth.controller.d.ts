@@ -13,6 +13,7 @@ export declare class ServiceAuthController {
             timestamp: number;
         };
     }): Promise<{
+        resolvedUserId: string;
         payload: unknown;
         meta: {
             timestamp: number;
@@ -20,6 +21,7 @@ export declare class ServiceAuthController {
         };
         signature: null;
     } | {
+        resolvedUserId: string;
         payload: unknown;
         meta: {
             timestamp: number;

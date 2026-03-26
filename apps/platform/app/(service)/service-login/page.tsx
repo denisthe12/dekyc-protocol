@@ -26,6 +26,7 @@ type SignedEnvelope = {
     nonce: string;
   };
   signature: string | null;
+  resolvedUserId: string;
 };
 
 const SERVICE_SECRETS: Record<
@@ -33,15 +34,12 @@ const SERVICE_SECRETS: Record<
   {
     clientSecret: string;
     responseSigningSecret: string;
-    userId: string;
   }
 > = {
-  // example:
-  // 'service_id_here': {
-  //   clientSecret: 'sk_...',
-  //   responseSigningSecret: 'resp_...',
-  //   userId: 'cmm...',
-  // },
+   'cmn0gksia0000bghmpybkqtjs': {
+     clientSecret: 'sk_9b868b87d4035d409a46e65469a4e44992309ec54434eeeb',
+     responseSigningSecret: 'resp_915a8b82ca26ba2c6f7dd9c96b0d533a4c0353db3837a88ae174781a22554f87',
+   },
 };
 
 export default function ServiceLoginPage() {
@@ -155,7 +153,6 @@ export default function ServiceLoginPage() {
           'x-nonce': nonce,
         },
         body: JSON.stringify({
-          userId: secretConfig.userId,
           biometricMockId: `mock-face-${timestamp}`,
           loginCode: loginCode.trim(),
           requestedClaims: DEFAULT_REQUESTED_CLAIMS,
@@ -183,7 +180,7 @@ export default function ServiceLoginPage() {
         serviceName: selectedService.name,
         serviceId: selectedService.id,
         clientId: selectedService.clientId,
-        userId: secretConfig.userId,
+        userId: envelope.resolvedUserId,
         claims: envelope.payload.claims,
         signature: envelope.signature,
         signedEnvelope: envelope,

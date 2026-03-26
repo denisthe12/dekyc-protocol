@@ -60,6 +60,11 @@ export default function ProfilePage() {
 
   const handleBiometricScanComplete = async () => {
     try {
+      setBiometricModalOpen(false);
+      setBiometricScanning(false);
+      setError(null);
+      setActionMessage(null);
+
       const generatedMockId = `face-${Date.now()}`;
 
       await setupBiometric({ biometricMockId: generatedMockId });
@@ -70,8 +75,6 @@ export default function ProfilePage() {
       setError(
         err instanceof Error ? err.message : 'Failed to configure biometric mock',
       );
-    } finally {
-      setBiometricScanning(false);
     }
   };
 

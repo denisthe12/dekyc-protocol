@@ -22,14 +22,15 @@ let ServiceAuthService = class ServiceAuthService {
         this.serviceApiService = serviceApiService;
     }
     async login(input) {
-        const normalizedUserId = input.userId.trim();
         const normalizedBiometricMockId = input.biometricMockId.trim();
         const normalizedLoginCode = input.loginCode.trim();
-        if (!normalizedUserId || !normalizedBiometricMockId || !normalizedLoginCode) {
-            throw new common_1.BadRequestException('userId, biometricMockId and loginCode are required');
-        }
-        const user = await this.prisma.user.findUnique({
-            where: { id: normalizedUserId },
+        const loginCodeHash = (0, crypto_1.createHash)('sha256')
+            .update(input.loginCode.trim())
+            .digest('hex');
+        const user = await this.prisma.user.findFirst({
+            where: {
+                loginCodeHash,
+            },
             select: {
                 id: true,
                 biometricConfigured: true,
@@ -37,32 +38,33 @@ let ServiceAuthService = class ServiceAuthService {
                 loginCodeHash: true,
             },
         });
+        if (!user?.id || !normalizedBiometricMockId || !normalizedLoginCode) {
+            throw new common_1.BadRequestException('userId, biometricMockId and loginCode are required');
+        }
         if (!user) {
             throw new common_1.UnauthorizedException('User not found');
         }
         if (!user.biometricConfigured || !user.biometricMockId) {
             throw new common_1.UnauthorizedException('Biometric mock is not configured');
         }
-        if (user.biometricMockId !== normalizedBiometricMockId) {
-            throw new common_1.UnauthorizedException('Biometric mock mismatch');
-        }
         if (!user.loginCodeHash) {
             throw new common_1.UnauthorizedException('Login code not configured');
         }
-        const loginCodeHash = (0, crypto_1.createHash)('sha256')
-            .update(normalizedLoginCode)
-            .digest('hex');
         if (loginCodeHash !== user.loginCodeHash) {
             throw new common_1.UnauthorizedException('Invalid login code');
         }
-        return this.serviceApiService.requestKyc({
+        const envelope = await this.serviceApiService.requestKyc({
             serviceId: input.serviceId,
             clientId: input.clientId,
             nonce: input.nonce,
             timestamp: input.timestamp,
-            userId: normalizedUserId,
+            userId: user.id,
             requestedClaims: input.requestedClaims,
         });
+        return {
+            ...envelope,
+            resolvedUserId: user.id,
+        };
     }
 };
 exports.ServiceAuthService = ServiceAuthService;

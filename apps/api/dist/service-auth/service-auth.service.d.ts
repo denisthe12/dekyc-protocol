@@ -9,11 +9,11 @@ export declare class ServiceAuthService {
         clientId: string;
         nonce: string;
         timestamp: number;
-        userId: string;
         biometricMockId: string;
         loginCode: string;
         requestedClaims?: string[];
     }): Promise<{
+        resolvedUserId: string;
         payload: unknown;
         meta: {
             timestamp: number;
@@ -21,6 +21,7 @@ export declare class ServiceAuthService {
         };
         signature: null;
     } | {
+        resolvedUserId: string;
         payload: unknown;
         meta: {
             timestamp: number;

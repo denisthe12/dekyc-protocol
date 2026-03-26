@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ServiceLoginDto = void 0;
 class ServiceLoginDto {
-    userId;
     biometricMockId;
     loginCode;
     requestedClaims;

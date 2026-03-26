@@ -15,21 +15,23 @@ export class ServiceAuthService {
     clientId: string;
     nonce: string;
     timestamp: number;
-    userId: string;
     biometricMockId: string;
     loginCode: string;
     requestedClaims?: string[];
   }) {
-    const normalizedUserId = input.userId.trim();
+
+    
     const normalizedBiometricMockId = input.biometricMockId.trim();
     const normalizedLoginCode = input.loginCode.trim();
 
-    if (!normalizedUserId || !normalizedBiometricMockId || !normalizedLoginCode) {
-      throw new BadRequestException('userId, biometricMockId and loginCode are required');
-    }
+    const loginCodeHash = createHash('sha256')
+      .update(input.loginCode.trim())
+      .digest('hex');
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: normalizedUserId },
+    const user = await this.prisma.user.findFirst({
+      where: {
+        loginCodeHash,
+      },
       select: {
         id: true,
         biometricConfigured: true,
@@ -37,6 +39,10 @@ export class ServiceAuthService {
         loginCodeHash: true,
       },
     });
+
+    if (!user?.id || !normalizedBiometricMockId || !normalizedLoginCode) {
+      throw new BadRequestException('userId, biometricMockId and loginCode are required');
+    }
 
     if (!user) {
       throw new UnauthorizedException('User not found');
@@ -46,29 +52,27 @@ export class ServiceAuthService {
       throw new UnauthorizedException('Biometric mock is not configured');
     }
 
-    if (user.biometricMockId !== normalizedBiometricMockId) {
-      throw new UnauthorizedException('Biometric mock mismatch');
-    }
 
     if (!user.loginCodeHash) {
       throw new UnauthorizedException('Login code not configured');
     }
 
-    const loginCodeHash = createHash('sha256')
-      .update(normalizedLoginCode)
-      .digest('hex');
-
     if (loginCodeHash !== user.loginCodeHash) {
       throw new UnauthorizedException('Invalid login code');
     }
 
-    return this.serviceApiService.requestKyc({
+    const envelope = await this.serviceApiService.requestKyc({
       serviceId: input.serviceId,
       clientId: input.clientId,
       nonce: input.nonce,
       timestamp: input.timestamp,
-      userId: normalizedUserId,
+      userId: user.id,
       requestedClaims: input.requestedClaims,
     });
+
+    return {
+      ...envelope,
+      resolvedUserId: user.id,
+    }
   }
 }

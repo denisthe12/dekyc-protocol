@@ -28,7 +28,6 @@ let ServiceAuthController = class ServiceAuthController {
             clientId: req.serviceAuth.clientId,
             nonce: req.serviceAuth.nonce,
             timestamp: req.serviceAuth.timestamp,
-            userId: body.userId,
             biometricMockId: body.biometricMockId,
             loginCode: body.loginCode,
             requestedClaims: body.requestedClaims,
