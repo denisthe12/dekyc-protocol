@@ -358,6 +358,19 @@ export default function EdsLabPage() {
         </p>
       </div>
 
+      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div className="text-sm font-semibold text-zinc-900">
+          What this lab demonstrates
+        </div>
+
+        <div className="mt-3 grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
+          <div>• Platform authentication before EDS binding</div>
+          <div>• Challenge generation and CMS signature flow</div>
+          <div>• Certificate parsing and identity extraction</div>
+          <div>• Persistence into UserCert, KycProfile, and KycVaultEntry</div>
+        </div>
+      </div>
+
           <div className="rounded-2xl border p-6 shadow-sm">
       <h2 className="text-lg font-semibold">Platform Auth</h2>
 
@@ -516,11 +529,37 @@ export default function EdsLabPage() {
         </div>
       )}
 
+      <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold text-emerald-900">
+            Extracted identity
+          </h3>
+          <span className="rounded-full border border-emerald-300 bg-white px-3 py-1 text-xs font-semibold text-emerald-700">
+            IDENTITY EXTRACTED
+          </span>
+        </div>
+        {attestResult &&
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3 text-sm">
+            <FieldCard label="fullName" value={attestResult.extractedIdentity.fullName} />
+            <FieldCard label="firstName" value={attestResult.extractedIdentity.firstName} />
+            <FieldCard label="lastName" value={attestResult.extractedIdentity.lastName} />
+            <FieldCard label="middleName" value={attestResult.extractedIdentity.middleName} />
+            <FieldCard label="iin" value={attestResult.extractedIdentity.iin} />
+            <FieldCard label="email" value={attestResult.extractedIdentity.email} />
+            <FieldCard label="birthDate" value={attestResult.extractedIdentity.birthDate} />
+            <FieldCard label="gender" value={attestResult.extractedIdentity.gender} />
+            <FieldCard label="birthCentury" value={attestResult.extractedIdentity.birthCentury?.toString() ?? null} />
+          </div>
+        }
+      </div>
+
       {attestResult && (
         <div className="rounded-2xl border p-6 shadow-sm">
           <h2 className="text-lg font-semibold">Ответ backend</h2>
-          <div className="mt-6">
-            <h3 className="text-base font-semibold">CMS debug</h3>
+          <details className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+            <summary className="cursor-pointer text-base font-semibold text-zinc-900">
+              CMS debug
+            </summary>
 
             <div className="mt-3 space-y-3 text-sm">
               <div>
@@ -565,7 +604,7 @@ export default function EdsLabPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </details>
           <div className="mt-6">
             <h3 className="text-base font-semibold">Parsed certificate</h3>
 
@@ -647,60 +686,13 @@ export default function EdsLabPage() {
                 </div>
               </div>
             </div>
-                      <div className="mt-6">
-            <h3 className="text-base font-semibold">Extracted identity</h3>
+          </div>
 
-            <div className="mt-3 space-y-3 text-sm">
-              <div>
-                <div className="font-medium">fullName</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.fullName ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">firstName</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.firstName ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">lastName</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.lastName ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">middleName</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.middleName ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">iin</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.iin ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">email</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.email ?? 'null'}
-                </div>
-              </div>
-              <div>
-              <div className="font-medium">birthDate</div>
-              <div className="rounded-lg bg-gray-100 p-2">
-                {attestResult.extractedIdentity.birthDate ?? 'null'}
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <h3 className="text-base font-semibold">Database result</h3>
+          <div className="mt-6">
+              <h3 className="text-base font-semibold">What platform saved</h3>
+              <p className="mt-2 text-sm text-zinc-600">
+                These records show that EDS verification is persisted into the platform domain model.
+              </p>
 
               <div className="mt-3 text-sm">
                 <div>
@@ -723,52 +715,20 @@ export default function EdsLabPage() {
                   {attestResult.savedKycVaultEntryId}
                 </div>
               </div>
-            </div>
+           </div>
 
-            <div>
-              <div className="font-medium">gender</div>
-              <div className="rounded-lg bg-gray-100 p-2">
-                {attestResult.extractedIdentity.gender ?? 'null'}
-              </div>
-            </div>
 
-            <div>
-              <div className="font-medium">birthCentury</div>
-              <div className="rounded-lg bg-gray-100 p-2">
-                {attestResult.extractedIdentity.birthCentury ?? 'null'}
-              </div>
-            </div>
+            <details className="mt-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+              <summary className="cursor-pointer text-base font-semibold text-zinc-900">
+                Certificate LAB (all fields)
+              </summary>
 
-              <div>
-                <div className="font-medium">certificateFingerprint256</div>
-                <div className="break-all rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.certificateFingerprint256 ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">certificateValidFrom</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.certificateValidFrom ?? 'null'}
-                </div>
-              </div>
-
-              <div>
-                <div className="font-medium">certificateValidTo</div>
-                <div className="rounded-lg bg-gray-100 p-2">
-                  {attestResult.extractedIdentity.certificateValidTo ?? 'null'}
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-          <div className="mt-6">
-            <h3 className="text-base font-semibold">Certificate LAB (all fields)</h3>
-
-            <pre className="mt-3 overflow-x-auto rounded-lg bg-gray-100 p-4 text-xs">
+              <pre className="mt-4 overflow-x-auto rounded-lg bg-white p-4 text-xs">
                 {JSON.stringify(attestResult.certificateLab, null, 2)}
-            </pre>
-            </div>
+              </pre>
+            </details>
+
+
           <div className="mt-4 space-y-3 text-sm">
             <div>
               <div className="font-medium">message</div>
@@ -825,6 +785,36 @@ export default function EdsLabPage() {
           </div>
         </div>
       )}
+      <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
+        <div className="text-sm font-semibold text-zinc-900">
+          How this connects to DeKYC
+        </div>
+
+        <div className="mt-3 text-sm leading-6 text-zinc-600">
+          After successful EDS verification, the platform extracts identity data,
+          saves the certificate record, builds a KYC profile, encrypts it into the vault,
+          and later uses it for permission-based signed KYC responses to services.
+        </div>
+      </div>
     </main>
+  );
+}
+
+function FieldCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null;
+}) {
+  return (
+    <div className="rounded-2xl border border-white bg-white p-4">
+      <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+        {label}
+      </div>
+      <div className="mt-2 break-all text-sm font-semibold text-zinc-900">
+        {value ?? 'null'}
+      </div>
+    </div>
   );
 }

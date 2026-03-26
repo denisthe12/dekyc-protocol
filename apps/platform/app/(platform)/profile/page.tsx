@@ -11,12 +11,16 @@ import {
   setupBiometric,
 } from '@/lib/api';
 import { ProfileSummaryResponse } from '@/lib/types';
+import { inputClassName } from '@/components/ui/input-class';
+import { FaceScanModal } from '@/components/biometric/face-scan-modal';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 
 export default function ProfilePage() {
   const [data, setData] = useState<ProfileSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [biometricMockId, setBiometricMockId] = useState('');
+  const [biometricModalOpen, setBiometricModalOpen] = useState(false);
+  const [biometricScanning, setBiometricScanning] = useState(false);
   const [lastIssuedLoginCode, setLastIssuedLoginCode] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -41,13 +45,25 @@ export default function ProfilePage() {
     void loadProfile();
   }, []);
 
-    const handleSetupBiometric = async () => {
+  const handleSetupBiometric = async () => {
     try {
-      setActionLoading(true);
+      setBiometricModalOpen(true);
+      setBiometricScanning(true);
       setError(null);
       setActionMessage(null);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to start biometric flow',
+      );
+    }
+  };
 
-      await setupBiometric({ biometricMockId });
+  const handleBiometricScanComplete = async () => {
+    try {
+      const generatedMockId = `face-${Date.now()}`;
+
+      await setupBiometric({ biometricMockId: generatedMockId });
+
       setActionMessage('Biometric mock configured successfully.');
       await loadProfile();
     } catch (err) {
@@ -55,7 +71,7 @@ export default function ProfilePage() {
         err instanceof Error ? err.message : 'Failed to configure biometric mock',
       );
     } finally {
-      setActionLoading(false);
+      setBiometricScanning(false);
     }
   };
 
@@ -165,7 +181,7 @@ export default function ProfilePage() {
               }
             />
             <StatusBadge
-              label={data.profileStatus.edsBound ? 'EDS connected' : 'EDS not connected'}
+              label={data.profileStatus.edsBound ? 'Digital signature connected' : 'Digital signature not connected'}
               tone={data.profileStatus.edsBound ? 'success' : 'warning'}
             />
             <StatusBadge
@@ -180,25 +196,23 @@ export default function ProfilePage() {
         ) : null}
       </SectionCard>
 
-            <SectionCard
+      <SectionCard
         title="Biometric Mock Setup"
         description="Configure mock face identity before connecting EDS and using service login."
       >
-        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
-          <input
-            value={biometricMockId}
-            onChange={(e) => setBiometricMockId(e.target.value)}
-            placeholder="Enter biometric mock id, for example: face-denis-001"
-            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
-          />
+        <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
+          <div className="text-sm leading-6 text-zinc-600">
+            Add your biometric mock profile to enable digital signature verification and service login.
+          </div>
 
-          <button
-            onClick={() => void handleSetupBiometric()}
-            disabled={actionLoading}
-            className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-          >
-            {actionLoading ? 'Saving...' : 'Save Biometric Mock'}
-          </button>
+          <div className="mt-4">
+            <PrimaryButton
+              onClick={() => void handleSetupBiometric()}
+              disabled={actionLoading || biometricScanning}
+            >
+              {biometricScanning ? 'Scanning face...' : 'Add Biometric'}
+            </PrimaryButton>
+          </div>
         </div>
 
         {data?.profileStatus.biometricMockId ? (
@@ -213,29 +227,29 @@ export default function ProfilePage() {
         description="This code is used together with mock face login on the consumer service."
       >
         <div className="flex flex-wrap gap-3">
-          <button
+          <PrimaryButton
             onClick={() => void handleIssueLoginCode()}
             disabled={actionLoading || !data?.profileStatus.biometricConfigured}
-            className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+            //className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
           >
             Issue Login Code
-          </button>
+          </PrimaryButton>
 
-          <button
+          <SecondaryButton
             onClick={() => void handleRotateLoginCode()}
             disabled={actionLoading || !data?.profileStatus.biometricConfigured}
-            className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
+            //className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
           >
             Rotate Login Code
-          </button>
+          </SecondaryButton>
 
-          <button
+          <SecondaryButton
             onClick={() => void handleCopyLoginCode()}
             disabled={!lastIssuedLoginCode}
-            className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
+            //className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
           >
             Copy Last Issued Code
-          </button>
+          </SecondaryButton>
         </div>
 
         {!data?.profileStatus.biometricConfigured ? (
@@ -304,6 +318,16 @@ export default function ProfilePage() {
           </div>
         )}
       </SectionCard>
+      <FaceScanModal
+        open={biometricModalOpen}
+        title="Biometric Scan"
+        description="Please place your face inside the frame. The scan will complete automatically."
+        onComplete={() => void handleBiometricScanComplete()}
+        onClose={() => {
+          setBiometricModalOpen(false);
+          setBiometricScanning(false);
+        }}
+      />
     </PlatformShell>
   );
 }

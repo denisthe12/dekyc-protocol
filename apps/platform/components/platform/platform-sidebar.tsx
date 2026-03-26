@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const items = [
+  { href: '/overview', label: 'Overview' },
+  { href: '/demo-guide', label: 'Demo Guide' },
   { href: '/profile', label: 'Profile' },
   { href: '/platform-kyc', label: 'KYC' },
   { href: '/platform-permissions', label: 'Permissions' },

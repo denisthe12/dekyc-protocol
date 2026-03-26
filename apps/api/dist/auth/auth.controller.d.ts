@@ -165,4 +165,47 @@ export declare class AuthController {
             } | null;
         };
     }>;
+    userOverview(req: Request & {
+        user: {
+            sub: string;
+            email: string;
+        };
+    }): Promise<{
+        user: {
+            id: string;
+            email: string;
+            emailVerified: boolean;
+            createdAt: Date;
+        };
+        onboarding: {
+            completedSteps: number;
+            totalSteps: number;
+            readyForServiceLogin: boolean;
+        };
+        status: {
+            biometricConfigured: boolean;
+            biometricMockId: string | null;
+            loginCodeConfigured: boolean;
+            loginCodeIssuedAt: Date | null;
+            edsBound: boolean;
+            kycReady: boolean;
+            vaultReady: boolean;
+            activePermissionsCount: number;
+        };
+        latestKycProfile: {
+            id: string;
+            fullName: string | null;
+            iin: string | null;
+            createdAt: Date;
+        } | null;
+        latestUserCert: {
+            id: string;
+            createdAt: Date;
+        } | null;
+        latestVaultEntry: {
+            id: string;
+            createdAt: Date;
+            algorithm: string;
+        } | null;
+    }>;
 }

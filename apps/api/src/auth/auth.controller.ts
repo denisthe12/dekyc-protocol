@@ -113,4 +113,12 @@ export class AuthController {
   ) {
     return this.authService.getKycSummary(req.user.sub);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('user-overview')
+  userOverview(
+    @Req() req: Request & { user: { sub: string; email: string } },
+  ) {
+    return this.authService.getUserOverview(req.user.sub);
+  }
 }

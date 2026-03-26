@@ -6,6 +6,8 @@ import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
 import { fetchProtocolSnapshot } from '@/lib/api';
 import { ProtocolSnapshot } from '@/lib/types';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SecondaryButton } from '@/components/ui/buttons';
 
 const LOCAL_EXPLORER_BASE =
   'https://explorer.solana.com/address';
@@ -47,16 +49,25 @@ export default function ProtocolPage() {
       title="Protocol Monitor"
       description="Live judge-facing monitor for on-chain permission state, scope capability tokens, and recent protocol activity."
     >
+      <div className="mb-6 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <div className="text-sm font-semibold text-zinc-900">
+        What this proves
+      </div>
+
+      <div className="mt-3 grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
+        <div>• Permissions are registered on-chain (Program PDA)</div>
+        <div>• Each scope is backed by Token-2022 capability tokens</div>
+        <div>• Access is enforced via token balance checks</div>
+        <div>• KYC responses are signed and independently verifiable</div>
+      </div>
+    </div>
       <SectionCard
         title="Live Snapshot"
         description="Current protocol state loaded from the real backend."
         actions={
-          <button
-            onClick={() => void loadSnapshot()}
-            className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
-          >
+          <SecondaryButton onClick={() => void loadSnapshot()}>
             Refresh
-          </button>
+          </SecondaryButton>
         }
       >
         {loading ? (
@@ -86,6 +97,15 @@ export default function ProtocolPage() {
             />
           </div>
         ) : null}
+        <div className="mt-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
+        <div className="text-sm font-semibold text-zinc-900">
+          Protocol Health
+        </div>
+        <div className="mt-2 text-sm leading-6 text-zinc-600">
+          This console shows the live state of permissions, scope grants, on-chain
+          references, and recent service access activity.
+        </div>
+      </div>
       </SectionCard>
 
       <SectionCard
@@ -95,7 +115,10 @@ export default function ProtocolPage() {
         {loading ? (
           <div className="text-sm text-zinc-500">Loading permissions...</div>
         ) : !snapshot || snapshot.permissions.length === 0 ? (
-          <div className="text-sm text-zinc-500">No protocol permissions found.</div>
+          <EmptyState
+            title="No protocol permissions found"
+            description="Create a permission from the user platform to see live protocol state, on-chain references, and scope grants here."
+          />
         ) : (
           <div className="space-y-5">
             {snapshot.permissions.map((permission) => (
@@ -224,9 +247,14 @@ export default function ProtocolPage() {
                       ))}
                     </div>
                   )}
+
                 </div>
               </div>
             ))}
+            <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
+              Each scope is materialized as a Token-2022 mint. Access is granted only if
+              the service verifies that the user's token account balance meets the required threshold.
+            </div>
           </div>
         )}
       </SectionCard>
@@ -238,7 +266,10 @@ export default function ProtocolPage() {
         {loading ? (
           <div className="text-sm text-zinc-500">Loading access logs...</div>
         ) : !snapshot || snapshot.accessLogs.length === 0 ? (
-          <div className="text-sm text-zinc-500">No access logs found.</div>
+          <EmptyState
+            title="No access logs found"
+            description="Recent service decisions will appear here after KYC requests are processed."
+          />
         ) : (
           <div className="space-y-3">
             {snapshot.accessLogs.map((log) => (
@@ -275,6 +306,18 @@ export default function ProtocolPage() {
           </div>
         )}
       </SectionCard>
+      <div className="mt-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-6">
+        <div className="text-sm font-semibold text-zinc-900">
+          Why this architecture matters
+        </div>
+
+        <div className="mt-3 text-sm leading-6 text-zinc-600">
+          Instead of trusting a centralized KYC provider, services verify access
+          rights via on-chain permission records, scoped capability tokens, and
+          signed responses. This makes identity access portable, auditable, and
+          cryptographically verifiable.
+        </div>
+      </div>
     </DashboardShell>
   );
 }

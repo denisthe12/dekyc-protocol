@@ -4,7 +4,7 @@ import {
   ServiceItem,
 } from './types';
 
-import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse, UserFacingPermissionItem, UserFacingServiceCatalogItem } from './types';
+import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse, UserFacingPermissionItem, UserFacingServiceCatalogItem, UserOverviewResponse } from './types';
 
 const API_BASE = 'http://localhost:3001/api';
 
@@ -134,6 +134,12 @@ export async function fetchUserFacingPermissions(): Promise<
   UserFacingPermissionItem[]
 > {
   return apiFetch<UserFacingPermissionItem[]>('/permissions/user-facing', {
+    method: 'GET',
+  });
+}
+
+export async function fetchUserOverview(): Promise<UserOverviewResponse> {
+  return apiFetch<UserOverviewResponse>('/auth/user-overview', {
     method: 'GET',
   });
 }

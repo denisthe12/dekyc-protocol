@@ -5,6 +5,11 @@ import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
 import { fetchServices } from '@/lib/api';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ActionBar } from '@/components/ui/action-bar';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
+import { inputClassName } from '@/components/ui/input-class';
+import { MetricTile } from '@/components/ui/metric-tile';
 import { ServiceItem } from '@/lib/types';
 
 const AVAILABLE_CLAIMS = [
@@ -18,8 +23,27 @@ const AVAILABLE_CLAIMS = [
   'age18Plus',
 ];
 
+type TokenCheck = {
+  scope: string;
+  ok: boolean;
+  reason: string;
+  readError: string | null;
+  tokenAccountAddress: string | null;
+  mintAddress: string | null;
+  balance: number;
+  requiredAmount: number;
+};
+
 type SignedKycEnvelope = {
-  payload: unknown;
+  payload: {
+    allowed: boolean;
+    reason: string;
+    claims: Record<string, unknown> | null;
+    grantedClaims?: string[];
+    grantedScopes?: string[];
+    tokenChecks?: TokenCheck[];
+    [key: string]: unknown;
+  };
   meta: {
     timestamp: number;
     nonce: string;
@@ -47,6 +71,10 @@ export default function DemoFlowPage() {
     () => services.find((service) => service.id === selectedServiceId) ?? null,
     [services, selectedServiceId],
   );
+
+  const tokenChecks = response?.payload.tokenChecks ?? [];
+  const grantedClaims = response?.payload.grantedClaims ?? [];
+  const grantedScopes = response?.payload.grantedScopes ?? [];
 
   const loadServices = async () => {
     try {
@@ -131,19 +159,21 @@ export default function DemoFlowPage() {
   return (
     <DashboardShell
       title="Demo Flow"
-      description="End-to-end live demo screen for judge walkthrough: service request → policy enforcement → scope token checks → signed KYC response."
+      description="Guided technical walkthrough of a real service KYC request: service auth, policy enforcement, token balance checks, and signed response delivery."
     >
+      <ActionBar
+        title="How to use this screen"
+        description="Choose a registered service, provide its credentials, enter a userId, request selected claims, and inspect the signed response returned by the protocol."
+        actions={
+          <SecondaryButton onClick={() => void loadServices()}>
+            Refresh Services
+          </SecondaryButton>
+        }
+      />
+
       <SectionCard
         title="Request Builder"
-        description="Use real service credentials and request selected KYC claims."
-        actions={
-          <button
-            onClick={() => void loadServices()}
-            className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
-          >
-            Refresh Services
-          </button>
-        }
+        description="This form matches the real /service-api/kyc-request contract."
       >
         {loadingServices ? (
           <div className="text-sm text-zinc-500">Loading services...</div>
@@ -157,7 +187,7 @@ export default function DemoFlowPage() {
                 <select
                   value={selectedServiceId}
                   onChange={(e) => setSelectedServiceId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+                  className={inputClassName}
                 >
                   <option value="">Select a service</option>
                   {services.map((service) => (
@@ -170,46 +200,46 @@ export default function DemoFlowPage() {
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Client ID
+                  x-client-id
                 </label>
                 <input
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+                  className={inputClassName}
                   placeholder="svc_..."
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  Client Secret
+                  x-client-secret
                 </label>
                 <input
                   value={clientSecret}
                   onChange={(e) => setClientSecret(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+                  className={inputClassName}
                   placeholder="sk_..."
                 />
               </div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-zinc-700">
-                  User ID
+                  body.userId
                 </label>
                 <input
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+                  className={inputClassName}
                   placeholder="cmm..."
                 />
               </div>
 
               {selectedService ? (
-                <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm">
-                  <div className="font-semibold text-zinc-900">
+                <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
+                  <div className="text-sm font-semibold text-zinc-900">
                     {selectedService.name}
                   </div>
-                  <div className="mt-1 text-zinc-600">
+                  <div className="mt-1 text-sm text-zinc-600">
                     {selectedService.description || 'No description'}
                   </div>
                 </div>
@@ -218,14 +248,14 @@ export default function DemoFlowPage() {
 
             <div>
               <div className="mb-3 text-sm font-medium text-zinc-700">
-                Requested claims
+                body.requestedClaims
               </div>
 
               <div className="space-y-2">
                 {AVAILABLE_CLAIMS.map((claim) => (
                   <label
                     key={claim}
-                    className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-900"
+                    className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-900"
                   >
                     <input
                       type="checkbox"
@@ -242,30 +272,149 @@ export default function DemoFlowPage() {
         )}
 
         <div className="mt-6">
-          <button
+          <PrimaryButton
             onClick={() => void submitRequest()}
             disabled={submitting || loadingServices}
-            className="rounded-2xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
           >
             {submitting ? 'Requesting...' : 'Request Signed KYC Response'}
-          </button>
+          </PrimaryButton>
         </div>
 
         {error ? (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {error}
           </div>
         ) : null}
       </SectionCard>
 
       <SectionCard
-        title="Signed Response Envelope"
-        description="This is the exact tamper-evident response returned by the protocol."
+        title="HTTP Request Shape"
+        description="Headers come from service auth. The body contains only userId and requestedClaims."
+      >
+        <pre className="overflow-x-auto rounded-2xl bg-zinc-950 p-4 text-xs text-zinc-100">
+{`POST /api/service-api/kyc-request
+
+Headers:
+  x-client-id
+  x-client-secret
+  x-timestamp
+  x-nonce
+
+Body:
+{
+  "userId": "${userId || 'cmm...'}",
+  "requestedClaims": ${JSON.stringify(requestedClaims, null, 2)}
+}`}
+        </pre>
+      </SectionCard>
+
+      <SectionCard
+        title="Response Summary"
+        description="High-level result of the protocol decision."
       >
         {!response ? (
-          <div className="text-sm text-zinc-500">
-            No response yet. Submit a service request.
+          <EmptyState
+            title="No response yet"
+            description="Submit a real KYC request above to inspect policy enforcement, token checks, and signed delivery."
+          />
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MetricTile
+              label="Allowed"
+              value={response.payload.allowed ? 'Yes' : 'No'}
+            />
+            <MetricTile
+              label="Reason"
+              value={String(response.payload.reason)}
+            />
+            <MetricTile
+              label="Granted claims"
+              value={grantedClaims.length ? grantedClaims.join(', ') : '—'}
+            />
+            <MetricTile
+              label="Granted scopes"
+              value={grantedScopes.length ? grantedScopes.join(', ') : '—'}
+            />
           </div>
+        )}
+      </SectionCard>
+
+      <SectionCard
+        title="Token Checks"
+        description="This is the on-chain enforcement layer: each requested scope is checked against its token-backed capability."
+      >
+        {!response ? (
+          <EmptyState
+            title="No token checks yet"
+            description="After a request, this section will show balance checks, token accounts, mint addresses, and enforcement outcomes."
+          />
+        ) : tokenChecks.length === 0 ? (
+          <EmptyState
+            title="No token checks returned"
+            description="The response did not include token check data for this request."
+          />
+        ) : (
+          <div className="space-y-4">
+            {tokenChecks.map((check) => (
+              <div
+                key={check.scope}
+                className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5"
+              >
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-zinc-900">
+                      {check.scope}
+                    </div>
+                    <div className="mt-1 text-sm text-zinc-600">
+                      Reason: {check.reason}
+                    </div>
+                  </div>
+
+                  <StatusBadge
+                    label={check.ok ? 'BALANCE OK' : 'BALANCE FAILED'}
+                    tone={check.ok ? 'success' : 'danger'}
+                  />
+                </div>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <MetricTile
+                    label="Required amount"
+                    value={String(check.requiredAmount)}
+                  />
+                  <MetricTile
+                    label="Balance"
+                    value={String(check.balance)}
+                  />
+                  <MetricTile
+                    label="Mint"
+                    value={check.mintAddress ?? '—'}
+                  />
+                  <MetricTile
+                    label="Token account"
+                    value={check.tokenAccountAddress ?? '—'}
+                  />
+                </div>
+
+                {check.readError ? (
+                  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                    {check.readError}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
+      </SectionCard>
+
+      <SectionCard
+        title="Signed Envelope"
+        description="This is the exact signed response returned by the protocol."
+      >
+        {!response ? (
+          <EmptyState
+            title="No signed envelope yet"
+            description="Submit a request to view the signed KYC response envelope."
+          />
         ) : (
           <pre className="overflow-x-auto rounded-2xl bg-zinc-950 p-4 text-xs text-zinc-100">
             {JSON.stringify(response, null, 2)}
@@ -274,31 +423,15 @@ export default function DemoFlowPage() {
       </SectionCard>
 
       <SectionCard
-        title="Envelope Status"
-        description="Quick visual read of the signed service response."
+        title="Why this matters"
+        description="This screen shows the full decision path from service authentication to signed KYC delivery."
       >
-        {!response ? (
-          <div className="text-sm text-zinc-500">
-            No envelope to inspect yet.
-          </div>
-        ) : (
-          <div className="flex flex-wrap gap-3">
-            <StatusBadge
-              label={
-                response.signature ? 'SIGNED RESPONSE' : 'UNSIGNED RESPONSE'
-              }
-              tone={response.signature ? 'success' : 'warning'}
-            />
-            <StatusBadge
-              label={`NONCE: ${response.meta.nonce}`}
-              tone="neutral"
-            />
-            <StatusBadge
-              label={`TIMESTAMP: ${response.meta.timestamp}`}
-              tone="neutral"
-            />
-          </div>
-        )}
+        <div className="grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
+          <div>• Service identity is verified through credential headers</div>
+          <div>• Requested claims are checked against granted scopes</div>
+          <div>• Each scope is enforced via token balance checks</div>
+          <div>• The final KYC response is signed and tamper-evident</div>
+        </div>
       </SectionCard>
     </DashboardShell>
   );

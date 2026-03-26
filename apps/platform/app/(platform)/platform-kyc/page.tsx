@@ -7,11 +7,19 @@ import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
 import { fetchKycSummary } from '@/lib/api';
 import { KycSummaryResponse } from '@/lib/types';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
+import { runPlatformEdsFlow, RunPlatformEdsFlowResult } from '@/lib/eds/eds-flow';
 
 export default function PlatformKycPage() {
   const [data, setData] = useState<KycSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [connectingSignature, setConnectingSignature] = useState(false);
+  const [signatureFlowError, setSignatureFlowError] = useState<string | null>(null);
+  const [signatureFlowMessage, setSignatureFlowMessage] = useState<string | null>(null);
+  const [lastEdsFlowResult, setLastEdsFlowResult] =
+    useState<RunPlatformEdsFlowResult | null>(null);
 
   const loadKycSummary = async () => {
     try {
@@ -29,18 +37,51 @@ export default function PlatformKycPage() {
     }
   };
 
+  const isDigitalSignatureAlreadyConnected =
+    Boolean(data?.eds.connected) || Boolean(data?.kyc.ready);
+
   useEffect(() => {
     void loadKycSummary();
   }, []);
 
+  const handleConnectDigitalSignature = async () => {
+    if (isDigitalSignatureAlreadyConnected) {
+      setSignatureFlowError('Digital signature is already connected.');
+      return;
+    }
+    try {
+      setConnectingSignature(true);
+      setSignatureFlowError(null);
+      setSignatureFlowMessage(null);
+
+      const result = await runPlatformEdsFlow();
+
+      setLastEdsFlowResult(result);
+      setSignatureFlowMessage(
+        'Digital signature connected successfully. Your KYC profile was updated.',
+      );
+
+      await loadKycSummary();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : 'Failed to connect digital signature';
+
+      setSignatureFlowError(message);
+    } finally {
+      setConnectingSignature(false);
+    }
+  };
+
   return (
     <PlatformShell
       title="KYC"
-      description="Bind your EDS after biometric setup and review your verified KYC profile."
+      description="Connect your digital signature and review your verified KYC profile."
     >
       <SectionCard
         title="KYC Gating"
-        description="Biometric mock must be configured before EDS can be connected."
+        description="Biometric setup must be completed before your digital signature can be connected."
         actions={
           <button
             onClick={() => void loadKycSummary()}
@@ -70,7 +111,7 @@ export default function PlatformKycPage() {
                 }
               />
               <StatusBadge
-                label={data.eds.connected ? 'EDS connected' : 'EDS not connected'}
+                label={data.eds.connected ? 'Digital signature connected' : 'Digital signature not connected'}
                 tone={data.eds.connected ? 'success' : 'warning'}
               />
               <StatusBadge
@@ -83,27 +124,71 @@ export default function PlatformKycPage() {
               />
             </div>
 
-            {!data.gating.canBindEds ? (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                Configure biometric mock in your Profile page before binding EDS.
+            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+              <div className="text-sm text-zinc-700">
+                Biometric setup is complete. You can now connect your digital signature and complete identity verification.
               </div>
-            ) : (
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-                <div className="text-sm text-zinc-700">
-                  Biometric step is complete. You can now connect your EDS and
-                  complete KYC verification.
+
+              <div className="mt-4 flex flex-wrap gap-3">
+                <PrimaryButton
+                  onClick={() => void handleConnectDigitalSignature()}
+                  disabled={connectingSignature || isDigitalSignatureAlreadyConnected}
+                >
+                  {isDigitalSignatureAlreadyConnected
+                    ? 'Digital Signature Already Connected'
+                    : connectingSignature
+                      ? 'Connecting Digital Signature...'
+                      : 'Connect Digital Signature'}
+                </PrimaryButton>
+
+                <SecondaryButton onClick={() => void loadKycSummary()}>
+                  Refresh KYC Status
+                </SecondaryButton>
+              </div>
+
+              <div className="mt-3 text-xs text-zinc-500">
+                After successful verification, your KYC profile will be filled automatically.
+              </div>
+              {isDigitalSignatureAlreadyConnected ? (
+                <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+                  Your digital signature is already connected. Rebinding is not available in the current product flow.
+                </div>
+              ) : null}
+            </div>
+            {signatureFlowError ? (
+              <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {signatureFlowError.includes('NCALayer')
+                  ? 'NCALayer is not running. Please start NCALayer first and try again.'
+                  : signatureFlowError}
+              </div>
+            ) : null}
+            {signatureFlowMessage ? (
+              <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                {signatureFlowMessage}
+              </div>
+            ) : null}
+            {lastEdsFlowResult ? (
+              <div className="mt-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+                <div className="text-sm font-semibold text-zinc-900">
+                  Latest Digital Signature Connection
                 </div>
 
-                <div className="mt-4">
-                  <Link
-                    href="/eds-lab"
-                    className="inline-flex rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-                  >
-                    Open EDS Verification
-                  </Link>
+                <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <MetricCard
+                    label="Challenge ID"
+                    value={lastEdsFlowResult.challenge.challengeId}
+                  />
+                  <MetricCard
+                    label="Challenge Base64"
+                    value={lastEdsFlowResult.challenge.challengeBase64}
+                  />
+                  <MetricCard
+                    label="Analyze Result"
+                    value={lastEdsFlowResult.analyzeResult ? 'Saved' : 'Processed'}
+                  />
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
         ) : null}
       </SectionCard>
@@ -115,9 +200,10 @@ export default function PlatformKycPage() {
         {loading ? (
           <div className="text-sm text-zinc-500">Loading profile...</div>
         ) : !data?.kyc.profile ? (
-          <div className="text-sm text-zinc-500">
-            No KYC profile yet. Complete biometric setup and connect EDS first.
-          </div>
+        <EmptyState
+          title="No KYC profile yet"
+          description="Complete biometric setup and connect your EDS first. After verification, your user-facing KYC profile will appear here."
+        />
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <MetricCard label="Full name" value={data.kyc.profile.fullName ?? '—'} />

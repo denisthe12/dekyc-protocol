@@ -15,6 +15,11 @@ import {
   UserFacingServiceCatalogItem,
 } from '@/lib/types';
 
+import { EmptyState } from '@/components/ui/empty-state';
+import { ActionBar } from '@/components/ui/action-bar';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
+import { inputClassName } from '@/components/ui/input-class';
+
 export default function PlatformPermissionsPage() {
   const [services, setServices] = useState<UserFacingServiceCatalogItem[]>([]);
   const [permissions, setPermissions] = useState<UserFacingPermissionItem[]>([]);
@@ -145,14 +150,11 @@ export default function PlatformPermissionsPage() {
         title="Create Permission"
         description="Required claims are enforced by the service. Optional claims are your choice."
         actions={
-          <button
-            onClick={() => void loadData()}
-            className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
-          >
+          <SecondaryButton onClick={() => void loadData()}>
             Refresh
-          </button>
-        }
-      >
+          </SecondaryButton>
+                  }
+         >
         {loading ? (
           <div className="text-sm text-zinc-500">Loading services and permissions...</div>
         ) : (
@@ -164,7 +166,7 @@ export default function PlatformPermissionsPage() {
               <select
                 value={selectedServiceId}
                 onChange={(e) => setSelectedServiceId(e.target.value)}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900"
+                className={inputClassName}
               >
                 <option value="">Select a service</option>
                 {services.map((service) => (
@@ -250,25 +252,17 @@ export default function PlatformPermissionsPage() {
               </div>
             </div>
 
-            <div>
-              <div className="mb-2 text-sm font-medium text-zinc-700">
-                Protocol-generated token threshold
-              </div>
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900">
-                {activePermission
-                  ? activePermission.requiredTokenAmount ?? '—'
-                  : 'Generated automatically after permission creation'}
-              </div>
-            </div>
 
             <div>
-              <button
-                onClick={() => void handleGrant()}
-                disabled={actionLoading || !!activePermission || !selectedService}
-                className="rounded-2xl bg-zinc-900 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
-              >
-                {actionLoading ? 'Processing...' : 'Grant Access'}
-              </button>
+            <PrimaryButton
+              onClick={() => void handleGrant()}
+              disabled={actionLoading || !!activePermission || !selectedService}
+            >
+              {actionLoading ? 'Processing...' : 'Grant Access'}
+            </PrimaryButton>
+            <div className="mt-3 text-xs text-zinc-500">
+              Required claims are enforced by the selected service. Optional claims are shared only if you approve them.
+            </div>
             </div>
           </div>
         )}
@@ -286,6 +280,11 @@ export default function PlatformPermissionsPage() {
         ) : null}
       </SectionCard>
 
+      <ActionBar
+        title="Permission lifecycle"
+        description="Required claims are enforced by the service, optional claims are chosen by the user, and protocol thresholds are generated automatically."
+      />
+
       <SectionCard
         title="Your Permissions"
         description="Here you can review and revoke the permissions you have granted."
@@ -293,7 +292,10 @@ export default function PlatformPermissionsPage() {
         {loading ? (
           <div className="text-sm text-zinc-500">Loading permissions...</div>
         ) : permissions.length === 0 ? (
-          <div className="text-sm text-zinc-500">No permissions created yet.</div>
+          <EmptyState
+            title="No permissions created yet"
+            description="Choose a service above and grant your first scoped permission."
+          />
         ) : (
           <div className="space-y-4">
             {permissions.map((permission) => (
@@ -328,10 +330,6 @@ export default function PlatformPermissionsPage() {
                     label="Granted claims"
                     value={(permission.allowedClaims ?? []).join(', ') || '—'}
                   />
-                  <MetricCard
-                    label="Required amount"
-                    value={String(permission.requiredTokenAmount ?? 0)}
-                  />
                   <MetricCard label="Created at" value={permission.createdAt} />
                   <MetricCard
                     label="Revoked at"
@@ -340,13 +338,13 @@ export default function PlatformPermissionsPage() {
                 </div>
 
                 <div className="mt-4">
-                  <button
-                    onClick={() => void handleRevoke(permission.id)}
-                    disabled={actionLoading || permission.status === 'REVOKED'}
-                    className="rounded-xl border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
-                  >
-                    Revoke Access
-                  </button>
+                <button
+                  onClick={() => void handleRevoke(permission.id)}
+                  disabled={actionLoading || permission.status === 'REVOKED'}
+                  className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+                >
+                  Revoke Access
+                </button>
                 </div>
               </div>
             ))}

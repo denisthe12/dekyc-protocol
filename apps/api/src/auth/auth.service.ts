@@ -308,6 +308,102 @@ export class AuthService {
     };
   }
 
+  async getUserOverview(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        biometricConfigured: true,
+        biometricMockId: true,
+        loginCodeHash: true,
+        loginCodeIssuedAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const latestUserCert = await this.prisma.userCert.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        createdAt: true,
+      },
+    });
+
+    const latestKycProfile = await this.prisma.kycProfile.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        fullName: true,
+        iin: true,
+        createdAt: true,
+      },
+    });
+
+    const latestVaultEntry = await this.prisma.kycVaultEntry.findFirst({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        algorithm: true,
+        createdAt: true,
+      },
+    });
+
+    const activePermissionsCount = await this.prisma.permission.count({
+      where: {
+        userId,
+        status: 'ACTIVE',
+      },
+    });
+
+    const completedSteps = [
+      user.emailVerified,
+      user.biometricConfigured,
+      Boolean(user.loginCodeHash),
+      Boolean(latestUserCert),
+      Boolean(latestKycProfile),
+      Boolean(latestVaultEntry),
+    ].filter(Boolean).length;
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        emailVerified: user.emailVerified,
+        createdAt: user.createdAt,
+      },
+      onboarding: {
+        completedSteps,
+        totalSteps: 6,
+        readyForServiceLogin:
+          user.biometricConfigured &&
+          Boolean(user.loginCodeHash) &&
+          Boolean(latestKycProfile),
+      },
+      status: {
+        biometricConfigured: user.biometricConfigured,
+        biometricMockId: user.biometricMockId,
+        loginCodeConfigured: Boolean(user.loginCodeHash),
+        loginCodeIssuedAt: user.loginCodeIssuedAt,
+        edsBound: Boolean(latestUserCert),
+        kycReady: Boolean(latestKycProfile),
+        vaultReady: Boolean(latestVaultEntry),
+        activePermissionsCount,
+      },
+      latestKycProfile,
+      latestUserCert,
+      latestVaultEntry,
+    };
+  }
+
   private generateLoginCode(): string {
     return `DK-${randomBytes(4).toString('hex').toUpperCase()}`;
   }

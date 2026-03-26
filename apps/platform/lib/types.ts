@@ -207,3 +207,42 @@ export type UserFacingPermissionItem = {
     status: string;
   };
 };
+
+export type UserOverviewResponse = {
+  user: {
+    id: string;
+    email: string;
+    emailVerified: boolean;
+    createdAt: string;
+  };
+  onboarding: {
+    completedSteps: number;
+    totalSteps: number;
+    readyForServiceLogin: boolean;
+  };
+  status: {
+    biometricConfigured: boolean;
+    biometricMockId: string | null;
+    loginCodeConfigured: boolean;
+    loginCodeIssuedAt: string | null;
+    edsBound: boolean;
+    kycReady: boolean;
+    vaultReady: boolean;
+    activePermissionsCount: number;
+  };
+  latestKycProfile: {
+    id: string;
+    fullName: string | null;
+    iin: string | null;
+    createdAt: string;
+  } | null;
+  latestUserCert: {
+    id: string;
+    createdAt: string;
+  } | null;
+  latestVaultEntry: {
+    id: string;
+    algorithm: string;
+    createdAt: string;
+  } | null;
+};

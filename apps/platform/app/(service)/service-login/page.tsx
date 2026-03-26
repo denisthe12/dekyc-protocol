@@ -6,8 +6,13 @@ import { ServiceShell } from '@/components/service/service-shell';
 import { fetchServices } from '@/lib/api';
 import { ServiceItem } from '@/lib/types';
 import { loadServiceSession, saveServiceSession } from '@/lib/service-session';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
+import { inputClassName } from '@/components/ui/input-class';
+import { FaceScanModal } from '@/components/biometric/face-scan-modal';
 
 const DEFAULT_REQUESTED_CLAIMS = ['fullName', 'verified', 'age18Plus'];
+const serviceInputClassName =
+  'w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-800';
 
 type SignedEnvelope = {
   payload: {
@@ -23,6 +28,22 @@ type SignedEnvelope = {
   signature: string | null;
 };
 
+const SERVICE_SECRETS: Record<
+  string,
+  {
+    clientSecret: string;
+    responseSigningSecret: string;
+    userId: string;
+  }
+> = {
+  // example:
+  // 'service_id_here': {
+  //   clientSecret: 'sk_...',
+  //   responseSigningSecret: 'resp_...',
+  //   userId: 'cmm...',
+  // },
+};
+
 export default function ServiceLoginPage() {
   const router = useRouter();
 
@@ -36,6 +57,10 @@ export default function ServiceLoginPage() {
   const [loadingServices, setLoadingServices] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [responseSigningSecret, setResponseSigningSecret] = useState('');
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const [faceScanCompleted, setFaceScanCompleted] = useState(false);
 
   const selectedService = useMemo(
     () => services.find((service) => service.id === selectedServiceId) ?? null,
@@ -79,9 +104,37 @@ export default function ServiceLoginPage() {
     }
   }, [selectedService]);
 
-  const handleLogin = async () => {
-    if (!selectedService || !clientId || !clientSecret || !userId || !biometricMockId || !loginCode) {
-      setError('Fill all fields before login.');
+  const handleStartLogin = () => {
+    if (!selectedService) {
+      setError('Select a service first.');
+      return;
+    }
+
+    setError(null);
+    setScanModalOpen(true);
+  };
+
+  const handleFaceScanComplete = () => {
+    setFaceScanCompleted(true);
+    setScanModalOpen(false);
+    setCodeModalOpen(true);
+  };
+
+  const handleSubmitLoginCode = async () => {
+    if (!selectedService) {
+      setError('Select a service first.');
+      return;
+    }
+
+    const secretConfig = SERVICE_SECRETS[selectedService.id];
+
+    if (!secretConfig) {
+      setError('Service demo secrets are not configured for this service.');
+      return;
+    }
+
+    if (!loginCode.trim()) {
+      setError('Enter your Unique Login Code.');
       return;
     }
 
@@ -96,14 +149,14 @@ export default function ServiceLoginPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-client-id': clientId,
-          'x-client-secret': clientSecret,
+          'x-client-id': selectedService.clientId,
+          'x-client-secret': secretConfig.clientSecret,
           'x-timestamp': String(timestamp),
           'x-nonce': nonce,
         },
         body: JSON.stringify({
-          userId: userId.trim(),
-          biometricMockId: biometricMockId.trim(),
+          userId: secretConfig.userId,
+          biometricMockId: `mock-face-${timestamp}`,
           loginCode: loginCode.trim(),
           requestedClaims: DEFAULT_REQUESTED_CLAIMS,
         }),
@@ -122,20 +175,24 @@ export default function ServiceLoginPage() {
       }
 
       const issuedAt = new Date().toISOString();
-      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const expiresAt = new Date(
+        Date.now() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString();
 
       saveServiceSession({
         serviceName: selectedService.name,
         serviceId: selectedService.id,
-        clientId,
-        userId: userId.trim(),
+        clientId: selectedService.clientId,
+        userId: secretConfig.userId,
         claims: envelope.payload.claims,
         signature: envelope.signature,
         signedEnvelope: envelope,
+        responseSigningSecret: secretConfig.responseSigningSecret,
         issuedAt,
         expiresAt,
       });
 
+      setCodeModalOpen(false);
       router.push('/service-dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Service login failed');
@@ -161,7 +218,7 @@ export default function ServiceLoginPage() {
                 <select
                   value={selectedServiceId}
                   onChange={(e) => setSelectedServiceId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
+                  className={serviceInputClassName}
                 >
                   <option value="">Select a service</option>
                   {services.map((service) => (
@@ -172,58 +229,24 @@ export default function ServiceLoginPage() {
                 </select>
               </Field>
 
-              <Field label="Client ID">
-                <input
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
-                  placeholder="svc_..."
-                />
-              </Field>
+              {selectedService ? (
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="text-sm font-semibold text-white">
+                    {selectedService.name}
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-zinc-400">
+                    {selectedService.description || 'No description'}
+                  </div>
+                </div>
+              ) : null}
 
-              <Field label="Client Secret">
-                <input
-                  value={clientSecret}
-                  onChange={(e) => setClientSecret(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
-                  placeholder="sk_..."
-                />
-              </Field>
-
-              <Field label="User ID">
-                <input
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
-                  placeholder="cmm..."
-                />
-              </Field>
-
-              <Field label="Mock Face ID">
-                <input
-                  value={biometricMockId}
-                  onChange={(e) => setBiometricMockId(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
-                  placeholder="face-denis-001"
-                />
-              </Field>
-
-              <Field label="Unique Login Code">
-                <input
-                  value={loginCode}
-                  onChange={(e) => setLoginCode(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
-                  placeholder="DK-..."
-                />
-              </Field>
-
-              <button
-                onClick={() => void handleLogin()}
-                disabled={submitting}
-                className="w-full rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-50"
+              <PrimaryButton
+                onClick={() => void handleStartLogin()}
+                disabled={submitting || loadingServices || !selectedService}
+                className="w-full bg-white text-black hover:bg-zinc-200"
               >
-                {submitting ? 'Logging in...' : 'Login via DeKYC'}
-              </button>
+                Login via DeKYC
+              </PrimaryButton>
 
               {error ? (
                 <div className="rounded-xl border border-red-900 bg-red-950/40 p-4 text-sm text-red-300">
@@ -244,8 +267,64 @@ export default function ServiceLoginPage() {
             <p>4. The service receives a signed KYC response envelope.</p>
             <p>5. A service-side session is created for 7 days.</p>
           </div>
+
+          <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
+            This demo shows passwordless consumer login powered by biometric mock,
+            unique login code, scoped KYC permissions, and signed protocol responses.
+          </div>
         </div>
       </div>
+      <FaceScanModal
+        open={scanModalOpen}
+        title="Face Scan"
+        description="Please place your face inside the frame. The scan will complete automatically."
+        onComplete={handleFaceScanComplete}
+        onClose={() => {
+          setScanModalOpen(false);
+        }}
+      />
+      {codeModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
+          <div className="w-full max-w-md rounded-[28px] bg-white p-8 shadow-2xl">
+            <div className="text-lg font-semibold text-zinc-900">
+              Enter Unique Login Code
+            </div>
+            <div className="mt-3 text-sm leading-6 text-zinc-600">
+              Your face scan was accepted. Enter your Unique Login Code to complete the login.
+            </div>
+
+            <div className="mt-6">
+              <label className="mb-2 block text-sm font-medium text-zinc-700">
+                Unique Login Code
+              </label>
+              <input
+                value={loginCode}
+                onChange={(e) => setLoginCode(e.target.value)}
+                className={inputClassName}
+                placeholder="DK-..."
+              />
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <SecondaryButton
+                onClick={() => {
+                  setCodeModalOpen(false);
+                  setLoginCode('');
+                }}
+              >
+                Cancel
+              </SecondaryButton>
+
+              <PrimaryButton
+                onClick={() => void handleSubmitLoginCode()}
+                disabled={submitting}
+              >
+                {submitting ? 'Logging in...' : 'Continue'}
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </ServiceShell>
   );
 }

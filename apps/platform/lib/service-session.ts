@@ -6,6 +6,7 @@ export type ServiceSession = {
   claims: Record<string, unknown>;
   signature: string | null;
   signedEnvelope: unknown;
+  responseSigningSecret: string;
   issuedAt: string;
   expiresAt: string;
 };
