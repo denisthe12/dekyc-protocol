@@ -46,6 +46,10 @@ export default function ProfilePage() {
   }, []);
 
   const handleSetupBiometric = async () => {
+    if (data?.profileStatus.biometricConfigured) {
+      setActionMessage('Biometric mock is already configured.');
+      return;
+    }
     try {
       setBiometricModalOpen(true);
       setBiometricScanning(true);
@@ -211,16 +215,24 @@ export default function ProfilePage() {
           <div className="mt-4">
             <PrimaryButton
               onClick={() => void handleSetupBiometric()}
-              disabled={actionLoading || biometricScanning}
+              disabled={
+                actionLoading ||
+                biometricScanning ||
+                Boolean(data?.profileStatus.biometricConfigured)
+              }
             >
-              {biometricScanning ? 'Scanning face...' : 'Add Biometric'}
+              {data?.profileStatus.biometricConfigured
+                ? 'Biometric Already Added'
+                : biometricScanning
+                  ? 'Scanning face...'
+                  : 'Add Biometric'}
             </PrimaryButton>
           </div>
         </div>
 
-        {data?.profileStatus.biometricMockId ? (
-          <div className="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-700">
-            Current biometric mock id: <span className="font-semibold">{data.profileStatus.biometricMockId}</span>
+        {data?.profileStatus.biometricConfigured ? (
+          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+            Your biometric mock is already configured. Rebinding is not available in the current product flow.
           </div>
         ) : null}
       </SectionCard>

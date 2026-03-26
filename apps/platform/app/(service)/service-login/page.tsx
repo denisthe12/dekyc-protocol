@@ -10,7 +10,14 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 import { inputClassName } from '@/components/ui/input-class';
 import { FaceScanModal } from '@/components/biometric/face-scan-modal';
 
-const DEFAULT_REQUESTED_CLAIMS = ['fullName', 'verified', 'age18Plus'];
+const DEFAULT_REQUESTED_CLAIMS = [
+  'fullName',
+  'iin',
+  'birthDate',
+  'email',
+  'verified',
+  'age18Plus',
+];
 const serviceInputClassName =
   'w-full rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-800';
 
@@ -255,19 +262,18 @@ export default function ServiceLoginPage() {
         </div>
 
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
-          <div className="text-lg font-semibold">How this works</div>
+          <div className="text-lg font-semibold">How login works</div>
 
           <div className="mt-6 space-y-3 text-sm text-zinc-400">
-            <p>1. The service validates its credentials with the DeKYC platform.</p>
-            <p>2. The user is matched by mock biometric identity and unique login code.</p>
-            <p>3. The protocol checks active permission, scopes, and token balances.</p>
-            <p>4. The service receives a signed KYC response envelope.</p>
-            <p>5. A service-side session is created for 7 days.</p>
+            <p>1. You start login with DeKYC face scan.</p>
+            <p>2. The platform verifies your identity through a mock biometric flow.</p>
+            <p>3. You enter your Unique Login Code as an additional demo factor.</p>
+            <p>4. The service receives a signed identity response from DeKYC.</p>
+            <p>5. A trusted service session is created.</p>
           </div>
 
           <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-400">
-            This demo shows passwordless consumer login powered by biometric mock,
-            unique login code, scoped KYC permissions, and signed protocol responses.
+            In the real product, login would rely on biometric verification only. The Unique Login Code is used here because the biometric flow is mocked for demo purposes.
           </div>
         </div>
       </div>

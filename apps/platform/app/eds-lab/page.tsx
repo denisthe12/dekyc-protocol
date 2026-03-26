@@ -2,19 +2,13 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { createNCALayerClient } from '@/lib/ncalayer';
+import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { SectionCard } from '@/components/dashboard/section-card';
 
 type ChallengeResponse = {
   challengeId: string;
   challengeBase64: string;
   expiresAt: string;
-};
-type AnalyzeResponse = {
-  ok: boolean;
-  filePath: string;
-  summary: {
-    realFieldsForMvp: string[];
-    missingFieldsForManualOrMock: string[];
-  };
 };
 
 type AttestResponse = {
@@ -69,8 +63,20 @@ type AttestResponse = {
   };
   savedKycProfileId: string;
   savedKycVaultEntryId: string;
-  
 };
+
+function getAccessTokenOrThrow() {
+  const token =
+    typeof window !== 'undefined'
+      ? window.localStorage.getItem('dekyc_access_token')
+      : null;
+
+  if (!token) {
+    throw new Error('Platform session not found. Please login again.');
+  }
+
+  return token;
+}
 
 export default function EdsLabPage() {
   const ncalayerClient = useMemo(() => createNCALayerClient(), []);
@@ -81,13 +87,7 @@ export default function EdsLabPage() {
 
   const [challenge, setChallenge] = useState<ChallengeResponse | null>(null);
   const [attestResult, setAttestResult] = useState<AttestResponse | null>(null);
-  const [analyzeResult, setAnalyzeResult] = useState<AnalyzeResponse | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(false);
-  const [meData, setMeData] = useState<{ id: string; email: string } | null>(null);
+
 
   const [connectionStatus, setConnectionStatus] = useState<
     'idle' | 'connected' | 'failed'
@@ -96,107 +96,19 @@ export default function EdsLabPage() {
   const [cmsSignatureBase64, setCmsSignatureBase64] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const savedToken = window.localStorage.getItem('dekyc_access_token');
-
-    if (savedToken) {
-      setAccessToken(savedToken);
-    }
-  }, []);
-
   const requestChallenge = async () => {
     try {
       setLoadingChallenge(true);
       setError(null);
       setAttestResult(null);
       setCmsSignatureBase64('');
+      setConnectionStatus('idle')
+      setChallenge(null)
+
+      const accessToken = getAccessTokenOrThrow();
 
       const response = await fetch('http://localhost:3001/api/eds/challenge', {
         method: 'POST',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Challenge request failed: ${response.status}`);
-      }
-
-      const data: ChallengeResponse = await response.json();
-      setChallenge(data);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(message);
-    } finally {
-      setLoadingChallenge(false);
-    }
-  };
-
-    const signup = async () => {
-    try {
-      setAuthLoading(true);
-      setError(null);
-
-      const response = await fetch('http://localhost:3001/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const rawText = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`Signup failed: ${response.status}. Response: ${rawText}`);
-      }
-
-      const data = JSON.parse(rawText);
-      setAccessToken(data.accessToken);
-      setMeData(data.user);
-      window.localStorage.setItem('dekyc_access_token', data.accessToken);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup error');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const login = async () => {
-    try {
-      setAuthLoading(true);
-      setError(null);
-
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const rawText = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`Login failed: ${response.status}. Response: ${rawText}`);
-      }
-
-      const data = JSON.parse(rawText);
-      setAccessToken(data.accessToken);
-      setMeData(data.user);
-      window.localStorage.setItem('dekyc_access_token', data.accessToken);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login error');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const loadMe = async () => {
-    if (!accessToken) {
-      setError('Сначала выполни signup или login.');
-      return;
-    }
-
-    try {
-      setAuthLoading(true);
-      setError(null);
-
-      const response = await fetch('http://localhost:3001/api/auth/me', {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -205,16 +117,17 @@ export default function EdsLabPage() {
       const rawText = await response.text();
 
       if (!response.ok) {
-        throw new Error(`Load me failed: ${response.status}. Response: ${rawText}`);
+        throw new Error(`Challenge request failed: ${response.status}. Response: ${rawText}`);
       }
 
-      const data = JSON.parse(rawText);
-      console.log('loadMe response:', data);
-      setMeData(data);
+      const data: ChallengeResponse = JSON.parse(rawText);
+      setChallenge(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Load me error');
+      const message =
+        err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(message);
     } finally {
-      setAuthLoading(false);
+      setLoadingChallenge(false);
     }
   };
 
@@ -242,12 +155,6 @@ export default function EdsLabPage() {
       setError('Сначала получи challenge.');
       return;
     }
-
-    if (!accessToken) {
-      setError('Сначала выполни signup или login.');
-      return;
-    }
-
     try {
       setSigning(true);
       setError(null);
@@ -264,6 +171,7 @@ export default function EdsLabPage() {
       );
 
       setCmsSignatureBase64(signature);
+      const accessToken = getAccessTokenOrThrow();
 
       const response = await fetch('http://localhost:3001/api/eds/attest', {
         method: 'POST',
@@ -308,142 +216,18 @@ export default function EdsLabPage() {
     }
   };
 
-    const saveAnalysis = async () => {
-    if (!attestResult) {
-      setError('Сначала подпиши challenge и получи parsedCertificate.');
-      return;
-    }
-
-    try {
-      setAnalyzing(true);
-      setError(null);
-
-      const response = await fetch('http://localhost:3001/api/eds/analyze', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          challengeId: attestResult.challengeId,
-          parsedCertificate: attestResult.parsedCertificate,
-          cmsDebug: attestResult.cmsDebug,
-        }),
-      });
-
-      const rawText = await response.text();
-
-      if (!response.ok) {
-        throw new Error(
-          `Analyze request failed: ${response.status}. Response: ${rawText}`,
-        );
-      }
-
-      const data: AnalyzeResponse = JSON.parse(rawText);
-      setAnalyzeResult(data);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Ошибка сохранения анализа';
-      setError(message);
-    } finally {
-      setAnalyzing(false);
-    }
-  };
-
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 p-8">
-      <div>
-        <h1 className="text-3xl font-bold">EDS Lab</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          Лабораторная страница для проверки NCALayer → CMS challenge → backend.
-        </p>
-      </div>
-
-      <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="text-sm font-semibold text-zinc-900">
-          What this lab demonstrates
-        </div>
-
-        <div className="mt-3 grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
-          <div>• Platform authentication before EDS binding</div>
-          <div>• Challenge generation and CMS signature flow</div>
-          <div>• Certificate parsing and identity extraction</div>
-          <div>• Persistence into UserCert, KycProfile, and KycVaultEntry</div>
-        </div>
-      </div>
-
-          <div className="rounded-2xl border p-6 shadow-sm">
-      <h2 className="text-lg font-semibold">Platform Auth</h2>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="rounded-xl border px-3 py-2 text-sm"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="rounded-xl border px-3 py-2 text-sm"
-        />
-      </div>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-3">
-        <button
-          onClick={signup}
-          disabled={authLoading}
-          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-        >
-          {authLoading ? 'Подождите...' : 'Signup'}
-        </button>
-
-        <button
-          onClick={login}
-          disabled={authLoading}
-          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-        >
-          {authLoading ? 'Подождите...' : 'Login'}
-        </button>
-
-        <button
-          onClick={loadMe}
-          disabled={authLoading || !accessToken}
-          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-        >
-          {authLoading ? 'Подождите...' : 'Load me'}
-        </button>
-      </div>
-
-      {accessToken && (
-        <div className="mt-4 text-sm">
-          <div className="font-medium">Access token</div>
-          <div className="break-all rounded-lg bg-gray-100 p-2">
-            {accessToken}
-          </div>
-        </div>
-      )}
-
-      {meData && (
-        <div className="mt-4 text-sm">
-          <div className="font-medium">Current user</div>
-          <div className="rounded-lg bg-gray-100 p-2">
-            {meData.email} ({meData.id})
-          </div>
-        </div>
-      )}
-    </div>
-
-        <div className="grid gap-4 md:grid-cols-4">
+    <DashboardShell
+      title="EDS Lab"
+      description="Technical demonstration of challenge generation, CMS signing, certificate parsing, and extracted identity data."
+    >
+      <div className="grid gap-4 md:grid-cols-3">
         <button
           onClick={requestChallenge}
           disabled={loadingChallenge}
           className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
         >
-          {loadingChallenge ? 'Запрашиваем...' : '1. Получить challenge'}
+          {loadingChallenge ? 'Generating...' : '1. Generate Challenge'}
         </button>
 
         <button
@@ -451,22 +235,15 @@ export default function EdsLabPage() {
           disabled={connecting}
           className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
         >
-          {connecting ? 'Подключаем...' : '2. Проверить NCALayer'}
+          {connecting ? 'Connecting...' : '2. Check NCALayer'}
         </button>
 
         <button
           onClick={signChallenge}
-          disabled={signing || !challenge}
+          disabled={signing || !challenge || connectionStatus !== 'connected'}
           className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
         >
-          {signing ? 'Подписываем...' : '3. Подписать challenge'}
-        </button>
-                <button
-          onClick={saveAnalysis}
-          disabled={analyzing || !attestResult}
-          className="rounded-xl border px-4 py-3 text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-        >
-          {analyzing ? 'Сохраняем...' : '4. Сохранить анализ'}
+          {signing ? 'Signing...' : '3. Connect Digital Signature'}
         </button>
       </div>
 
@@ -757,34 +534,6 @@ export default function EdsLabPage() {
           </div>
         </div>
       )}
-    {analyzeResult && (
-        <div className="rounded-2xl border p-6 shadow-sm">
-          <h2 className="text-lg font-semibold">Итог анализа этапа 0</h2>
-
-          <div className="mt-4 space-y-3 text-sm">
-            <div>
-              <div className="font-medium">Файл отчёта</div>
-              <div className="break-all rounded-lg bg-gray-100 p-2">
-                {analyzeResult.filePath}
-              </div>
-            </div>
-
-            <div>
-              <div className="font-medium">Реальные поля для MVP</div>
-              <div className="rounded-lg bg-gray-100 p-2">
-                {analyzeResult.summary.realFieldsForMvp.join(', ') || '—'}
-              </div>
-            </div>
-
-            <div>
-              <div className="font-medium">Поля, которые уйдут в manual/mock</div>
-              <div className="rounded-lg bg-gray-100 p-2">
-                {analyzeResult.summary.missingFieldsForManualOrMock.join(', ') || '—'}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
         <div className="text-sm font-semibold text-zinc-900">
           How this connects to DeKYC
@@ -796,7 +545,7 @@ export default function EdsLabPage() {
           and later uses it for permission-based signed KYC responses to services.
         </div>
       </div>
-    </main>
+    </DashboardShell>
   );
 }
 

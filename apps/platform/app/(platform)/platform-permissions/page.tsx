@@ -43,6 +43,18 @@ export default function PlatformPermissionsPage() {
     ) ?? null;
   }, [permissions, selectedServiceId]);
 
+  const getClaimChecked = (claim: string) => {
+    if (activePermission) {
+      return (activePermission.allowedClaims ?? []).includes(claim);
+    }
+
+    if ((selectedService?.requiredClaims ?? []).includes(claim)) {
+      return true;
+    }
+
+    return selectedOptionalClaims.includes(claim);
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -215,7 +227,12 @@ export default function PlatformPermissionsPage() {
                         key={claim}
                         className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-900"
                       >
-                        <input type="checkbox" checked readOnly className="h-4 w-4" />
+                        <input
+                          type="checkbox"
+                          checked={getClaimChecked(claim)}
+                          readOnly
+                          className="h-4 w-4"
+                        />
                         <span>{claim}</span>
                       </label>
                     ))
@@ -237,13 +254,13 @@ export default function PlatformPermissionsPage() {
                         key={claim}
                         className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-900"
                       >
-                        <input
-                          type="checkbox"
-                          checked={selectedOptionalClaims.includes(claim)}
-                          onChange={() => toggleOptionalClaim(claim)}
-                          disabled={!!activePermission}
-                          className="h-4 w-4"
-                        />
+                      <input
+                        type="checkbox"
+                        checked={getClaimChecked(claim)}
+                        onChange={() => toggleOptionalClaim(claim)}
+                        disabled={!!activePermission}
+                        className="h-4 w-4"
+                      />
                         <span>{claim}</span>
                       </label>
                     ))
