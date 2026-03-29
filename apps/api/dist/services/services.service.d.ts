@@ -28,8 +28,8 @@ export declare class ServicesService {
         clientId: string;
         description: string | null;
         category: string | null;
-        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
-        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+        requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
     }[]>;
     getServiceById(serviceId: string): Promise<{
         id: string;
@@ -40,8 +40,8 @@ export declare class ServicesService {
         clientId: string;
         description: string | null;
         category: string | null;
-        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
-        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+        requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
     } | null>;
     getServiceByClientIdWithSecrets(clientId: string): Promise<{
         id: string;
@@ -54,8 +54,8 @@ export declare class ServicesService {
         responseSigningSecret: string | null;
         description: string | null;
         category: string | null;
-        requiredClaims: import("@prisma/client/runtime/library").JsonValue | null;
-        optionalClaims: import("@prisma/client/runtime/library").JsonValue | null;
+        requiredClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
+        optionalClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
     } | null>;
     validateServiceCredentials(clientId: string, clientSecret: string): Promise<{
         id: string;
@@ -69,8 +69,8 @@ export declare class ServicesService {
         status: string;
         description: string | null;
         category: string | null;
-        requiredClaims: import("@prisma/client/runtime/library").JsonValue;
-        optionalClaims: import("@prisma/client/runtime/library").JsonValue;
+        requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
     }[]>;
     private generateClientId;
     private generateClientSecret;

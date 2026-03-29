@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { PermissionScopeGrant } from '@prisma/client';
+import { PermissionScopeGrant } from '../../prisma/generated/client';
 
 @Injectable()
 export class PermissionScopeGrantsService {

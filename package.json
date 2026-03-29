@@ -7,6 +7,14 @@
     "dev:platform": "pnpm --filter platform dev",
     "dev:api": "pnpm --filter api start:dev",
     "build": "pnpm -r build",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "dev:energy-web": "pnpm --filter energy-web dev",
+    "dev:energy-api": "pnpm --filter energy-api start:dev",
+    "build:energy-web": "pnpm --filter energy-web build",
+    "build:energy-api": "pnpm --filter energy-api build",
+    "lint:energy-web": "pnpm --filter energy-web lint",
+    "lint:energy-api": "pnpm --filter energy-api lint",
+    "typecheck:energy-web": "pnpm --filter energy-web typecheck",
+    "typecheck:energy-api": "pnpm --filter energy-api typecheck"
   }
 }

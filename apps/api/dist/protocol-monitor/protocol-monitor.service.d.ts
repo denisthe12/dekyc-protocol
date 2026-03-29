@@ -41,7 +41,7 @@ export declare class ProtocolMonitorService {
             onchainPermissionPda: string | null;
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
-            allowedClaims: import("@prisma/client/runtime/library").JsonValue | null;
+            allowedClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
         })[];
         accessLogs: ({

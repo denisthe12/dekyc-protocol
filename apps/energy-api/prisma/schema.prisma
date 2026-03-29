@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnergyUserRole {
+  USER
+  ADMIN
+  JUDGE
+  ISSUER
+}
+
+enum EnergyWalletStatus {
+  PENDING
+  ACTIVE
+  BLOCKED
+}
+
+model EnergyUser {
+  id                String              @id @default(cuid())
+  dekycUserId       String              @unique
+  email             String?             @db.VarChar(255)
+  fullName          String?             @db.VarChar(255)
+  role              EnergyUserRole      @default(USER)
+  lastLoginAt       DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  profile           EnergyUserProfile?
+  wallet            EnergyUserWallet?
+  sessions          EnergyUserSession[]
+}
+
+model EnergyUserProfile {
+  id                String      @id @default(cuid())
+  energyUserId      String      @unique
+  dekycUserId       String      @db.VarChar(191)
+  email             String?     @db.VarChar(255)
+  fullName          String?     @db.VarChar(255)
+  iin               String?     @db.VarChar(32)
+  birthDate         String?     @db.VarChar(64)
+  verified          Boolean     @default(false)
+  age18Plus         Boolean     @default(false)
+  rawClaimsJson     Json?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  user              EnergyUser  @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+
+  @@index([dekycUserId])
+}
+
+model EnergyUserWallet {
+  id                        String             @id @default(cuid())
+  energyUserId              String             @unique
+  custodialWalletAddress    String             @unique @db.VarChar(128)
+  kzteTokenAccountAddress   String?            @unique @db.VarChar(128)
+  energyPointsAccountAddress String?           @unique @db.VarChar(128)
+  walletStatus              EnergyWalletStatus @default(PENDING)
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+
+  user                      EnergyUser         @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+}
+
+model EnergyUserSession {
+  id                String      @id @default(cuid())
+  energyUserId      String
+  accessTokenHash   String      @unique @db.VarChar(255)
+  expiresAt         DateTime
+  createdAt         DateTime    @default(now())
+
+  user              EnergyUser  @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+
+  @@index([energyUserId])
+}
