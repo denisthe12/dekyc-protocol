@@ -1,8 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { SolanaService } from './solana.service';
 import { Token2022Service } from './token-2022.service';
-import { SolanaStatusResponseDto } from './dto/solana-status.response.dto';
-import { CreateKzteMintResponseDto } from './dto/create-kzte-mint.response.dto';
 
 @Controller('solana')
 export class SolanaController {
@@ -12,7 +10,7 @@ export class SolanaController {
   ) {}
 
   @Get('status')
-  public async getStatus(): Promise<SolanaStatusResponseDto> {
+  public async getStatus() {
     const signer = await this.solanaService.getSignerStatus();
     const kzte = await this.token2022Service.getKzteMintStatus();
 
@@ -21,11 +19,12 @@ export class SolanaController {
       signerAddress: signer.signerAddress,
       signerBalanceSol: signer.signerBalanceSol,
       kzte,
+      tokenizationProgramId: this.solanaService.getProgramId().toBase58(),
     };
   }
 
   @Post('kzte/init')
-  public async createKzteMint(): Promise<CreateKzteMintResponseDto> {
+  public async createKzteMint() {
     return this.token2022Service.createKzteMint();
   }
 }

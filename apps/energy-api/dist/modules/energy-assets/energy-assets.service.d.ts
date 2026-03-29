@@ -1,0 +1,56 @@
+import { PrismaService } from '@/modules/prisma/prisma.service';
+import { CreatedEnergyAssetResult } from '@/modules/energy/energy-blockchain.service';
+export declare class EnergyAssetsService {
+    private readonly prisma;
+    constructor(prisma: PrismaService);
+    createDemoAsset(onchain: CreatedEnergyAssetResult): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
+        registryPda: string;
+        assetPda: string;
+        treasuryShareAccount: string;
+        createAssetTx: string | null;
+        issueSharesTx: string | null;
+        assetId: string;
+        issuerEnergyUserId: string | null;
+        title: string;
+        description: string | null;
+        location: string | null;
+        assetType: string;
+        totalShares: number;
+        pricePerShareKzte: number;
+        investorBps: number;
+        operatorBps: number;
+        payoutMode: string;
+        shareMintAddress: string;
+        proofRootHash: string;
+        metadataUriHash: string;
+    }>;
+    listAssets(): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
+        registryPda: string;
+        assetPda: string;
+        treasuryShareAccount: string;
+        createAssetTx: string | null;
+        issueSharesTx: string | null;
+        assetId: string;
+        issuerEnergyUserId: string | null;
+        title: string;
+        description: string | null;
+        location: string | null;
+        assetType: string;
+        totalShares: number;
+        pricePerShareKzte: number;
+        investorBps: number;
+        operatorBps: number;
+        payoutMode: string;
+        shareMintAddress: string;
+        proofRootHash: string;
+        metadataUriHash: string;
+    }[]>;
+}

@@ -26,6 +26,7 @@ let SolanaController = class SolanaController {
             signerAddress: signer.signerAddress,
             signerBalanceSol: signer.signerBalanceSol,
             kzte,
+            tokenizationProgramId: this.solanaService.getProgramId().toBase58(),
         };
     }
     async createKzteMint() {

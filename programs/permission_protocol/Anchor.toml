@@ -5,14 +5,15 @@ anchor_version = "0.32.1"
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-permission_protocol = "2hSnMJEbng1ZzW4NKQx2YmTxBpWaUf145ZU6bcZ85hAA"
+[programs.devnet]
+permission_protocol = "EvnqmkfMXN3sepqFkQTQjQgWKK9XKkGe2Zou9XSWVufh"
+tokenization_case = "6VF97rmPyhMgqkEQGhGu7dSm7oq9tWHZELSKqttUB4Ed"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

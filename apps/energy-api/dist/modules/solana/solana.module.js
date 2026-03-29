@@ -11,14 +11,25 @@ const common_1 = require("@nestjs/common");
 const solana_controller_1 = require("./solana.controller");
 const solana_service_1 = require("./solana.service");
 const token_2022_service_1 = require("./token-2022.service");
+const anchor_service_1 = require("./anchor.service");
 let SolanaModule = class SolanaModule {
 };
 exports.SolanaModule = SolanaModule;
 exports.SolanaModule = SolanaModule = __decorate([
     (0, common_1.Module)({
         controllers: [solana_controller_1.SolanaController],
-        providers: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service],
-        exports: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service],
+        providers: [
+            solana_service_1.SolanaService,
+            token_2022_service_1.Token2022Service,
+            {
+                provide: anchor_service_1.AnchorService,
+                useFactory: async (solanaService) => {
+                    return anchor_service_1.AnchorService.create(solanaService);
+                },
+                inject: [solana_service_1.SolanaService],
+            },
+        ],
+        exports: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service, anchor_service_1.AnchorService],
     })
 ], SolanaModule);
 //# sourceMappingURL=solana.module.js.map

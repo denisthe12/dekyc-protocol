@@ -7,8 +7,6 @@ import {
   LAMPORTS_PER_SOL,
   PublicKey,
 } from '@solana/web3.js';
-import { DEFAULT_SOLANA_RPC_URL } from './solana.constants';
-import { SolanaSignerStatus } from './solana.types';
 
 @Injectable()
 export class SolanaService {
@@ -20,7 +18,7 @@ export class SolanaService {
       return this.connection;
     }
 
-    const rpcUrl = process.env.SOLANA_RPC_URL ?? DEFAULT_SOLANA_RPC_URL;
+    const rpcUrl = process.env.SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
     this.connection = new Connection(rpcUrl, 'confirmed');
 
     return this.connection;
@@ -48,12 +46,29 @@ export class SolanaService {
     return this.signer;
   }
 
-  public async getSignerPublicKey(): Promise<PublicKey> {
-    const signer = await this.getSigner();
-    return signer.publicKey;
+  public getProgramId(): PublicKey {
+    const value = process.env.TOKENIZATION_PROGRAM_ID?.trim();
+    if (!value) {
+      throw new Error('TOKENIZATION_PROGRAM_ID is not configured');
+    }
+
+    return new PublicKey(value);
   }
 
-  public async getSignerStatus(): Promise<SolanaSignerStatus> {
+  public getKzteMint(): PublicKey {
+    const value = process.env.KZTE_MINT_ADDRESS?.trim();
+    if (!value) {
+      throw new Error('KZTE_MINT_ADDRESS is not configured');
+    }
+
+    return new PublicKey(value);
+  }
+
+  public async getSignerStatus(): Promise<{
+    rpcUrl: string;
+    signerAddress: string;
+    signerBalanceSol: number;
+  }> {
     const connection = this.getConnection();
     const signer = await this.getSigner();
     const balanceLamports = await connection.getBalance(signer.publicKey, 'confirmed');

@@ -1,0 +1,555 @@
+{
+  "address": "6VF97rmPyhMgqkEQGhGu7dSm7oq9tWHZELSKqttUB4Ed",
+  "metadata": {
+    "name": "tokenization_case",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "DeKYC Energy Rights Exchange tokenization program"
+  },
+  "instructions": [
+    {
+      "name": "create_energy_asset",
+      "discriminator": [
+        253,
+        117,
+        66,
+        187,
+        157,
+        162,
+        132,
+        162
+      ],
+      "accounts": [
+        {
+          "name": "issuer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registry",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "share_mint",
+          "docs": [
+            "must be set to this asset PDA address before calling issue_shares"
+          ]
+        },
+        {
+          "name": "treasury_share_account"
+        },
+        {
+          "name": "energy_asset",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  110,
+                  101,
+                  114,
+                  103,
+                  121,
+                  95,
+                  97,
+                  115,
+                  115,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "asset_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "asset_id",
+          "type": "u64"
+        },
+        {
+          "name": "total_shares",
+          "type": "u64"
+        },
+        {
+          "name": "price_per_share_kzte",
+          "type": "u64"
+        },
+        {
+          "name": "investor_bps",
+          "type": "u16"
+        },
+        {
+          "name": "operator_bps",
+          "type": "u16"
+        },
+        {
+          "name": "payout_mode",
+          "type": {
+            "defined": {
+              "name": "PayoutMode"
+            }
+          }
+        },
+        {
+          "name": "proof_root_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "metadata_uri_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_registry",
+      "discriminator": [
+        210,
+        219,
+        233,
+        49,
+        251,
+        19,
+        135,
+        13
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "kzte_mint"
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "issue_shares",
+      "discriminator": [
+        110,
+        72,
+        179,
+        47,
+        131,
+        109,
+        115,
+        103
+      ],
+      "accounts": [
+        {
+          "name": "issuer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "energy_asset"
+          ]
+        },
+        {
+          "name": "energy_asset",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true,
+          "relations": [
+            "energy_asset"
+          ]
+        },
+        {
+          "name": "treasury_share_account",
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EnergyAsset",
+      "discriminator": [
+        191,
+        186,
+        173,
+        151,
+        242,
+        6,
+        115,
+        35
+      ]
+    },
+    {
+      "name": "Registry",
+      "discriminator": [
+        47,
+        174,
+        110,
+        246,
+        184,
+        182,
+        252,
+        218
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "EnergyAssetCreated",
+      "discriminator": [
+        240,
+        0,
+        41,
+        211,
+        71,
+        69,
+        174,
+        31
+      ]
+    },
+    {
+      "name": "RegistryCreated",
+      "discriminator": [
+        155,
+        150,
+        75,
+        69,
+        222,
+        185,
+        234,
+        132
+      ]
+    },
+    {
+      "name": "SharesIssued",
+      "discriminator": [
+        0,
+        70,
+        31,
+        135,
+        18,
+        242,
+        247,
+        173
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "RegistryPaused",
+      "msg": "Platform registry is paused"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidRegistryAdmin",
+      "msg": "Only registry admin can perform this action"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidIssuer",
+      "msg": "Only asset issuer can perform this action"
+    },
+    {
+      "code": 6003,
+      "name": "SharesAlreadyIssued",
+      "msg": "Shares have already been issued for this asset"
+    },
+    {
+      "code": 6004,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidBasisPoints",
+      "msg": "Invalid basis points configuration"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidTotalShares",
+      "msg": "Invalid total shares"
+    }
+  ],
+  "types": [
+    {
+      "name": "AssetStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "ActiveSale"
+          },
+          {
+            "name": "SoldOut"
+          },
+          {
+            "name": "Paused"
+          },
+          {
+            "name": "Closed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EnergyAsset",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset_id",
+            "type": "u64"
+          },
+          {
+            "name": "registry",
+            "type": "pubkey"
+          },
+          {
+            "name": "issuer",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_share_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "issued_shares",
+            "type": "u64"
+          },
+          {
+            "name": "sold_shares",
+            "type": "u64"
+          },
+          {
+            "name": "price_per_share_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "investor_bps",
+            "type": "u16"
+          },
+          {
+            "name": "operator_bps",
+            "type": "u16"
+          },
+          {
+            "name": "payout_mode",
+            "type": {
+              "defined": {
+                "name": "PayoutMode"
+              }
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "AssetStatus"
+              }
+            }
+          },
+          {
+            "name": "proof_root_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "metadata_uri_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EnergyAssetCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset_id",
+            "type": "u64"
+          },
+          {
+            "name": "issuer",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_share_account",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PayoutMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Kzte"
+          },
+          {
+            "name": "EnergyPoints"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Registry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "kzte_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RegistryCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "kzte_mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SharesIssued",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset_id",
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_share_account",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

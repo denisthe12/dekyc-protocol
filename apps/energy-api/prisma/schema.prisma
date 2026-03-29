@@ -21,6 +21,14 @@ enum EnergyWalletStatus {
   BLOCKED
 }
 
+enum EnergyAssetStatus {
+  DRAFT
+  ACTIVE_SALE
+  SOLD_OUT
+  PAUSED
+  CLOSED
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -81,4 +89,40 @@ model EnergyUserSession {
   user              EnergyUser  @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
 
   @@index([energyUserId])
+}
+
+model EnergyAsset {
+  id                        String            @id @default(cuid())
+  assetId                   String            @unique @db.VarChar(64)
+  issuerEnergyUserId        String?           @db.VarChar(191)
+
+  title                     String            @db.VarChar(255)
+  description               String?           @db.Text
+  location                  String?           @db.VarChar(255)
+  assetType                 String            @db.VarChar(100)
+
+  totalShares               Int
+  pricePerShareKzte         Int
+  investorBps               Int
+  operatorBps               Int
+
+  payoutMode                String            @db.VarChar(50)
+  status                    EnergyAssetStatus @default(DRAFT)
+
+  assetPda                  String            @unique @db.VarChar(128)
+  registryPda               String            @db.VarChar(128)
+  shareMintAddress          String            @unique @db.VarChar(128)
+  treasuryShareAccount      String            @unique @db.VarChar(128)
+
+  proofRootHash             String            @db.VarChar(128)
+  metadataUriHash           String            @db.VarChar(128)
+
+  createAssetTx             String?           @db.VarChar(128)
+  issueSharesTx             String?           @db.VarChar(128)
+
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+
+  @@index([issuerEnergyUserId])
+  @@index([status])
 }

@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const fs_1 = require("fs");
 const path = require("path");
 const web3_js_1 = require("@solana/web3.js");
-const solana_constants_1 = require("./solana.constants");
 let SolanaService = class SolanaService {
     constructor() {
         this.connection = null;
@@ -21,7 +20,7 @@ let SolanaService = class SolanaService {
         if (this.connection) {
             return this.connection;
         }
-        const rpcUrl = process.env.SOLANA_RPC_URL ?? solana_constants_1.DEFAULT_SOLANA_RPC_URL;
+        const rpcUrl = process.env.SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
         this.connection = new web3_js_1.Connection(rpcUrl, 'confirmed');
         return this.connection;
     }
@@ -42,9 +41,19 @@ let SolanaService = class SolanaService {
         this.signer = web3_js_1.Keypair.fromSecretKey(Uint8Array.from(secret));
         return this.signer;
     }
-    async getSignerPublicKey() {
-        const signer = await this.getSigner();
-        return signer.publicKey;
+    getProgramId() {
+        const value = process.env.TOKENIZATION_PROGRAM_ID?.trim();
+        if (!value) {
+            throw new Error('TOKENIZATION_PROGRAM_ID is not configured');
+        }
+        return new web3_js_1.PublicKey(value);
+    }
+    getKzteMint() {
+        const value = process.env.KZTE_MINT_ADDRESS?.trim();
+        if (!value) {
+            throw new Error('KZTE_MINT_ADDRESS is not configured');
+        }
+        return new web3_js_1.PublicKey(value);
     }
     async getSignerStatus() {
         const connection = this.getConnection();
