@@ -48,5 +48,19 @@ export async function fetchEnergyMe(accessToken: string) {
     email: string | null;
     fullName: string | null;
     role: string;
+    profile: {
+      iin: string | null;
+      birthDate: string | null;
+      verified: boolean;
+      age18Plus: boolean;
+    } | null;
+    wallet: {
+      custodialWalletAddress: string;
+      kzteTokenAccountAddress: string | null;
+      energyPointsAccountAddress: string | null;
+      walletStatus: string;
+      initialKzteAirdropped: boolean;
+      initialKzteAirdropTx: string | null;
+    } | null;
   };
 }

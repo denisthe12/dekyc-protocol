@@ -13,11 +13,12 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("../../../prisma/generated/client");
 const prisma_service_1 = require("../prisma/prisma.service");
-const crypto_1 = require("crypto");
+const wallets_service_1 = require("../wallets/wallets.service");
 const users_json_helper_1 = require("./users-json.helper");
 let UsersService = class UsersService {
-    constructor(prisma) {
+    constructor(prisma, walletsService) {
         this.prisma = prisma;
+        this.walletsService = walletsService;
     }
     async findById(id) {
         const user = await this.prisma.energyUser.findUnique({
@@ -59,6 +60,8 @@ let UsersService = class UsersService {
                     kzteTokenAccountAddress: user.wallet.kzteTokenAccountAddress,
                     energyPointsAccountAddress: user.wallet.energyPointsAccountAddress,
                     walletStatus: user.wallet.walletStatus,
+                    initialKzteAirdropped: user.wallet.initialKzteAirdropped,
+                    initialKzteAirdropTx: user.wallet.initialKzteAirdropTx,
                 }
                 : null,
         };
@@ -87,6 +90,7 @@ let UsersService = class UsersService {
         const age18Plus = typeof params.claims?.age18Plus === 'boolean'
             ? params.claims.age18Plus
             : false;
+        let userId;
         if (existing) {
             await this.prisma.energyUser.update({
                 where: { id: existing.id },
@@ -121,48 +125,45 @@ let UsersService = class UsersService {
                     rawClaimsJson: (0, users_json_helper_1.toPrismaJson)(params.claims),
                 },
             });
-            if (!existing.wallet) {
-                await this.prisma.energyUserWallet.create({
-                    data: {
-                        energyUserId: existing.id,
-                        custodialWalletAddress: this.generateWalletAddress(),
-                        walletStatus: client_1.EnergyWalletStatus.PENDING,
-                    },
-                });
-            }
-            const updated = await this.prisma.energyUser.findUniqueOrThrow({
-                where: { id: existing.id },
-            });
-            return this.mapToCurrentUser(updated);
+            userId = existing.id;
         }
-        const created = await this.prisma.energyUser.create({
-            data: {
-                dekycUserId: params.dekycUserId,
-                email,
-                fullName,
-                role: client_1.EnergyUserRole.USER,
-                lastLoginAt: new Date(),
-                profile: {
-                    create: {
-                        dekycUserId: params.dekycUserId,
-                        email,
-                        fullName,
-                        iin,
-                        birthDate,
-                        verified,
-                        age18Plus,
-                        rawClaimsJson: (0, users_json_helper_1.toPrismaJson)(params.claims),
+        else {
+            const created = await this.prisma.energyUser.create({
+                data: {
+                    dekycUserId: params.dekycUserId,
+                    email,
+                    fullName,
+                    role: client_1.EnergyUserRole.USER,
+                    lastLoginAt: new Date(),
+                    profile: {
+                        create: {
+                            dekycUserId: params.dekycUserId,
+                            email,
+                            fullName,
+                            iin,
+                            birthDate,
+                            verified,
+                            age18Plus,
+                            rawClaimsJson: (0, users_json_helper_1.toPrismaJson)(params.claims),
+                        },
+                    },
+                    wallet: {
+                        create: {
+                            custodialWalletAddress: `pending-${params.dekycUserId}`,
+                            walletStatus: client_1.EnergyWalletStatus.PENDING,
+                        },
                     },
                 },
-                wallet: {
-                    create: {
-                        custodialWalletAddress: this.generateWalletAddress(),
-                        walletStatus: client_1.EnergyWalletStatus.PENDING,
-                    },
-                },
-            },
+            });
+            userId = created.id;
+        }
+        await this.walletsService.ensureUserWallet({
+            energyUserId: userId,
         });
-        return this.mapToCurrentUser(created);
+        const user = await this.prisma.energyUser.findUniqueOrThrow({
+            where: { id: userId },
+        });
+        return this.mapToCurrentUser(user);
     }
     mapToCurrentUser(user) {
         return {
@@ -173,13 +174,11 @@ let UsersService = class UsersService {
             role: user.role,
         };
     }
-    generateWalletAddress() {
-        return `energy-wallet-${(0, crypto_1.randomUUID)()}`;
-    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        wallets_service_1.WalletsService])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

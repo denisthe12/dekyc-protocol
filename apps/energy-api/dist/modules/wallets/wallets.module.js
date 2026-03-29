@@ -6,18 +6,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UsersModule = void 0;
+exports.WalletsModule = void 0;
 const common_1 = require("@nestjs/common");
-const users_service_1 = require("./users.service");
-const wallets_module_1 = require("../wallets/wallets.module");
-let UsersModule = class UsersModule {
+const wallets_service_1 = require("./wallets.service");
+const solana_module_1 = require("../solana/solana.module");
+let WalletsModule = class WalletsModule {
 };
-exports.UsersModule = UsersModule;
-exports.UsersModule = UsersModule = __decorate([
+exports.WalletsModule = WalletsModule;
+exports.WalletsModule = WalletsModule = __decorate([
     (0, common_1.Module)({
-        imports: [wallets_module_1.WalletsModule],
-        providers: [users_service_1.UsersService],
-        exports: [users_service_1.UsersService],
+        imports: [solana_module_1.SolanaModule],
+        providers: [wallets_service_1.WalletsService],
+        exports: [wallets_service_1.WalletsService],
     })
-], UsersModule);
-//# sourceMappingURL=users.module.js.map
+], WalletsModule);
+//# sourceMappingURL=wallets.module.js.map

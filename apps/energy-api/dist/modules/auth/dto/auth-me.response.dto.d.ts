@@ -16,5 +16,7 @@ export declare class AuthMeResponseDto {
         kzteTokenAccountAddress: string | null;
         energyPointsAccountAddress: string | null;
         walletStatus: EnergyWalletStatus;
+        initialKzteAirdropped: boolean;
+        initialKzteAirdropTx: string | null;
     } | null;
 }

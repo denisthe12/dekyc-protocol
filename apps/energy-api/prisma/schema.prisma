@@ -56,16 +56,19 @@ model EnergyUserProfile {
 }
 
 model EnergyUserWallet {
-  id                        String             @id @default(cuid())
-  energyUserId              String             @unique
-  custodialWalletAddress    String             @unique @db.VarChar(128)
-  kzteTokenAccountAddress   String?            @unique @db.VarChar(128)
-  energyPointsAccountAddress String?           @unique @db.VarChar(128)
-  walletStatus              EnergyWalletStatus @default(PENDING)
-  createdAt                 DateTime           @default(now())
-  updatedAt                 DateTime           @updatedAt
+  id                         String             @id @default(cuid())
+  energyUserId               String             @unique
+  custodialWalletAddress     String             @unique @db.VarChar(128)
+  custodialWalletSecretJson  Json?
+  kzteTokenAccountAddress    String?            @unique @db.VarChar(128)
+  energyPointsAccountAddress String?            @unique @db.VarChar(128)
+  walletStatus               EnergyWalletStatus @default(PENDING)
+  initialKzteAirdropped      Boolean            @default(false)
+  initialKzteAirdropTx       String?            @db.VarChar(128)
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
 
-  user                      EnergyUser         @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+  user                       EnergyUser         @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
 }
 
 model EnergyUserSession {

@@ -5,13 +5,7 @@ import { useEffect, useState } from 'react';
 import { loadEnergySession, clearEnergySession } from '@/lib/session';
 import { fetchEnergyMe } from '@/lib/api/energy';
 
-type MeState = {
-  id: string;
-  dekycUserId: string;
-  email: string | null;
-  fullName: string | null;
-  role: string;
-} | null;
+type MeState = Awaited<ReturnType<typeof fetchEnergyMe>> | null;
 
 export default function HomePage() {
   const [me, setMe] = useState<MeState>(null);
@@ -94,7 +88,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6">
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -102,12 +96,11 @@ export default function HomePage() {
                 DeKYC Energy
               </div>
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">
-                Сессия создана
+                Профиль energy-пользователя создан
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
-                Следующим шагом мы создадим профиль, кошелёк пользователя,
-                стартовый баланс KZTE и защищённые страницы assets / marketplace /
-                portfolio.
+                Теперь у пользователя есть реальный custodial-адрес, реальный
+                Token-2022 account для KZTE и стартовое начисление 1 000 000 KZTE.
               </p>
             </div>
 
@@ -121,7 +114,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
             <div className="text-sm text-zinc-500">Пользователь</div>
             <div className="mt-2 text-xl font-semibold">
@@ -133,9 +126,63 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
-            <div className="text-sm text-zinc-500">DeKYC User ID</div>
+            <div className="text-sm text-zinc-500">IIN</div>
             <div className="mt-2 break-all text-sm text-zinc-300">
-              {me.dekycUserId}
+              {me.profile?.iin ?? 'не передан'}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Проверка</div>
+            <div className="mt-2 text-sm text-zinc-300">
+              verified: {String(me.profile?.verified ?? false)}
+            </div>
+            <div className="mt-1 text-sm text-zinc-300">
+              age18Plus: {String(me.profile?.age18Plus ?? false)}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Роль</div>
+            <div className="mt-2 text-lg font-semibold">{me.role}</div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Custodial адрес</div>
+            <div className="mt-3 break-all text-sm text-zinc-300">
+              {me.wallet?.custodialWalletAddress ?? 'не создан'}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">KZTE token account</div>
+            <div className="mt-3 break-all text-sm text-zinc-300">
+              {me.wallet?.kzteTokenAccountAddress ?? 'не создан'}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Статус кошелька</div>
+            <div className="mt-2 text-lg font-semibold">
+              {me.wallet?.walletStatus ?? 'UNKNOWN'}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Стартовый KZTE airdrop</div>
+            <div className="mt-2 text-lg font-semibold">
+              {String(me.wallet?.initialKzteAirdropped ?? false)}
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+            <div className="text-sm text-zinc-500">Tx начисления</div>
+            <div className="mt-3 break-all text-xs text-zinc-300">
+              {me.wallet?.initialKzteAirdropTx ?? 'ещё нет'}
             </div>
           </div>
         </div>

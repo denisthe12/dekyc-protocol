@@ -6,13 +6,16 @@ import {
 } from '../../../prisma/generated/client';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { CurrentUser } from './current-user.type';
-import { randomUUID } from 'crypto';
 import { AuthMeResponseDto } from '@/modules/auth/dto/auth-me.response.dto';
+import { WalletsService } from '@/modules/wallets/wallets.service';
 import { toPrismaJson } from './users-json.helper';
 
 @Injectable()
 export class UsersService {
-  public constructor(private readonly prisma: PrismaService) {}
+  public constructor(
+    private readonly prisma: PrismaService,
+    private readonly walletsService: WalletsService,
+  ) {}
 
   public async findById(id: string): Promise<CurrentUser | null> {
     const user = await this.prisma.energyUser.findUnique({
@@ -59,6 +62,8 @@ export class UsersService {
             kzteTokenAccountAddress: user.wallet.kzteTokenAccountAddress,
             energyPointsAccountAddress: user.wallet.energyPointsAccountAddress,
             walletStatus: user.wallet.walletStatus,
+            initialKzteAirdropped: user.wallet.initialKzteAirdropped,
+            initialKzteAirdropTx: user.wallet.initialKzteAirdropTx,
           }
         : null,
     };
@@ -104,6 +109,8 @@ export class UsersService {
         ? params.claims.age18Plus
         : false;
 
+    let userId: string;
+
     if (existing) {
       await this.prisma.energyUser.update({
         where: { id: existing.id },
@@ -140,52 +147,48 @@ export class UsersService {
         },
       });
 
-      if (!existing.wallet) {
-        await this.prisma.energyUserWallet.create({
-          data: {
-            energyUserId: existing.id,
-            custodialWalletAddress: this.generateWalletAddress(),
-            walletStatus: EnergyWalletStatus.PENDING,
+      userId = existing.id;
+    } else {
+      const created = await this.prisma.energyUser.create({
+        data: {
+          dekycUserId: params.dekycUserId,
+          email,
+          fullName,
+          role: EnergyUserRole.USER,
+          lastLoginAt: new Date(),
+          profile: {
+            create: {
+              dekycUserId: params.dekycUserId,
+              email,
+              fullName,
+              iin,
+              birthDate,
+              verified,
+              age18Plus,
+              rawClaimsJson: toPrismaJson(params.claims),
+            },
           },
-        });
-      }
-
-      const updated = await this.prisma.energyUser.findUniqueOrThrow({
-        where: { id: existing.id },
+          wallet: {
+            create: {
+              custodialWalletAddress: `pending-${params.dekycUserId}`,
+              walletStatus: EnergyWalletStatus.PENDING,
+            },
+          },
+        },
       });
 
-      return this.mapToCurrentUser(updated);
+      userId = created.id;
     }
 
-    const created = await this.prisma.energyUser.create({
-      data: {
-        dekycUserId: params.dekycUserId,
-        email,
-        fullName,
-        role: EnergyUserRole.USER,
-        lastLoginAt: new Date(),
-        profile: {
-          create: {
-            dekycUserId: params.dekycUserId,
-            email,
-            fullName,
-            iin,
-            birthDate,
-            verified,
-            age18Plus,
-            rawClaimsJson: toPrismaJson(params.claims),
-          },
-        },
-        wallet: {
-          create: {
-            custodialWalletAddress: this.generateWalletAddress(),
-            walletStatus: EnergyWalletStatus.PENDING,
-          },
-        },
-      },
+    await this.walletsService.ensureUserWallet({
+      energyUserId: userId,
     });
 
-    return this.mapToCurrentUser(created);
+    const user = await this.prisma.energyUser.findUniqueOrThrow({
+      where: { id: userId },
+    });
+
+    return this.mapToCurrentUser(user);
   }
 
   private mapToCurrentUser(user: EnergyUser): CurrentUser {
@@ -196,9 +199,5 @@ export class UsersService {
       fullName: user.fullName,
       role: user.role,
     };
-  }
-
-  private generateWalletAddress(): string {
-    return `energy-wallet-${randomUUID()}`;
   }
 }

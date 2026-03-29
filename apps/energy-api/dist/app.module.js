@@ -14,12 +14,13 @@ const auth_module_1 = require("./modules/auth/auth.module");
 const users_module_1 = require("./modules/users/users.module");
 const prisma_module_1 = require("./modules/prisma/prisma.module");
 const solana_module_1 = require("./modules/solana/solana.module");
+const wallets_module_1 = require("./modules/wallets/wallets.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, solana_module_1.SolanaModule],
+        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, solana_module_1.SolanaModule, wallets_module_1.WalletsModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
