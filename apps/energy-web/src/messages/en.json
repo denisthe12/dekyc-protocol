@@ -1,0 +1,25 @@
+{
+  "Common": {
+    "appName": "DeKYC Energy",
+    "loading": "Loading...",
+    "backHome": "Back to home"
+  },
+  "AssetsPage": {
+    "eyebrow": "Asset market",
+    "title": "Energy projects",
+    "description": "Real projects created through energy-api and the Anchor tokenization program.",
+    "empty": "No assets available yet.",
+    "assetType": "Asset type",
+    "location": "Location",
+    "totalShares": "Total shares",
+    "pricePerShare": "Price per share",
+    "status": "Status",
+    "registryPda": "Registry PDA",
+    "assetPda": "Asset PDA",
+    "shareMint": "Share mint",
+    "treasury": "Treasury account",
+    "createAssetTx": "Create asset transaction",
+    "issueSharesTx": "Issue shares transaction",
+    "openExplorer": "Open in Explorer"
+  }
+}

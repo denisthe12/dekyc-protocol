@@ -116,6 +116,8 @@ model EnergyAsset {
 
   proofRootHash             String            @db.VarChar(128)
   metadataUriHash           String            @db.VarChar(128)
+  metadataJson              Json
+  metadataCanonicalJson     String            @db.Text
 
   createAssetTx             String?           @db.VarChar(128)
   issueSharesTx             String?           @db.VarChar(128)

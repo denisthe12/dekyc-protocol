@@ -1,9 +1,8 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
-import { CreatedEnergyAssetResult } from '@/modules/energy/energy-blockchain.service';
 export declare class EnergyAssetsService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    createDemoAsset(onchain: CreatedEnergyAssetResult): Promise<{
+    createDemoAsset(onchain: any): Promise<{
         id: string;
         createdAt: Date;
         updatedAt: Date;
@@ -27,6 +26,8 @@ export declare class EnergyAssetsService {
         shareMintAddress: string;
         proofRootHash: string;
         metadataUriHash: string;
+        metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
+        metadataCanonicalJson: string;
     }>;
     listAssets(): Promise<{
         id: string;
@@ -52,5 +53,7 @@ export declare class EnergyAssetsService {
         shareMintAddress: string;
         proofRootHash: string;
         metadataUriHash: string;
+        metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
+        metadataCanonicalJson: string;
     }[]>;
 }

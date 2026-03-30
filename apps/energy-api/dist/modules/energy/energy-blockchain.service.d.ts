@@ -1,6 +1,7 @@
 import { PublicKey } from '@solana/web3.js';
 import { AnchorService } from '@/modules/solana/anchor.service';
 import { SolanaService } from '@/modules/solana/solana.service';
+import { type EnergyMetadata } from './utils/metadata.util';
 export type CreatedEnergyAssetResult = {
     registryPda: string;
     registryTx: string | null;
@@ -10,6 +11,8 @@ export type CreatedEnergyAssetResult = {
     treasuryShareAccount: string;
     createAssetTx: string;
     issueSharesTx: string;
+    metadata: EnergyMetadata;
+    metadataHash: string;
 };
 export declare class EnergyBlockchainService {
     private readonly anchorService;

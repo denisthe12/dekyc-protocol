@@ -8,6 +8,8 @@ import {
 } from '@solana/spl-token';
 import { AnchorService } from '@/modules/solana/anchor.service';
 import { SolanaService } from '@/modules/solana/solana.service';
+import { sha256FromObject } from './utils/hash.util';
+import { buildEnergyMetadata, type EnergyMetadata } from './utils/metadata.util';
 
 export type CreatedEnergyAssetResult = {
   registryPda: string;
@@ -18,6 +20,9 @@ export type CreatedEnergyAssetResult = {
   treasuryShareAccount: string;
   createAssetTx: string;
   issueSharesTx: string;
+  metadata: EnergyMetadata;
+  metadataHash: string;
+
 };
 
 @Injectable()
@@ -79,6 +84,16 @@ export class EnergyBlockchainService {
     const assetIdBn = new anchor.BN(Date.now());
     const assetIdLe = assetIdBn.toArrayLike(Buffer, 'le', 8);
 
+    const metadata = buildEnergyMetadata({
+      assetId: assetIdBn.toString(),
+    });
+
+    const metadataHashBuffer = sha256FromObject(metadata);
+
+    const metadataUriHash = Array.from(metadataHashBuffer);
+
+    const proofRootHash = new Array(32).fill(0); // пока оставим
+
     const [assetPda] = PublicKey.findProgramAddressSync(
       [Buffer.from('energy_asset'), assetIdLe],
       program.programId,
@@ -105,9 +120,6 @@ export class EnergyBlockchainService {
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
-
-    const proofRootHash = new Array(32).fill(0) as number[];
-    const metadataUriHash = new Array(32).fill(0) as number[];
 
     const createAssetTx = await program.methods
       .createEnergyAsset(
@@ -149,6 +161,8 @@ export class EnergyBlockchainService {
       treasuryShareAccount: treasuryShareAccount.address.toBase58(),
       createAssetTx,
       issueSharesTx,
+      metadata,
+      metadataHash: metadataHashBuffer.toString('hex'),
     };
   }
 }

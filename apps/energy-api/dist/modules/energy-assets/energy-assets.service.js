@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnergyAssetsService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
+const canonical_json_util_1 = require("../energy/utils/canonical-json.util");
 let EnergyAssetsService = class EnergyAssetsService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -21,22 +22,24 @@ let EnergyAssetsService = class EnergyAssetsService {
             data: {
                 assetId: onchain.assetId,
                 issuerEnergyUserId: null,
-                title: `Solar Roof ${onchain.assetId}`,
-                description: 'Demo asset created from energy-api and Anchor program',
-                location: 'Aktau, Kazakhstan',
-                assetType: 'SOLAR',
-                totalShares: 1000,
-                pricePerShareKzte: 10000,
-                investorBps: 8000,
-                operatorBps: 2000,
-                payoutMode: 'KZTE',
+                title: onchain.metadata.title,
+                description: onchain.metadata.description,
+                location: onchain.metadata.location,
+                assetType: onchain.metadata.assetType,
+                totalShares: onchain.metadata.totalShares,
+                pricePerShareKzte: onchain.metadata.pricePerShareKzte,
+                investorBps: onchain.metadata.investorBps,
+                operatorBps: onchain.metadata.operatorBps,
+                payoutMode: onchain.metadata.payoutMode,
                 status: 'ACTIVE_SALE',
                 assetPda: onchain.assetPda,
                 registryPda: onchain.registryPda,
                 shareMintAddress: onchain.shareMint,
                 treasuryShareAccount: onchain.treasuryShareAccount,
                 proofRootHash: '0'.repeat(64),
-                metadataUriHash: '0'.repeat(64),
+                metadataUriHash: onchain.metadataHash,
+                metadataJson: onchain.metadata,
+                metadataCanonicalJson: (0, canonical_json_util_1.toCanonicalJson)(onchain.metadata),
                 createAssetTx: onchain.createAssetTx,
                 issueSharesTx: onchain.issueSharesTx,
             },

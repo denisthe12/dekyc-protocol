@@ -16,6 +16,8 @@ const web3_js_1 = require("@solana/web3.js");
 const spl_token_1 = require("@solana/spl-token");
 const anchor_service_1 = require("../solana/anchor.service");
 const solana_service_1 = require("../solana/solana.service");
+const hash_util_1 = require("./utils/hash.util");
+const metadata_util_1 = require("./utils/metadata.util");
 let EnergyBlockchainService = class EnergyBlockchainService {
     constructor(anchorService, solanaService) {
         this.anchorService = anchorService;
@@ -57,11 +59,15 @@ let EnergyBlockchainService = class EnergyBlockchainService {
         const registry = await this.createRegistryIfNeeded();
         const assetIdBn = new anchor.BN(Date.now());
         const assetIdLe = assetIdBn.toArrayLike(Buffer, 'le', 8);
+        const metadata = (0, metadata_util_1.buildEnergyMetadata)({
+            assetId: assetIdBn.toString(),
+        });
+        const metadataHashBuffer = (0, hash_util_1.sha256FromObject)(metadata);
+        const metadataUriHash = Array.from(metadataHashBuffer);
+        const proofRootHash = new Array(32).fill(0);
         const [assetPda] = web3_js_1.PublicKey.findProgramAddressSync([Buffer.from('energy_asset'), assetIdLe], program.programId);
         const shareMint = await (0, spl_token_1.createMint)(provider.connection, signer, assetPda, null, 0, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const treasuryShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, signer, shareMint, assetPda, true, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
-        const proofRootHash = new Array(32).fill(0);
-        const metadataUriHash = new Array(32).fill(0);
         const createAssetTx = await program.methods
             .createEnergyAsset(assetIdBn, new anchor.BN(1000), new anchor.BN(10000), 8000, 2000, { kzte: {} }, proofRootHash, metadataUriHash)
             .accounts({
@@ -91,6 +97,8 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             treasuryShareAccount: treasuryShareAccount.address.toBase58(),
             createAssetTx,
             issueSharesTx,
+            metadata,
+            metadataHash: metadataHashBuffer.toString('hex'),
         };
     }
 };

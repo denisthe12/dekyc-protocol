@@ -1,0 +1,25 @@
+{
+  "Common": {
+    "appName": "DeKYC Energy",
+    "loading": "Загрузка...",
+    "backHome": "На главную"
+  },
+  "AssetsPage": {
+    "eyebrow": "Рынок активов",
+    "title": "Энергетические проекты",
+    "description": "Реальные проекты, созданные через energy-api и Anchor-программу токенизации.",
+    "empty": "Пока нет доступных проектов.",
+    "assetType": "Тип актива",
+    "location": "Локация",
+    "totalShares": "Всего долей",
+    "pricePerShare": "Цена одной доли",
+    "status": "Статус",
+    "registryPda": "Registry PDA",
+    "assetPda": "Asset PDA",
+    "shareMint": "Mint долей",
+    "treasury": "Treasury аккаунт",
+    "createAssetTx": "Транзакция создания",
+    "issueSharesTx": "Транзакция выпуска долей",
+    "openExplorer": "Открыть в Explorer"
+  }
+}

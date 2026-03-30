@@ -35,6 +35,8 @@ export declare class EnergyController {
             shareMintAddress: string;
             proofRootHash: string;
             metadataUriHash: string;
+            metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
+            metadataCanonicalJson: string;
         };
     }>;
     listAssets(): Promise<{
@@ -61,5 +63,7 @@ export declare class EnergyController {
         shareMintAddress: string;
         proofRootHash: string;
         metadataUriHash: string;
+        metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
+        metadataCanonicalJson: string;
     }[]>;
 }
