@@ -50,4 +50,16 @@ pub mod tokenization_case {
     pub fn buy_shares(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
         instructions::buy_shares::handler(ctx, share_amount)
     }
+
+    pub fn create_revenue_epoch(
+        ctx: Context<CreateRevenueEpoch>,
+        epoch_index: u64,
+        total_amount_kzte: u64,
+    ) -> Result<()> {
+        instructions::create_revenue_epoch::handler(ctx, epoch_index, total_amount_kzte)
+    }
+
+    pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
+        instructions::claim_payout::handler(ctx)
+    }
 }

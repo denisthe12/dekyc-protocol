@@ -59,6 +59,26 @@ let Token2022Service = class Token2022Service {
             tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID.toBase58(),
         };
     }
+    async mintKzteToSigner(params) {
+        const signer = await this.solanaService.getSigner();
+        const connection = this.solanaService.getConnection();
+        const mintAddress = process.env.KZTE_MINT_ADDRESS?.trim() ?? '';
+        if (!mintAddress) {
+            throw new Error('KZTE_MINT_ADDRESS is not configured');
+        }
+        const decimals = Number(process.env.KZTE_DECIMALS ?? solana_constants_1.DEFAULT_KZTE_DECIMALS);
+        const amountKzte = params?.amountKzte ?? 1_000_000;
+        const amountBaseUnits = BigInt(amountKzte) * BigInt(10 ** decimals);
+        const signerKzteAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(connection, signer, new web3_js_1.PublicKey(mintAddress), signer.publicKey, false, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        const tx = await (0, spl_token_1.mintTo)(connection, signer, new web3_js_1.PublicKey(mintAddress), signerKzteAccount.address, signer, amountBaseUnits, [], undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        return {
+            signerAddress: signer.publicKey.toBase58(),
+            signerKzteAccount: signerKzteAccount.address.toBase58(),
+            amountKzte,
+            amountBaseUnits: amountBaseUnits.toString(),
+            tx,
+        };
+    }
 };
 exports.Token2022Service = Token2022Service;
 exports.Token2022Service = Token2022Service = __decorate([

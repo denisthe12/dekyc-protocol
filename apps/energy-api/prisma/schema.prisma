@@ -34,6 +34,11 @@ enum EnergyPositionStatus {
   CLOSED
 }
 
+enum EnergyRevenueEpochStatus {
+  OPEN
+  CLOSED
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -161,4 +166,49 @@ model EnergyInvestorPosition {
   @@unique([energyUserId, energyAssetId])
   @@index([energyUserId])
   @@index([energyAssetId])
+}
+
+model EnergyRevenueEpoch {
+  id                    String                   @id @default(cuid())
+  energyAssetId         String                   @db.VarChar(191)
+
+  epochIndex            Int
+  revenueEpochPda       String                   @unique @db.VarChar(128)
+  treasuryKzteAccount   String                   @db.VarChar(128)
+
+  totalAmountKzte       Int
+  amountPerShareKzte    Int
+  totalSharesSnapshot   Int
+
+  createEpochTx         String?                  @db.VarChar(128)
+  status                EnergyRevenueEpochStatus @default(OPEN)
+
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  @@unique([energyAssetId, epochIndex])
+  @@index([energyAssetId])
+}
+
+model EnergyPayoutClaim {
+  id                    String      @id @default(cuid())
+  energyUserId          String      @db.VarChar(191)
+  energyAssetId         String      @db.VarChar(191)
+  energyRevenueEpochId  String      @db.VarChar(191)
+
+  claimReceiptPda       String      @unique @db.VarChar(128)
+  claimerWalletAddress  String      @db.VarChar(128)
+  claimerKzteAccount    String      @db.VarChar(128)
+  claimerShareAccount   String      @db.VarChar(128)
+
+  claimedAmountKzte     Int
+  claimTx               String?     @db.VarChar(128)
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@unique([energyUserId, energyRevenueEpochId])
+  @@index([energyUserId])
+  @@index([energyAssetId])
+  @@index([energyRevenueEpochId])
 }

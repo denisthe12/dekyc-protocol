@@ -1,4 +1,4 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { SolanaService } from './solana.service';
 import { Token2022Service } from './token-2022.service';
 
@@ -26,5 +26,14 @@ export class SolanaController {
   @Post('kzte/init')
   public async createKzteMint() {
     return this.token2022Service.createKzteMint();
+  }
+
+  @Post('kzte/mint-to-signer')
+  public async mintKzteToSigner(
+    @Body() body?: { amountKzte?: number },
+  ) {
+    return this.token2022Service.mintKzteToSigner({
+      amountKzte: body?.amountKzte,
+    });
   }
 }

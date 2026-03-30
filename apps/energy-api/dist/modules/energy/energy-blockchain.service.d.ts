@@ -55,6 +55,9 @@ export declare class EnergyBlockchainService {
         position: {
             id: string;
             energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
             energyAssetId: string;
             assetId: string;
             assetPda: string;
@@ -66,9 +69,6 @@ export declare class EnergyBlockchainService {
             totalKzteSpent: number;
             averagePricePerShare: number;
             lastPurchaseTx: string | null;
-            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-            createdAt: Date;
-            updatedAt: Date;
         };
     }>;
 }

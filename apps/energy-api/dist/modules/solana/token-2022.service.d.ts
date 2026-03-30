@@ -9,4 +9,13 @@ export declare class Token2022Service {
         decimals: number;
         tokenProgram: string;
     }>;
+    mintKzteToSigner(params?: {
+        amountKzte?: number;
+    }): Promise<{
+        signerAddress: string;
+        signerKzteAccount: string;
+        amountKzte: number;
+        amountBaseUnits: string;
+        tx: string;
+    }>;
 }

@@ -19,6 +19,9 @@ export declare class PositionsService {
     }): Promise<{
         id: string;
         energyUserId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
         energyAssetId: string;
         assetId: string;
         assetPda: string;
@@ -30,9 +33,6 @@ export declare class PositionsService {
         totalKzteSpent: number;
         averagePricePerShare: number;
         lastPurchaseTx: string | null;
-        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     reconcilePosition(params: {
         energyUserId: string;
@@ -46,6 +46,9 @@ export declare class PositionsService {
         updated: {
             id: string;
             energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
             energyAssetId: string;
             assetId: string;
             assetPda: string;
@@ -57,14 +60,14 @@ export declare class PositionsService {
             totalKzteSpent: number;
             averagePricePerShare: number;
             lastPurchaseTx: string | null;
-            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-            createdAt: Date;
-            updatedAt: Date;
         };
     }>;
     getPortfolio(energyUserId: string): Promise<{
         id: string;
         energyUserId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
         energyAssetId: string;
         assetId: string;
         assetPda: string;
@@ -76,8 +79,5 @@ export declare class PositionsService {
         totalKzteSpent: number;
         averagePricePerShare: number;
         lastPurchaseTx: string | null;
-        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-        createdAt: Date;
-        updatedAt: Date;
     }[]>;
 }

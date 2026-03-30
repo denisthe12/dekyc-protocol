@@ -65,6 +65,92 @@
       ]
     },
     {
+      "name": "claim_payout",
+      "discriminator": [
+        127,
+        240,
+        132,
+        62,
+        227,
+        198,
+        146,
+        133
+      ],
+      "accounts": [
+        {
+          "name": "claimer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "energy_asset",
+          "writable": true
+        },
+        {
+          "name": "revenue_epoch",
+          "writable": true
+        },
+        {
+          "name": "kzte_mint",
+          "writable": true
+        },
+        {
+          "name": "treasury_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "claimer_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "claimer_share_account",
+          "writable": true
+        },
+        {
+          "name": "claim_receipt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  95,
+                  114,
+                  101,
+                  99,
+                  101,
+                  105,
+                  112,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "revenue_epoch"
+              },
+              {
+                "kind": "account",
+                "path": "claimer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "create_energy_asset",
       "discriminator": [
         253,
@@ -247,6 +333,97 @@
       "args": []
     },
     {
+      "name": "create_revenue_epoch",
+      "discriminator": [
+        61,
+        106,
+        101,
+        202,
+        107,
+        115,
+        105,
+        221
+      ],
+      "accounts": [
+        {
+          "name": "issuer",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "energy_asset"
+          ]
+        },
+        {
+          "name": "energy_asset",
+          "writable": true
+        },
+        {
+          "name": "kzte_mint",
+          "writable": true
+        },
+        {
+          "name": "treasury_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "issuer_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "revenue_epoch",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  118,
+                  101,
+                  110,
+                  117,
+                  101,
+                  95,
+                  101,
+                  112,
+                  111,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "energy_asset.asset_id",
+                "account": "EnergyAsset"
+              },
+              {
+                "kind": "arg",
+                "path": "epoch_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_index",
+          "type": "u64"
+        },
+        {
+          "name": "total_amount_kzte",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "issue_shares",
       "discriminator": [
         110,
@@ -291,6 +468,19 @@
   ],
   "accounts": [
     {
+      "name": "ClaimReceipt",
+      "discriminator": [
+        223,
+        233,
+        11,
+        229,
+        124,
+        165,
+        207,
+        28
+      ]
+    },
+    {
       "name": "EnergyAsset",
       "discriminator": [
         191,
@@ -314,6 +504,19 @@
         182,
         252,
         218
+      ]
+    },
+    {
+      "name": "RevenueEpoch",
+      "discriminator": [
+        92,
+        96,
+        185,
+        132,
+        167,
+        75,
+        54,
+        150
       ]
     }
   ],
@@ -393,6 +596,16 @@
       "code": 6006,
       "name": "InvalidTotalShares",
       "msg": "Invalid total shares"
+    },
+    {
+      "code": 6007,
+      "name": "NoSharesOwned",
+      "msg": "No shares owned by claimer"
+    },
+    {
+      "code": 6008,
+      "name": "NothingToClaim",
+      "msg": "Nothing to claim"
     }
   ],
   "types": [
@@ -415,6 +628,34 @@
           },
           {
             "name": "Closed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "epoch",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimer",
+            "type": "pubkey"
+          },
+          {
+            "name": "claimed_amount_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
@@ -587,6 +828,42 @@
           {
             "name": "kzte_mint",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RevenueEpoch",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "epoch_index",
+            "type": "u64"
+          },
+          {
+            "name": "treasury_kzte_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_amount_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "amount_per_share_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "total_shares_snapshot",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }

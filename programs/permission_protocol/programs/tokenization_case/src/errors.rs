@@ -22,4 +22,10 @@ pub enum TokenizationError {
 
     #[msg("Invalid total shares")]
     InvalidTotalShares,
+
+    #[msg("No shares owned by claimer")]
+    NoSharesOwned,
+
+    #[msg("Nothing to claim")]
+    NothingToClaim,
 }

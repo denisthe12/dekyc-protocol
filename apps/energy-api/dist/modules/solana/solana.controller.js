@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SolanaController = void 0;
 const common_1 = require("@nestjs/common");
@@ -32,6 +35,11 @@ let SolanaController = class SolanaController {
     async createKzteMint() {
         return this.token2022Service.createKzteMint();
     }
+    async mintKzteToSigner(body) {
+        return this.token2022Service.mintKzteToSigner({
+            amountKzte: body?.amountKzte,
+        });
+    }
 };
 exports.SolanaController = SolanaController;
 __decorate([
@@ -46,6 +54,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], SolanaController.prototype, "createKzteMint", null);
+__decorate([
+    (0, common_1.Post)('kzte/mint-to-signer'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], SolanaController.prototype, "mintKzteToSigner", null);
 exports.SolanaController = SolanaController = __decorate([
     (0, common_1.Controller)('solana'),
     __metadata("design:paramtypes", [solana_service_1.SolanaService,

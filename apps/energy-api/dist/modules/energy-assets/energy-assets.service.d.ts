@@ -5,12 +5,12 @@ export declare class EnergyAssetsService {
     constructor(prisma: PrismaService);
     createDemoAsset(onchain: CreatedEnergyAssetResult): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-        createdAt: Date;
-        updatedAt: Date;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -33,12 +33,12 @@ export declare class EnergyAssetsService {
     }>;
     listAssets(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-        createdAt: Date;
-        updatedAt: Date;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;

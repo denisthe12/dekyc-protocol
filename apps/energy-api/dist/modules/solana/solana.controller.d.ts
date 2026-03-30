@@ -16,4 +16,13 @@ export declare class SolanaController {
         decimals: number;
         tokenProgram: string;
     }>;
+    mintKzteToSigner(body?: {
+        amountKzte?: number;
+    }): Promise<{
+        signerAddress: string;
+        signerKzteAccount: string;
+        amountKzte: number;
+        amountBaseUnits: string;
+        tx: string;
+    }>;
 }

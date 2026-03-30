@@ -4,6 +4,8 @@ import {
   TOKEN_2022_PROGRAM_ID,
   createMint,
   getMint,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
 } from '@solana/spl-token';
 import {
   DEFAULT_KZTE_DECIMALS,
@@ -77,6 +79,59 @@ export class Token2022Service {
       mintAddress: mintPublicKey.toBase58(),
       decimals,
       tokenProgram: TOKEN_2022_PROGRAM_ID.toBase58(),
+    };
+  }
+
+  public async mintKzteToSigner(params?: {
+    amountKzte?: number;
+  }): Promise<{
+    signerAddress: string;
+    signerKzteAccount: string;
+    amountKzte: number;
+    amountBaseUnits: string;
+    tx: string;
+  }> {
+    const signer = await this.solanaService.getSigner();
+    const connection = this.solanaService.getConnection();
+    const mintAddress = process.env.KZTE_MINT_ADDRESS?.trim() ?? '';
+
+    if (!mintAddress) {
+      throw new Error('KZTE_MINT_ADDRESS is not configured');
+    }
+
+    const decimals = Number(process.env.KZTE_DECIMALS ?? DEFAULT_KZTE_DECIMALS);
+    const amountKzte = params?.amountKzte ?? 1_000_000;
+    const amountBaseUnits = BigInt(amountKzte) * BigInt(10 ** decimals);
+
+    const signerKzteAccount = await getOrCreateAssociatedTokenAccount(
+      connection,
+      signer,
+      new PublicKey(mintAddress),
+      signer.publicKey,
+      false,
+      undefined,
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    const tx = await mintTo(
+      connection,
+      signer,
+      new PublicKey(mintAddress),
+      signerKzteAccount.address,
+      signer,
+      amountBaseUnits,
+      [],
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    return {
+      signerAddress: signer.publicKey.toBase58(),
+      signerKzteAccount: signerKzteAccount.address.toBase58(),
+      amountKzte,
+      amountBaseUnits: amountBaseUnits.toString(),
+      tx,
     };
   }
 }
