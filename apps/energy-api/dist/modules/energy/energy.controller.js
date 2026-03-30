@@ -8,11 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnergyController = void 0;
 const common_1 = require("@nestjs/common");
 const energy_blockchain_service_1 = require("./energy-blockchain.service");
 const energy_assets_service_1 = require("../energy-assets/energy-assets.service");
+const buy_demo_shares_dto_1 = require("./dto/buy-demo-shares.dto");
 let EnergyController = class EnergyController {
     constructor(energyBlockchainService, energyAssetsService) {
         this.energyBlockchainService = energyBlockchainService;
@@ -31,6 +35,9 @@ let EnergyController = class EnergyController {
             onchain,
             db,
         };
+    }
+    async buyDemoShares(dto) {
+        return this.energyBlockchainService.buyDemoShares(dto);
     }
     async listAssets() {
         return this.energyAssetsService.listAssets();
@@ -55,6 +62,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EnergyController.prototype, "createDemoAsset", null);
+__decorate([
+    (0, common_1.Post)('buy-demo-shares'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [buy_demo_shares_dto_1.BuyDemoSharesDto]),
+    __metadata("design:returntype", Promise)
+], EnergyController.prototype, "buyDemoShares", null);
 __decorate([
     (0, common_1.Get)('assets'),
     __metadata("design:type", Function),

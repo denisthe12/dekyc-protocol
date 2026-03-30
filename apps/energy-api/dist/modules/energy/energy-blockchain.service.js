@@ -18,10 +18,12 @@ const anchor_service_1 = require("../solana/anchor.service");
 const solana_service_1 = require("../solana/solana.service");
 const hash_util_1 = require("./utils/hash.util");
 const metadata_util_1 = require("./utils/metadata.util");
+const prisma_service_1 = require("../prisma/prisma.service");
 let EnergyBlockchainService = class EnergyBlockchainService {
-    constructor(anchorService, solanaService) {
+    constructor(anchorService, solanaService, prisma) {
         this.anchorService = anchorService;
         this.solanaService = solanaService;
+        this.prisma = prisma;
     }
     async getRegistryPda() {
         const program = this.anchorService.program;
@@ -59,15 +61,16 @@ let EnergyBlockchainService = class EnergyBlockchainService {
         const registry = await this.createRegistryIfNeeded();
         const assetIdBn = new anchor.BN(Date.now());
         const assetIdLe = assetIdBn.toArrayLike(Buffer, 'le', 8);
+        const [assetPda] = web3_js_1.PublicKey.findProgramAddressSync([Buffer.from('energy_asset'), assetIdLe], program.programId);
+        const shareMint = await (0, spl_token_1.createMint)(provider.connection, signer, assetPda, null, 0, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        const treasuryShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, signer, shareMint, assetPda, true, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        const treasuryKzteAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, signer, this.solanaService.getKzteMint(), assetPda, true, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const metadata = (0, metadata_util_1.buildEnergyMetadata)({
             assetId: assetIdBn.toString(),
         });
         const metadataHashBuffer = (0, hash_util_1.sha256FromObject)(metadata);
         const metadataUriHash = Array.from(metadataHashBuffer);
         const proofRootHash = new Array(32).fill(0);
-        const [assetPda] = web3_js_1.PublicKey.findProgramAddressSync([Buffer.from('energy_asset'), assetIdLe], program.programId);
-        const shareMint = await (0, spl_token_1.createMint)(provider.connection, signer, assetPda, null, 0, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
-        const treasuryShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, signer, shareMint, assetPda, true, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const createAssetTx = await program.methods
             .createEnergyAsset(assetIdBn, new anchor.BN(1000), new anchor.BN(10000), 8000, 2000, { kzte: {} }, proofRootHash, metadataUriHash)
             .accounts({
@@ -75,6 +78,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             registry: new web3_js_1.PublicKey(registry.registryPda),
             shareMint,
             treasuryShareAccount: treasuryShareAccount.address,
+            treasuryKzteAccount: treasuryKzteAccount.address,
             energyAsset: assetPda,
         })
             .rpc();
@@ -95,10 +99,57 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             assetPda: assetPda.toBase58(),
             shareMint: shareMint.toBase58(),
             treasuryShareAccount: treasuryShareAccount.address.toBase58(),
+            treasuryKzteAccount: treasuryKzteAccount.address.toBase58(),
             createAssetTx,
             issueSharesTx,
             metadata,
             metadataHash: metadataHashBuffer.toString('hex'),
+        };
+    }
+    async buyDemoShares(params) {
+        const provider = this.anchorService.provider;
+        const program = this.anchorService.program;
+        const backendSigner = await this.solanaService.getSigner();
+        const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+            where: {
+                assetId: params.assetId,
+            },
+        });
+        const wallet = await this.prisma.energyUserWallet.findUniqueOrThrow({
+            where: {
+                energyUserId: params.energyUserId,
+            },
+        });
+        const secret = wallet.custodialWalletSecretJson;
+        if (!secret) {
+            throw new Error('User custodial key is missing');
+        }
+        const buyerKeypair = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(secret));
+        const buyerShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, backendSigner, new web3_js_1.PublicKey(asset.shareMintAddress), buyerKeypair.publicKey, false, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        const tx = await program.methods
+            .buyShares(new anchor.BN(params.shareAmount))
+            .accounts({
+            buyer: buyerKeypair.publicKey,
+            energyAsset: new web3_js_1.PublicKey(asset.assetPda),
+            kzteMint: this.solanaService.getKzteMint(),
+            shareMint: new web3_js_1.PublicKey(asset.shareMintAddress),
+            treasuryKzteAccount: new web3_js_1.PublicKey(asset.treasuryKzteAccount),
+            treasuryShareAccount: new web3_js_1.PublicKey(asset.treasuryShareAccount),
+            buyerKzteAccount: new web3_js_1.PublicKey(wallet.kzteTokenAccountAddress ?? ''),
+            buyerShareAccount: buyerShareAccount.address,
+            tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID,
+        })
+            .signers([buyerKeypair])
+            .rpc();
+        return {
+            assetId: asset.assetId,
+            assetPda: asset.assetPda,
+            buyerWallet: wallet.custodialWalletAddress,
+            buyerKzteAccount: wallet.kzteTokenAccountAddress,
+            buyerShareAccount: buyerShareAccount.address.toBase58(),
+            treasuryKzteAccount: asset.treasuryKzteAccount,
+            treasuryShareAccount: asset.treasuryShareAccount,
+            tx,
         };
     }
 };
@@ -106,6 +157,7 @@ exports.EnergyBlockchainService = EnergyBlockchainService;
 exports.EnergyBlockchainService = EnergyBlockchainService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [anchor_service_1.AnchorService,
-        solana_service_1.SolanaService])
+        solana_service_1.SolanaService,
+        prisma_service_1.PrismaService])
 ], EnergyBlockchainService);
 //# sourceMappingURL=energy-blockchain.service.js.map

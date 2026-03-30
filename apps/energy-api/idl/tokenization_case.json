@@ -8,6 +8,63 @@
   },
   "instructions": [
     {
+      "name": "buy_shares",
+      "discriminator": [
+        40,
+        239,
+        138,
+        154,
+        8,
+        37,
+        106,
+        108
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "energy_asset",
+          "writable": true
+        },
+        {
+          "name": "kzte_mint",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true
+        },
+        {
+          "name": "treasury_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "treasury_share_account",
+          "writable": true
+        },
+        {
+          "name": "buyer_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "buyer_share_account",
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "share_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "create_energy_asset",
       "discriminator": [
         253,
@@ -53,6 +110,9 @@
         },
         {
           "name": "treasury_share_account"
+        },
+        {
+          "name": "treasury_kzte_account"
         },
         {
           "name": "energy_asset",
@@ -382,6 +442,10 @@
           },
           {
             "name": "treasury_share_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_kzte_account",
             "type": "pubkey"
           },
           {

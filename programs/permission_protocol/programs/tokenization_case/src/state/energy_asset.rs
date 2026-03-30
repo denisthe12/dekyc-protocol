@@ -8,6 +8,7 @@ pub struct EnergyAsset {
     pub issuer: Pubkey,
     pub share_mint: Pubkey,
     pub treasury_share_account: Pubkey,
+    pub treasury_kzte_account: Pubkey,
 
     pub total_shares: u64,
     pub issued_shares: u64,
@@ -32,6 +33,7 @@ impl EnergyAsset {
         + 32                   // issuer
         + 32                   // share_mint
         + 32                   // treasury_share_account
+        + 32                   // treasury_kzte_account
         + 8                    // total_shares
         + 8                    // issued_shares
         + 8                    // sold_shares

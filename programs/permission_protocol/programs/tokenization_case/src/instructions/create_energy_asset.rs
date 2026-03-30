@@ -23,6 +23,9 @@ pub struct CreateEnergyAsset<'info> {
     /// CHECK: treasury share token account is created off-chain and owned by asset PDA
     pub treasury_share_account: UncheckedAccount<'info>,
 
+    /// CHECK: treasury KZTE token account is created off-chain and owned by asset PDA
+    pub treasury_kzte_account: UncheckedAccount<'info>,
+
     #[account(
         init,
         payer = issuer,
@@ -60,6 +63,7 @@ pub fn handler(
     asset.issuer = ctx.accounts.issuer.key();
     asset.share_mint = ctx.accounts.share_mint.key();
     asset.treasury_share_account = ctx.accounts.treasury_share_account.key();
+    asset.treasury_kzte_account = ctx.accounts.treasury_kzte_account.key();
     asset.total_shares = total_shares;
     asset.issued_shares = 0;
     asset.sold_shares = 0;

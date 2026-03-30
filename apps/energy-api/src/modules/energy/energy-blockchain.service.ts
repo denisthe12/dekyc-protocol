@@ -9,7 +9,8 @@ import {
 import { AnchorService } from '@/modules/solana/anchor.service';
 import { SolanaService } from '@/modules/solana/solana.service';
 import { sha256FromObject } from './utils/hash.util';
-import { buildEnergyMetadata, type EnergyMetadata } from './utils/metadata.util';
+import { buildEnergyMetadata } from './utils/metadata.util';
+import { PrismaService } from '@/modules/prisma/prisma.service';
 
 export type CreatedEnergyAssetResult = {
   registryPda: string;
@@ -18,11 +19,22 @@ export type CreatedEnergyAssetResult = {
   assetPda: string;
   shareMint: string;
   treasuryShareAccount: string;
+  treasuryKzteAccount: string;
   createAssetTx: string;
   issueSharesTx: string;
-  metadata: EnergyMetadata;
+  metadata: {
+    title: string;
+    description: string;
+    location: string;
+    assetType: string;
+    totalShares: number;
+    pricePerShareKzte: number;
+    investorBps: number;
+    operatorBps: number;
+    payoutMode: string;
+    createdAt: string;
+  };
   metadataHash: string;
-
 };
 
 @Injectable()
@@ -30,6 +42,7 @@ export class EnergyBlockchainService {
   public constructor(
     private readonly anchorService: AnchorService,
     private readonly solanaService: SolanaService,
+    private readonly prisma: PrismaService,
   ) {}
 
   public async getRegistryPda(): Promise<PublicKey> {
@@ -84,16 +97,6 @@ export class EnergyBlockchainService {
     const assetIdBn = new anchor.BN(Date.now());
     const assetIdLe = assetIdBn.toArrayLike(Buffer, 'le', 8);
 
-    const metadata = buildEnergyMetadata({
-      assetId: assetIdBn.toString(),
-    });
-
-    const metadataHashBuffer = sha256FromObject(metadata);
-
-    const metadataUriHash = Array.from(metadataHashBuffer);
-
-    const proofRootHash = new Array(32).fill(0); // пока оставим
-
     const [assetPda] = PublicKey.findProgramAddressSync(
       [Buffer.from('energy_asset'), assetIdLe],
       program.programId,
@@ -121,6 +124,25 @@ export class EnergyBlockchainService {
       TOKEN_2022_PROGRAM_ID,
     );
 
+    const treasuryKzteAccount = await getOrCreateAssociatedTokenAccount(
+      provider.connection,
+      signer,
+      this.solanaService.getKzteMint(),
+      assetPda,
+      true,
+      undefined,
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    const metadata = buildEnergyMetadata({
+      assetId: assetIdBn.toString(),
+    });
+
+    const metadataHashBuffer = sha256FromObject(metadata);
+    const metadataUriHash = Array.from(metadataHashBuffer);
+    const proofRootHash = new Array(32).fill(0);
+
     const createAssetTx = await program.methods
       .createEnergyAsset(
         assetIdBn,
@@ -137,6 +159,7 @@ export class EnergyBlockchainService {
         registry: new PublicKey(registry.registryPda),
         shareMint,
         treasuryShareAccount: treasuryShareAccount.address,
+        treasuryKzteAccount: treasuryKzteAccount.address,
         energyAsset: assetPda,
       })
       .rpc();
@@ -159,10 +182,82 @@ export class EnergyBlockchainService {
       assetPda: assetPda.toBase58(),
       shareMint: shareMint.toBase58(),
       treasuryShareAccount: treasuryShareAccount.address.toBase58(),
+      treasuryKzteAccount: treasuryKzteAccount.address.toBase58(),
       createAssetTx,
       issueSharesTx,
       metadata,
       metadataHash: metadataHashBuffer.toString('hex'),
+    };
+  }
+
+  public async buyDemoShares(params: {
+    energyUserId: string;
+    assetId: string;
+    shareAmount: number;
+  }) {
+    const provider = this.anchorService.provider;
+    const program = this.anchorService.program;
+    const backendSigner = await this.solanaService.getSigner();
+
+    const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+      where: {
+        assetId: params.assetId,
+      },
+    });
+
+    const wallet = await this.prisma.energyUserWallet.findUniqueOrThrow({
+      where: {
+        energyUserId: params.energyUserId,
+      },
+    });
+
+    const secret = wallet.custodialWalletSecretJson as number[] | null;
+    if (!secret) {
+      throw new Error('User custodial key is missing');
+    }
+
+    const buyerKeypair = anchor.web3.Keypair.fromSecretKey(
+      Uint8Array.from(secret),
+    );
+
+    const buyerShareAccount = await getOrCreateAssociatedTokenAccount(
+      provider.connection,
+      backendSigner,
+      new PublicKey(asset.shareMintAddress),
+      buyerKeypair.publicKey,
+      false,
+      undefined,
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    const tx = await program.methods
+      .buyShares(new anchor.BN(params.shareAmount))
+      .accounts({
+        buyer: buyerKeypair.publicKey,
+        energyAsset: new PublicKey(asset.assetPda),
+        kzteMint: this.solanaService.getKzteMint(),
+        shareMint: new PublicKey(asset.shareMintAddress),
+        treasuryKzteAccount: new PublicKey(asset.treasuryKzteAccount),
+        treasuryShareAccount: new PublicKey(asset.treasuryShareAccount),
+        buyerKzteAccount: new PublicKey(
+          wallet.kzteTokenAccountAddress ?? '',
+        ),
+        buyerShareAccount: buyerShareAccount.address,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+      })
+      .signers([buyerKeypair])
+      .rpc();
+
+    return {
+      assetId: asset.assetId,
+      assetPda: asset.assetPda,
+      buyerWallet: wallet.custodialWalletAddress,
+      buyerKzteAccount: wallet.kzteTokenAccountAddress,
+      buyerShareAccount: buyerShareAccount.address.toBase58(),
+      treasuryKzteAccount: asset.treasuryKzteAccount,
+      treasuryShareAccount: asset.treasuryShareAccount,
+      tx,
     };
   }
 }

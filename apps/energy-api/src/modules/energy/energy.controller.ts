@@ -1,6 +1,7 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { EnergyBlockchainService } from './energy-blockchain.service';
 import { EnergyAssetsService } from '@/modules/energy-assets/energy-assets.service';
+import { BuyDemoSharesDto } from './dto/buy-demo-shares.dto';
 
 @Controller('energy')
 export class EnergyController {
@@ -28,6 +29,11 @@ export class EnergyController {
       onchain,
       db,
     };
+  }
+
+  @Post('buy-demo-shares')
+  public async buyDemoShares(@Body() dto: BuyDemoSharesDto) {
+    return this.energyBlockchainService.buyDemoShares(dto);
   }
 
   @Get('assets')

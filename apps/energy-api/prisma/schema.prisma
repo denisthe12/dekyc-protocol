@@ -113,6 +113,7 @@ model EnergyAsset {
   registryPda               String            @db.VarChar(128)
   shareMintAddress          String            @unique @db.VarChar(128)
   treasuryShareAccount      String            @unique @db.VarChar(128)
+  treasuryKzteAccount       String            @unique @db.VarChar(128)
 
   proofRootHash             String            @db.VarChar(128)
   metadataUriHash           String            @db.VarChar(128)

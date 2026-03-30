@@ -36,6 +36,7 @@ let EnergyAssetsService = class EnergyAssetsService {
                 registryPda: onchain.registryPda,
                 shareMintAddress: onchain.shareMint,
                 treasuryShareAccount: onchain.treasuryShareAccount,
+                treasuryKzteAccount: onchain.treasuryKzteAccount,
                 proofRootHash: '0'.repeat(64),
                 metadataUriHash: onchain.metadataHash,
                 metadataJson: onchain.metadata,

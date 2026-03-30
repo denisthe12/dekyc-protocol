@@ -1,5 +1,6 @@
 import { EnergyBlockchainService } from './energy-blockchain.service';
 import { EnergyAssetsService } from '@/modules/energy-assets/energy-assets.service';
+import { BuyDemoSharesDto } from './dto/buy-demo-shares.dto';
 export declare class EnergyController {
     private readonly energyBlockchainService;
     private readonly energyAssetsService;
@@ -19,9 +20,11 @@ export declare class EnergyController {
             registryPda: string;
             assetPda: string;
             treasuryShareAccount: string;
+            treasuryKzteAccount: string;
             createAssetTx: string | null;
             issueSharesTx: string | null;
             assetId: string;
+            shareMintAddress: string;
             issuerEnergyUserId: string | null;
             title: string;
             description: string | null;
@@ -32,12 +35,21 @@ export declare class EnergyController {
             investorBps: number;
             operatorBps: number;
             payoutMode: string;
-            shareMintAddress: string;
             proofRootHash: string;
             metadataUriHash: string;
             metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
             metadataCanonicalJson: string;
         };
+    }>;
+    buyDemoShares(dto: BuyDemoSharesDto): Promise<{
+        assetId: string;
+        assetPda: string;
+        buyerWallet: string;
+        buyerKzteAccount: string | null;
+        buyerShareAccount: string;
+        treasuryKzteAccount: string;
+        treasuryShareAccount: string;
+        tx: string;
     }>;
     listAssets(): Promise<{
         id: string;
@@ -47,9 +59,11 @@ export declare class EnergyController {
         registryPda: string;
         assetPda: string;
         treasuryShareAccount: string;
+        treasuryKzteAccount: string;
         createAssetTx: string | null;
         issueSharesTx: string | null;
         assetId: string;
+        shareMintAddress: string;
         issuerEnergyUserId: string | null;
         title: string;
         description: string | null;
@@ -60,7 +74,6 @@ export declare class EnergyController {
         investorBps: number;
         operatorBps: number;
         payoutMode: string;
-        shareMintAddress: string;
         proofRootHash: string;
         metadataUriHash: string;
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;

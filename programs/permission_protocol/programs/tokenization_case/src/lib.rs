@@ -46,4 +46,8 @@ pub mod tokenization_case {
     pub fn issue_shares(ctx: Context<IssueShares>) -> Result<()> {
         instructions::issue_shares::handler(ctx)
     }
+
+    pub fn buy_shares(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
+        instructions::buy_shares::handler(ctx, share_amount)
+    }
 }

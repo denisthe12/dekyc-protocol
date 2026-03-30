@@ -7,7 +7,7 @@ import { toCanonicalJson } from '@/modules/energy/utils/canonical-json.util';
 export class EnergyAssetsService {
   public constructor(private readonly prisma: PrismaService) {}
 
-  public async createDemoAsset(onchain: any) {
+  public async createDemoAsset(onchain: CreatedEnergyAssetResult) {
     return this.prisma.energyAsset.create({
       data: {
         assetId: onchain.assetId,
@@ -26,6 +26,7 @@ export class EnergyAssetsService {
         registryPda: onchain.registryPda,
         shareMintAddress: onchain.shareMint,
         treasuryShareAccount: onchain.treasuryShareAccount,
+        treasuryKzteAccount: onchain.treasuryKzteAccount,
         proofRootHash: '0'.repeat(64),
         metadataUriHash: onchain.metadataHash,
         metadataJson: onchain.metadata,
