@@ -29,6 +29,11 @@ enum EnergyAssetStatus {
   CLOSED
 }
 
+enum EnergyPositionStatus {
+  ACTIVE
+  CLOSED
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -128,4 +133,32 @@ model EnergyAsset {
 
   @@index([issuerEnergyUserId])
   @@index([status])
+}
+
+model EnergyInvestorPosition {
+  id                    String               @id @default(cuid())
+  energyUserId          String               @db.VarChar(191)
+  energyAssetId         String               @db.VarChar(191)
+
+  assetId               String               @db.VarChar(64)
+  assetPda              String               @db.VarChar(128)
+  shareMintAddress      String               @db.VarChar(128)
+
+  buyerWalletAddress    String               @db.VarChar(128)
+  buyerKzteAccount      String?              @db.VarChar(128)
+  buyerShareAccount     String               @db.VarChar(128)
+
+  totalSharesPurchased  Int                  @default(0)
+  totalKzteSpent        Int                  @default(0)
+  averagePricePerShare  Int                  @default(0)
+
+  lastPurchaseTx        String?              @db.VarChar(128)
+  status                EnergyPositionStatus @default(ACTIVE)
+
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@unique([energyUserId, energyAssetId])
+  @@index([energyUserId])
+  @@index([energyAssetId])
 }

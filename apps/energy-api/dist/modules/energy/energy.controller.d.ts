@@ -1,10 +1,13 @@
 import { EnergyBlockchainService } from './energy-blockchain.service';
 import { EnergyAssetsService } from '@/modules/energy-assets/energy-assets.service';
 import { BuyDemoSharesDto } from './dto/buy-demo-shares.dto';
+import { PositionsService } from '@/modules/positions/positions.service';
+import { ReconcilePositionDto } from './dto/reconcile-position.dto';
 export declare class EnergyController {
     private readonly energyBlockchainService;
     private readonly energyAssetsService;
-    constructor(energyBlockchainService: EnergyBlockchainService, energyAssetsService: EnergyAssetsService);
+    private readonly positionsService;
+    constructor(energyBlockchainService: EnergyBlockchainService, energyAssetsService: EnergyAssetsService, positionsService: PositionsService);
     createRegistry(): Promise<{
         registryPda: string;
         tx: string | null;
@@ -14,17 +17,7 @@ export declare class EnergyController {
         onchain: import("./energy-blockchain.service").CreatedEnergyAssetResult;
         db: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-            registryPda: string;
-            assetPda: string;
-            treasuryShareAccount: string;
-            treasuryKzteAccount: string;
-            createAssetTx: string | null;
-            issueSharesTx: string | null;
             assetId: string;
-            shareMintAddress: string;
             issuerEnergyUserId: string | null;
             title: string;
             description: string | null;
@@ -35,10 +28,20 @@ export declare class EnergyController {
             investorBps: number;
             operatorBps: number;
             payoutMode: string;
+            status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
+            assetPda: string;
+            registryPda: string;
+            shareMintAddress: string;
+            treasuryShareAccount: string;
+            treasuryKzteAccount: string;
             proofRootHash: string;
             metadataUriHash: string;
             metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
             metadataCanonicalJson: string;
+            createAssetTx: string | null;
+            issueSharesTx: string | null;
+            createdAt: Date;
+            updatedAt: Date;
         };
     }>;
     buyDemoShares(dto: BuyDemoSharesDto): Promise<{
@@ -50,20 +53,53 @@ export declare class EnergyController {
         treasuryKzteAccount: string;
         treasuryShareAccount: string;
         tx: string;
+        position: {
+            id: string;
+            assetId: string;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            assetPda: string;
+            shareMintAddress: string;
+            createdAt: Date;
+            updatedAt: Date;
+            energyUserId: string;
+            buyerKzteAccount: string | null;
+            buyerShareAccount: string;
+            energyAssetId: string;
+            buyerWalletAddress: string;
+            totalSharesPurchased: number;
+            totalKzteSpent: number;
+            averagePricePerShare: number;
+            lastPurchaseTx: string | null;
+        };
+    }>;
+    reconcilePosition(dto: ReconcilePositionDto): Promise<{
+        assetId: string;
+        energyAssetId: string;
+        buyerShareAccount: string;
+        onchainShares: number;
+        recalculatedTotalSpent: number;
+        updated: {
+            id: string;
+            assetId: string;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            assetPda: string;
+            shareMintAddress: string;
+            createdAt: Date;
+            updatedAt: Date;
+            energyUserId: string;
+            buyerKzteAccount: string | null;
+            buyerShareAccount: string;
+            energyAssetId: string;
+            buyerWalletAddress: string;
+            totalSharesPurchased: number;
+            totalKzteSpent: number;
+            averagePricePerShare: number;
+            lastPurchaseTx: string | null;
+        };
     }>;
     listAssets(): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-        registryPda: string;
-        assetPda: string;
-        treasuryShareAccount: string;
-        treasuryKzteAccount: string;
-        createAssetTx: string | null;
-        issueSharesTx: string | null;
         assetId: string;
-        shareMintAddress: string;
         issuerEnergyUserId: string | null;
         title: string;
         description: string | null;
@@ -74,9 +110,37 @@ export declare class EnergyController {
         investorBps: number;
         operatorBps: number;
         payoutMode: string;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
+        assetPda: string;
+        registryPda: string;
+        shareMintAddress: string;
+        treasuryShareAccount: string;
+        treasuryKzteAccount: string;
         proofRootHash: string;
         metadataUriHash: string;
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
         metadataCanonicalJson: string;
+        createAssetTx: string | null;
+        issueSharesTx: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }[]>;
+    getPortfolio(energyUserId: string): Promise<{
+        id: string;
+        assetId: string;
+        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+        assetPda: string;
+        shareMintAddress: string;
+        createdAt: Date;
+        updatedAt: Date;
+        energyUserId: string;
+        buyerKzteAccount: string | null;
+        buyerShareAccount: string;
+        energyAssetId: string;
+        buyerWalletAddress: string;
+        totalSharesPurchased: number;
+        totalKzteSpent: number;
+        averagePricePerShare: number;
+        lastPurchaseTx: string | null;
     }[]>;
 }

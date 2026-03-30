@@ -21,5 +21,19 @@
     "createAssetTx": "Транзакция создания",
     "issueSharesTx": "Транзакция выпуска долей",
     "openExplorer": "Открыть в Explorer"
+  },
+  "PortfolioPage": {
+    "eyebrow": "Портфель",
+    "title": "Мои позиции",
+    "description": "Купленные доли и накопленные инвестиционные позиции пользователя.",
+    "empty": "У пользователя пока нет позиций.",
+    "shares": "Куплено долей",
+    "spent": "Потрачено KZTE",
+    "averagePrice": "Средняя цена",
+    "assetId": "ID актива",
+    "assetPda": "Asset PDA",
+    "shareMint": "Mint долей",
+    "buyerShareAccount": "Аккаунт долей пользователя",
+    "lastPurchaseTx": "Последняя покупка"
   }
 }

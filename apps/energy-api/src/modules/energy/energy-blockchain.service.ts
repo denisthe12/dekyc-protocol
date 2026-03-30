@@ -11,6 +11,7 @@ import { SolanaService } from '@/modules/solana/solana.service';
 import { sha256FromObject } from './utils/hash.util';
 import { buildEnergyMetadata } from './utils/metadata.util';
 import { PrismaService } from '@/modules/prisma/prisma.service';
+import { PositionsService } from '../positions/positions.service';
 
 export type CreatedEnergyAssetResult = {
   registryPda: string;
@@ -43,6 +44,7 @@ export class EnergyBlockchainService {
     private readonly anchorService: AnchorService,
     private readonly solanaService: SolanaService,
     private readonly prisma: PrismaService,
+    private readonly positionsService: PositionsService,
   ) {}
 
   public async getRegistryPda(): Promise<PublicKey> {
@@ -249,6 +251,22 @@ export class EnergyBlockchainService {
       .signers([buyerKeypair])
       .rpc();
 
+    const totalKzteSpent = params.shareAmount * asset.pricePerShareKzte;
+
+    const position = await this.positionsService.recordPurchase({
+      energyUserId: params.energyUserId,
+      energyAssetId: asset.id,
+      assetId: asset.assetId,
+      assetPda: asset.assetPda,
+      shareMintAddress: asset.shareMintAddress,
+      buyerWalletAddress: wallet.custodialWalletAddress,
+      buyerKzteAccount: wallet.kzteTokenAccountAddress,
+      buyerShareAccount: buyerShareAccount.address.toBase58(),
+      purchasedShares: params.shareAmount,
+      totalKzteSpent,
+      tx,
+    });
+
     return {
       assetId: asset.assetId,
       assetPda: asset.assetPda,
@@ -258,6 +276,7 @@ export class EnergyBlockchainService {
       treasuryKzteAccount: asset.treasuryKzteAccount,
       treasuryShareAccount: asset.treasuryShareAccount,
       tx,
+      position,
     };
   }
 }

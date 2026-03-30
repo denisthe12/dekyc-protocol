@@ -1,13 +1,16 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { EnergyBlockchainService } from './energy-blockchain.service';
 import { EnergyAssetsService } from '@/modules/energy-assets/energy-assets.service';
 import { BuyDemoSharesDto } from './dto/buy-demo-shares.dto';
+import { PositionsService } from '@/modules/positions/positions.service';
+import { ReconcilePositionDto } from './dto/reconcile-position.dto';
 
 @Controller('energy')
 export class EnergyController {
   public constructor(
     private readonly energyBlockchainService: EnergyBlockchainService,
     private readonly energyAssetsService: EnergyAssetsService,
+    private readonly positionsService: PositionsService,
   ) {}
 
   @Post('create-registry')
@@ -36,8 +39,18 @@ export class EnergyController {
     return this.energyBlockchainService.buyDemoShares(dto);
   }
 
+  @Post('reconcile-position')
+  public async reconcilePosition(@Body() dto: ReconcilePositionDto) {
+    return this.positionsService.reconcilePosition(dto);
+  }
+
   @Get('assets')
   public async listAssets() {
     return this.energyAssetsService.listAssets();
+  }
+
+  @Get('portfolio/:energyUserId')
+  public async getPortfolio(@Param('energyUserId') energyUserId: string) {
+    return this.positionsService.getPortfolio(energyUserId);
   }
 }

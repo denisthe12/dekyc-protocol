@@ -19,11 +19,13 @@ const solana_service_1 = require("../solana/solana.service");
 const hash_util_1 = require("./utils/hash.util");
 const metadata_util_1 = require("./utils/metadata.util");
 const prisma_service_1 = require("../prisma/prisma.service");
+const positions_service_1 = require("../positions/positions.service");
 let EnergyBlockchainService = class EnergyBlockchainService {
-    constructor(anchorService, solanaService, prisma) {
+    constructor(anchorService, solanaService, prisma, positionsService) {
         this.anchorService = anchorService;
         this.solanaService = solanaService;
         this.prisma = prisma;
+        this.positionsService = positionsService;
     }
     async getRegistryPda() {
         const program = this.anchorService.program;
@@ -141,6 +143,20 @@ let EnergyBlockchainService = class EnergyBlockchainService {
         })
             .signers([buyerKeypair])
             .rpc();
+        const totalKzteSpent = params.shareAmount * asset.pricePerShareKzte;
+        const position = await this.positionsService.recordPurchase({
+            energyUserId: params.energyUserId,
+            energyAssetId: asset.id,
+            assetId: asset.assetId,
+            assetPda: asset.assetPda,
+            shareMintAddress: asset.shareMintAddress,
+            buyerWalletAddress: wallet.custodialWalletAddress,
+            buyerKzteAccount: wallet.kzteTokenAccountAddress,
+            buyerShareAccount: buyerShareAccount.address.toBase58(),
+            purchasedShares: params.shareAmount,
+            totalKzteSpent,
+            tx,
+        });
         return {
             assetId: asset.assetId,
             assetPda: asset.assetPda,
@@ -150,6 +166,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             treasuryKzteAccount: asset.treasuryKzteAccount,
             treasuryShareAccount: asset.treasuryShareAccount,
             tx,
+            position,
         };
     }
 };
@@ -158,6 +175,7 @@ exports.EnergyBlockchainService = EnergyBlockchainService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [anchor_service_1.AnchorService,
         solana_service_1.SolanaService,
-        prisma_service_1.PrismaService])
+        prisma_service_1.PrismaService,
+        positions_service_1.PositionsService])
 ], EnergyBlockchainService);
 //# sourceMappingURL=energy-blockchain.service.js.map

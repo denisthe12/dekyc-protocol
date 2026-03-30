@@ -5,17 +5,14 @@ export declare class EnergyAssetsService {
     constructor(prisma: PrismaService);
     createDemoAsset(onchain: CreatedEnergyAssetResult): Promise<{
         id: string;
+        assetId: string;
+        assetPda: string;
+        shareMintAddress: string;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-        registryPda: string;
-        assetPda: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
-        createAssetTx: string | null;
-        issueSharesTx: string | null;
-        assetId: string;
-        shareMintAddress: string;
         issuerEnergyUserId: string | null;
         title: string;
         description: string | null;
@@ -26,24 +23,24 @@ export declare class EnergyAssetsService {
         investorBps: number;
         operatorBps: number;
         payoutMode: string;
+        registryPda: string;
         proofRootHash: string;
         metadataUriHash: string;
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
         metadataCanonicalJson: string;
+        createAssetTx: string | null;
+        issueSharesTx: string | null;
     }>;
     listAssets(): Promise<{
         id: string;
+        assetId: string;
+        assetPda: string;
+        shareMintAddress: string;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
-        registryPda: string;
-        assetPda: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
-        createAssetTx: string | null;
-        issueSharesTx: string | null;
-        assetId: string;
-        shareMintAddress: string;
         issuerEnergyUserId: string | null;
         title: string;
         description: string | null;
@@ -54,9 +51,12 @@ export declare class EnergyAssetsService {
         investorBps: number;
         operatorBps: number;
         payoutMode: string;
+        registryPda: string;
         proofRootHash: string;
         metadataUriHash: string;
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
         metadataCanonicalJson: string;
+        createAssetTx: string | null;
+        issueSharesTx: string | null;
     }[]>;
 }

@@ -21,5 +21,19 @@
     "createAssetTx": "Create asset transaction",
     "issueSharesTx": "Issue shares transaction",
     "openExplorer": "Open in Explorer"
+  },
+  "PortfolioPage": {
+    "eyebrow": "Portfolio",
+    "title": "My positions",
+    "description": "Purchased shares and accumulated investment positions of the user.",
+    "empty": "The user has no positions yet.",
+    "shares": "Purchased shares",
+    "spent": "Spent KZTE",
+    "averagePrice": "Average price",
+    "assetId": "Asset ID",
+    "assetPda": "Asset PDA",
+    "shareMint": "Share mint",
+    "buyerShareAccount": "User share account",
+    "lastPurchaseTx": "Last purchase"
   }
 }

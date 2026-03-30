@@ -12,12 +12,13 @@ const energy_controller_1 = require("./energy.controller");
 const energy_blockchain_service_1 = require("./energy-blockchain.service");
 const solana_module_1 = require("../solana/solana.module");
 const energy_assets_module_1 = require("../energy-assets/energy-assets.module");
+const positions_module_1 = require("../positions/positions.module");
 let EnergyModule = class EnergyModule {
 };
 exports.EnergyModule = EnergyModule;
 exports.EnergyModule = EnergyModule = __decorate([
     (0, common_1.Module)({
-        imports: [solana_module_1.SolanaModule, energy_assets_module_1.EnergyAssetsModule],
+        imports: [solana_module_1.SolanaModule, energy_assets_module_1.EnergyAssetsModule, positions_module_1.PositionsModule],
         controllers: [energy_controller_1.EnergyController],
         providers: [energy_blockchain_service_1.EnergyBlockchainService],
         exports: [energy_blockchain_service_1.EnergyBlockchainService],

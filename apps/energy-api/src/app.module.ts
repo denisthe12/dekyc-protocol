@@ -8,6 +8,8 @@ import { SolanaModule } from '@/modules/solana/solana.module';
 import { WalletsModule } from '@/modules/wallets/wallets.module';
 import { EnergyModule } from '@/modules/energy/energy.module';
 import { EnergyAssetsModule } from '@/modules/energy-assets/energy-assets.module';
+import { PositionsModule } from '@/modules/positions/positions.module';
+import { PayoutsModule } from '@/modules/payouts/payouts.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { EnergyAssetsModule } from '@/modules/energy-assets/energy-assets.module
     WalletsModule,
     EnergyModule,
     EnergyAssetsModule,
+    PositionsModule,
+    PayoutsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

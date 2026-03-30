@@ -2,6 +2,7 @@ import { PublicKey } from '@solana/web3.js';
 import { AnchorService } from '@/modules/solana/anchor.service';
 import { SolanaService } from '@/modules/solana/solana.service';
 import { PrismaService } from '@/modules/prisma/prisma.service';
+import { PositionsService } from '../positions/positions.service';
 export type CreatedEnergyAssetResult = {
     registryPda: string;
     registryTx: string | null;
@@ -30,7 +31,8 @@ export declare class EnergyBlockchainService {
     private readonly anchorService;
     private readonly solanaService;
     private readonly prisma;
-    constructor(anchorService: AnchorService, solanaService: SolanaService, prisma: PrismaService);
+    private readonly positionsService;
+    constructor(anchorService: AnchorService, solanaService: SolanaService, prisma: PrismaService, positionsService: PositionsService);
     getRegistryPda(): Promise<PublicKey>;
     createRegistryIfNeeded(): Promise<{
         registryPda: string;
@@ -50,5 +52,23 @@ export declare class EnergyBlockchainService {
         treasuryKzteAccount: string;
         treasuryShareAccount: string;
         tx: string;
+        position: {
+            id: string;
+            energyUserId: string;
+            energyAssetId: string;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            buyerWalletAddress: string;
+            buyerKzteAccount: string | null;
+            buyerShareAccount: string;
+            totalSharesPurchased: number;
+            totalKzteSpent: number;
+            averagePricePerShare: number;
+            lastPurchaseTx: string | null;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            createdAt: Date;
+            updatedAt: Date;
+        };
     }>;
 }

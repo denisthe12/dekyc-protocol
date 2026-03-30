@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const energy_blockchain_service_1 = require("./energy-blockchain.service");
 const energy_assets_service_1 = require("../energy-assets/energy-assets.service");
 const buy_demo_shares_dto_1 = require("./dto/buy-demo-shares.dto");
+const positions_service_1 = require("../positions/positions.service");
+const reconcile_position_dto_1 = require("./dto/reconcile-position.dto");
 let EnergyController = class EnergyController {
-    constructor(energyBlockchainService, energyAssetsService) {
+    constructor(energyBlockchainService, energyAssetsService, positionsService) {
         this.energyBlockchainService = energyBlockchainService;
         this.energyAssetsService = energyAssetsService;
+        this.positionsService = positionsService;
     }
     async createRegistry() {
         return this.energyBlockchainService.createRegistryIfNeeded();
@@ -39,8 +42,14 @@ let EnergyController = class EnergyController {
     async buyDemoShares(dto) {
         return this.energyBlockchainService.buyDemoShares(dto);
     }
+    async reconcilePosition(dto) {
+        return this.positionsService.reconcilePosition(dto);
+    }
     async listAssets() {
         return this.energyAssetsService.listAssets();
+    }
+    async getPortfolio(energyUserId) {
+        return this.positionsService.getPortfolio(energyUserId);
     }
 };
 exports.EnergyController = EnergyController;
@@ -70,14 +79,29 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], EnergyController.prototype, "buyDemoShares", null);
 __decorate([
+    (0, common_1.Post)('reconcile-position'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [reconcile_position_dto_1.ReconcilePositionDto]),
+    __metadata("design:returntype", Promise)
+], EnergyController.prototype, "reconcilePosition", null);
+__decorate([
     (0, common_1.Get)('assets'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], EnergyController.prototype, "listAssets", null);
+__decorate([
+    (0, common_1.Get)('portfolio/:energyUserId'),
+    __param(0, (0, common_1.Param)('energyUserId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], EnergyController.prototype, "getPortfolio", null);
 exports.EnergyController = EnergyController = __decorate([
     (0, common_1.Controller)('energy'),
     __metadata("design:paramtypes", [energy_blockchain_service_1.EnergyBlockchainService,
-        energy_assets_service_1.EnergyAssetsService])
+        energy_assets_service_1.EnergyAssetsService,
+        positions_service_1.PositionsService])
 ], EnergyController);
 //# sourceMappingURL=energy.controller.js.map
