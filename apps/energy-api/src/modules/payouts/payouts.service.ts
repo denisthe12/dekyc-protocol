@@ -219,4 +219,33 @@ export class PayoutsService {
       },
     });
   }
+
+  public async listClaimsForUser(params: {
+    energyUserId: string;
+    assetId?: string;
+  }) {
+    const where: {
+      energyUserId: string;
+      energyAssetId?: string;
+    } = {
+      energyUserId: params.energyUserId,
+    };
+
+    if (params.assetId) {
+      const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+        where: {
+          assetId: params.assetId,
+        },
+      });
+
+      where.energyAssetId = asset.id;
+    }
+
+    return this.prisma.energyPayoutClaim.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
 }

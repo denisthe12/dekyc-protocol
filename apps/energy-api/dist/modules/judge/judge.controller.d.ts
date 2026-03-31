@@ -1,0 +1,127 @@
+import { JudgeService } from './judge.service';
+export declare class JudgeController {
+    private readonly judgeService;
+    constructor(judgeService: JudgeService);
+    getSummary(): Promise<{
+        generatedAt: string;
+        solana: {
+            rpcUrl: string;
+            signerAddress: string;
+            signerBalanceSol: number;
+            tokenizationProgramId: string;
+        };
+        kzte: import("../solana/solana.types").KzteMintStatus;
+        users: ({
+            profile: {
+                id: string;
+                energyUserId: string;
+                createdAt: Date;
+                updatedAt: Date;
+                dekycUserId: string;
+                email: string | null;
+                fullName: string | null;
+                iin: string | null;
+                birthDate: string | null;
+                verified: boolean;
+                age18Plus: boolean;
+                rawClaimsJson: import("prisma/generated/client/runtime/library").JsonValue | null;
+            } | null;
+            wallet: {
+                id: string;
+                energyUserId: string;
+                custodialWalletAddress: string;
+                kzteTokenAccountAddress: string | null;
+                energyPointsAccountAddress: string | null;
+                custodialWalletSecretJson: import("prisma/generated/client/runtime/library").JsonValue | null;
+                walletStatus: import("prisma/generated/client").$Enums.EnergyWalletStatus;
+                initialKzteAirdropped: boolean;
+                initialKzteAirdropTx: string | null;
+                createdAt: Date;
+                updatedAt: Date;
+            } | null;
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            dekycUserId: string;
+            email: string | null;
+            fullName: string | null;
+            role: import("prisma/generated/client").$Enums.EnergyUserRole;
+            lastLoginAt: Date | null;
+        })[];
+        assets: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            treasuryShareAccount: string;
+            treasuryKzteAccount: string;
+            issuerEnergyUserId: string | null;
+            title: string;
+            description: string | null;
+            location: string | null;
+            assetType: string;
+            totalShares: number;
+            pricePerShareKzte: number;
+            investorBps: number;
+            operatorBps: number;
+            payoutMode: string;
+            registryPda: string;
+            proofRootHash: string;
+            metadataUriHash: string;
+            metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
+            metadataCanonicalJson: string;
+            createAssetTx: string | null;
+            issueSharesTx: string | null;
+        }[];
+        positions: {
+            id: string;
+            energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            energyAssetId: string;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            buyerWalletAddress: string;
+            buyerKzteAccount: string | null;
+            buyerShareAccount: string;
+            totalSharesPurchased: number;
+            totalKzteSpent: number;
+            averagePricePerShare: number;
+            lastPurchaseTx: string | null;
+        }[];
+        epochs: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyRevenueEpochStatus;
+            energyAssetId: string;
+            treasuryKzteAccount: string;
+            epochIndex: number;
+            revenueEpochPda: string;
+            totalAmountKzte: number;
+            amountPerShareKzte: number;
+            totalSharesSnapshot: number;
+            createEpochTx: string | null;
+        }[];
+        claims: {
+            id: string;
+            energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            energyAssetId: string;
+            claimReceiptPda: string;
+            claimerKzteAccount: string;
+            claimerShareAccount: string;
+            energyRevenueEpochId: string;
+            claimerWalletAddress: string;
+            claimedAmountKzte: number;
+            claimTx: string | null;
+        }[];
+    }>;
+}

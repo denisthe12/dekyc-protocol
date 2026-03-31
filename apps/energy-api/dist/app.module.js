@@ -19,6 +19,7 @@ const energy_module_1 = require("./modules/energy/energy.module");
 const energy_assets_module_1 = require("./modules/energy-assets/energy-assets.module");
 const positions_module_1 = require("./modules/positions/positions.module");
 const payouts_module_1 = require("./modules/payouts/payouts.module");
+const judge_module_1 = require("./modules/judge/judge.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +35,7 @@ exports.AppModule = AppModule = __decorate([
             energy_assets_module_1.EnergyAssetsModule,
             positions_module_1.PositionsModule,
             payouts_module_1.PayoutsModule,
+            judge_module_1.JudgeModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

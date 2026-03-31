@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Query } from '@nestjs/common';
 import { PayoutsService } from './payouts.service';
 import { CreateRevenueEpochDto } from './dto/create-revenue-epoch.dto';
 import { ClaimPayoutDto } from './dto/claim-payout.dto';
@@ -20,5 +20,16 @@ export class PayoutsController {
   @Get('epochs/:assetId')
   public async listEpochs(@Param('assetId') assetId: string) {
     return this.payoutsService.listEpochs(assetId);
+  }
+
+  @Get('claims/:energyUserId')
+  public async listClaims(
+    @Param('energyUserId') energyUserId: string,
+    @Query('assetId') assetId?: string,
+  ) {
+    return this.payoutsService.listClaimsForUser({
+      energyUserId,
+      assetId,
+    });
   }
 }

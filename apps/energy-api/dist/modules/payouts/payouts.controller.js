@@ -30,6 +30,12 @@ let PayoutsController = class PayoutsController {
     async listEpochs(assetId) {
         return this.payoutsService.listEpochs(assetId);
     }
+    async listClaims(energyUserId, assetId) {
+        return this.payoutsService.listClaimsForUser({
+            energyUserId,
+            assetId,
+        });
+    }
 };
 exports.PayoutsController = PayoutsController;
 __decorate([
@@ -53,6 +59,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PayoutsController.prototype, "listEpochs", null);
+__decorate([
+    (0, common_1.Get)('claims/:energyUserId'),
+    __param(0, (0, common_1.Param)('energyUserId')),
+    __param(1, (0, common_1.Query)('assetId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], PayoutsController.prototype, "listClaims", null);
 exports.PayoutsController = PayoutsController = __decorate([
     (0, common_1.Controller)('payouts'),
     __metadata("design:paramtypes", [payouts_service_1.PayoutsService])

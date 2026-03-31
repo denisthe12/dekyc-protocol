@@ -168,6 +168,25 @@ let PayoutsService = class PayoutsService {
             },
         });
     }
+    async listClaimsForUser(params) {
+        const where = {
+            energyUserId: params.energyUserId,
+        };
+        if (params.assetId) {
+            const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+                where: {
+                    assetId: params.assetId,
+                },
+            });
+            where.energyAssetId = asset.id;
+        }
+        return this.prisma.energyPayoutClaim.findMany({
+            where,
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+    }
 };
 exports.PayoutsService = PayoutsService;
 exports.PayoutsService = PayoutsService = __decorate([

@@ -70,7 +70,9 @@ export default async function AssetsPage({ params }: AssetsPageProps) {
                       <div className="text-sm uppercase tracking-[0.2em] text-zinc-500">
                         {asset.assetType}
                       </div>
-                      <h2 className="mt-3 text-2xl font-semibold">{asset.title}</h2>
+                      <Link href={`/${locale}/assets/${asset.assetId}`} className="mt-3 block text-2xl font-semibold transition hover:text-zinc-300">
+                        {asset.title}
+                      </Link>
                       <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">
                         {asset.description ?? '—'}
                       </p>

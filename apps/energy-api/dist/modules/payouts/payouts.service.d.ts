@@ -68,4 +68,21 @@ export declare class PayoutsService {
         totalSharesSnapshot: number;
         createEpochTx: string | null;
     }[]>;
+    listClaimsForUser(params: {
+        energyUserId: string;
+        assetId?: string;
+    }): Promise<{
+        id: string;
+        energyUserId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        energyAssetId: string;
+        claimReceiptPda: string;
+        claimerKzteAccount: string;
+        claimerShareAccount: string;
+        energyRevenueEpochId: string;
+        claimerWalletAddress: string;
+        claimedAmountKzte: number;
+        claimTx: string | null;
+    }[]>;
 }
