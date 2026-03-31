@@ -97,5 +97,18 @@
     "buySuccess": "Listing успешно выкуплен",
     "buyError": "Не удалось выкупить listing",
     "createListingTx": "Транзакция создания listing"
+  },
+  "Navbar": {
+    "assets": "Активы",
+    "otc": "OTC",
+    "portfolio": "Портфель",
+    "history": "История",
+    "judge": "Judge"
+  },
+  "ProfileDropdown": {
+    "profile": "Профиль",
+    "history": "История",
+    "settings": "Настройки",
+    "logout": "Выйти"
   }
 }

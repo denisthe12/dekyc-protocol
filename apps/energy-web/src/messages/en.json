@@ -97,5 +97,18 @@
     "buySuccess": "Listing filled successfully",
     "buyError": "Failed to fill listing",
     "createListingTx": "Create listing transaction"
+  },
+  "Navbar": {
+    "assets": "Assets",
+    "otc": "OTC",
+    "portfolio": "Portfolio",
+    "history": "History",
+    "judge": "Judge"
+  },
+  "ProfileDropdown": {
+    "profile": "Profile",
+    "history": "History",
+    "settings": "Settings",
+    "logout": "Logout"
   }
 }
