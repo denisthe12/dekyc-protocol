@@ -79,5 +79,23 @@
     "canonicalJson": "Canonical JSON",
     "openExplorer": "Открыть в Explorer",
     "empty": "Нет данных"
+  },
+  "OtcPage": {
+    "eyebrow": "OTC marketplace",
+    "title": "Вторичный рынок долей",
+    "description": "Пользователи могут размещать доли на OTC-доске и покупать их внутри платформы.",
+    "empty": "Пока нет открытых OTC listing.",
+    "shareAmount": "Количество долей",
+    "pricePerShare": "Цена за долю",
+    "totalPrice": "Итоговая цена",
+    "seller": "Продавец",
+    "listingPda": "Listing PDA",
+    "escrow": "Escrow account",
+    "buy": "Купить",
+    "buying": "Покупка...",
+    "ownListing": "Ваш listing",
+    "buySuccess": "Listing успешно выкуплен",
+    "buyError": "Не удалось выкупить listing",
+    "createListingTx": "Транзакция создания listing"
   }
 }

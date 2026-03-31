@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { fetchAssets } from '@/lib/api/assets';
+import { formatKzte } from '@/lib/formatters';
 
 type AssetsPageProps = {
   params: Promise<{ locale: string }>;
@@ -96,7 +97,7 @@ export default async function AssetsPage({ params }: AssetsPageProps) {
                       <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                         <div className="text-xs text-zinc-500">{t('pricePerShare')}</div>
                         <div className="mt-2 text-sm text-zinc-300">
-                          {asset.pricePerShareKzte} KZTE
+                          {formatKzte(asset.pricePerShareKzte)} KZTE
                         </div>
                       </div>
 

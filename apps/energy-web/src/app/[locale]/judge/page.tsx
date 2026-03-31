@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { fetchJudgeSummary } from '@/lib/api/judge';
+import { formatKzte } from '@/lib/formatters';
 
 type JudgePageProps = {
   params: Promise<{ locale: string }>;
@@ -195,7 +196,7 @@ export default async function JudgePage({ params }: JudgePageProps) {
                     <div>
                       <div className="text-xs text-zinc-500">Price</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {asset.pricePerShareKzte} KZTE
+                        {formatKzte(asset.pricePerShareKzte)} KZTE
                       </div>
                     </div>
                     <div>
@@ -274,13 +275,13 @@ export default async function JudgePage({ params }: JudgePageProps) {
                     <div>
                       <div className="text-xs text-zinc-500">Spent</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {position.totalKzteSpent}
+                        {formatKzte(position.totalKzteSpent)}
                       </div>
                     </div>
                     <div>
                       <div className="text-xs text-zinc-500">Average price</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {position.averagePricePerShare}
+                        {formatKzte(position.averagePricePerShare)}
                       </div>
                     </div>
                   </div>
@@ -310,13 +311,13 @@ export default async function JudgePage({ params }: JudgePageProps) {
                     <div>
                       <div className="text-xs text-zinc-500">Amount/share</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {epoch.amountPerShareKzte}
+                        {formatKzte(epoch.amountPerShareKzte)}
                       </div>
                     </div>
                     <div>
                       <div className="text-xs text-zinc-500">Total amount</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {epoch.totalAmountKzte}
+                        {formatKzte(epoch.totalAmountKzte)}
                       </div>
                     </div>
                     <div>
@@ -367,7 +368,7 @@ export default async function JudgePage({ params }: JudgePageProps) {
                     <div>
                       <div className="text-xs text-zinc-500">Amount</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {claim.claimedAmountKzte}
+                        {formatKzte(claim.claimedAmountKzte)}
                       </div>
                     </div>
                     <div>

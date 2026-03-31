@@ -154,6 +154,10 @@ export class OtcService {
       throw new Error('Listing is not open');
     }
 
+    if (listing.sellerEnergyUserId === params.energyUserId) {
+      throw new Error('Seller cannot fill own listing');
+    }
+
     const buyerWallet = await this.prisma.energyUserWallet.findUniqueOrThrow({
       where: { energyUserId: params.energyUserId },
     });
@@ -205,6 +209,21 @@ export class OtcService {
       },
     });
 
+    await this.reconcilePositionsAfterFill({
+      sellerEnergyUserId: listing.sellerEnergyUserId,
+      buyerEnergyUserId: params.energyUserId,
+      energyAssetId: listing.energyAssetId,
+      assetId: listing.assetId,
+      assetPda: listing.assetPda,
+      shareMintAddress: listing.shareMintAddress,
+      sellerBuyerShareAccount: listing.sellerShareAccount,
+      buyerWalletAddress: buyerWallet.custodialWalletAddress,
+      buyerKzteAccount: buyerWallet.kzteTokenAccountAddress,
+      buyerShareAccount: buyerShareAccount.address.toBase58(),
+      shareAmount: listing.shareAmount,
+      totalPriceKzte: listing.totalPriceKzte,
+    });
+
     return {
       buyerWallet: buyerWallet.custodialWalletAddress,
       buyerShareAccount: buyerShareAccount.address.toBase58(),
@@ -220,6 +239,109 @@ export class OtcService {
       },
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+
+  private async reconcilePositionsAfterFill(params: {
+    sellerEnergyUserId: string;
+    buyerEnergyUserId: string;
+    energyAssetId: string;
+    assetId: string;
+    assetPda: string;
+    shareMintAddress: string;
+    sellerBuyerShareAccount: string;
+    buyerWalletAddress: string;
+    buyerKzteAccount: string | null;
+    buyerShareAccount: string;
+    shareAmount: number;
+    totalPriceKzte: number;
+  }) {
+    // SELLER
+    const sellerPosition =
+      await this.prisma.energyInvestorPosition.findUnique({
+        where: {
+          energyUserId_energyAssetId: {
+            energyUserId: params.sellerEnergyUserId,
+            energyAssetId: params.energyAssetId,
+          },
+        },
+      });
+
+    if (sellerPosition) {
+      const nextSellerShares = Math.max(
+        0,
+        sellerPosition.totalSharesPurchased - params.shareAmount,
+      );
+
+      const nextSellerTotalSpent =
+        nextSellerShares > 0
+          ? nextSellerShares * sellerPosition.averagePricePerShare
+          : 0;
+
+      await this.prisma.energyInvestorPosition.update({
+        where: { id: sellerPosition.id },
+        data: {
+          totalSharesPurchased: nextSellerShares,
+          totalKzteSpent: nextSellerTotalSpent,
+          averagePricePerShare:
+            nextSellerShares > 0 ? sellerPosition.averagePricePerShare : 0,
+          status: nextSellerShares > 0 ? 'ACTIVE' : 'CLOSED',
+        },
+      });
+    }
+
+    // BUYER
+    const buyerPosition =
+      await this.prisma.energyInvestorPosition.findUnique({
+        where: {
+          energyUserId_energyAssetId: {
+            energyUserId: params.buyerEnergyUserId,
+            energyAssetId: params.energyAssetId,
+          },
+        },
+      });
+
+    if (!buyerPosition) {
+      await this.prisma.energyInvestorPosition.create({
+        data: {
+          energyUserId: params.buyerEnergyUserId,
+          energyAssetId: params.energyAssetId,
+          assetId: params.assetId,
+          assetPda: params.assetPda,
+          shareMintAddress: params.shareMintAddress,
+          buyerWalletAddress: params.buyerWalletAddress,
+          buyerKzteAccount: params.buyerKzteAccount,
+          buyerShareAccount: params.buyerShareAccount,
+          totalSharesPurchased: params.shareAmount,
+          totalKzteSpent: params.totalPriceKzte,
+          averagePricePerShare: Math.floor(
+            params.totalPriceKzte / params.shareAmount,
+          ),
+          lastPurchaseTx: null,
+          status: 'ACTIVE',
+        },
+      });
+
+      return;
+    }
+
+    const newShares = buyerPosition.totalSharesPurchased + params.shareAmount;
+    const newTotalSpent = buyerPosition.totalKzteSpent + params.totalPriceKzte;
+
+    await this.prisma.energyInvestorPosition.update({
+      where: { id: buyerPosition.id },
+      data: {
+        assetId: params.assetId,
+        assetPda: params.assetPda,
+        shareMintAddress: params.shareMintAddress,
+        buyerWalletAddress: params.buyerWalletAddress,
+        buyerKzteAccount: params.buyerKzteAccount,
+        buyerShareAccount: params.buyerShareAccount,
+        totalSharesPurchased: newShares,
+        totalKzteSpent: newTotalSpent,
+        averagePricePerShare: Math.floor(newTotalSpent / newShares),
+        status: 'ACTIVE',
       },
     });
   }

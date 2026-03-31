@@ -9,6 +9,8 @@ import { fetchEpochs, fetchClaims, claimPayout, RevenueEpochItem, PayoutClaimIte
 import { fetchEnergyMe } from '@/lib/api/energy';
 import { loadEnergySession } from '@/lib/session';
 import { EnergyAssetListItem } from '@/lib/api/assets';
+import { formatKzte } from '@/lib/formatters';
+import { format } from 'path';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) {
@@ -169,7 +171,7 @@ export default function AssetDetailPage() {
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
               <div className="text-xs text-zinc-500">Price</div>
               <div className="mt-2 text-sm text-zinc-300">
-                {asset.pricePerShareKzte} KZTE
+                {formatKzte(asset.pricePerShareKzte)} KZTE
               </div>
             </div>
 
@@ -216,14 +218,14 @@ export default function AssetDetailPage() {
                       <div>
                         <div className="text-xs text-zinc-500">{t('amountPerShare')}</div>
                         <div className="mt-2 text-sm text-zinc-300">
-                          {epoch.amountPerShareKzte} base units
+                          {formatKzte(epoch.amountPerShareKzte)} KZTE
                         </div>
                       </div>
 
                       <div>
                         <div className="text-xs text-zinc-500">{t('totalAmount')}</div>
                         <div className="mt-2 text-sm text-zinc-300">
-                          {epoch.totalAmountKzte} base units
+                          {formatKzte(epoch.totalAmountKzte)} KZTE
                         </div>
                       </div>
 
@@ -286,7 +288,7 @@ export default function AssetDetailPage() {
                       <div>
                         <div className="text-xs text-zinc-500">{t('claimedAmount')}</div>
                         <div className="mt-2 text-sm text-zinc-300">
-                          {claim.claimedAmountKzte} base units
+                          {formatKzte(claim.claimedAmountKzte)} KZTE
                         </div>
                       </div>
 

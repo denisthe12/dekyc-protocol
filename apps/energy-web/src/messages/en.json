@@ -79,5 +79,23 @@
     "canonicalJson": "Canonical JSON",
     "openExplorer": "Open in Explorer",
     "empty": "No data"
+  },
+  "OtcPage": {
+    "eyebrow": "OTC marketplace",
+    "title": "Secondary share market",
+    "description": "Users can place shares on the OTC board and buy them inside the platform.",
+    "empty": "There are no open OTC listings yet.",
+    "shareAmount": "Share amount",
+    "pricePerShare": "Price per share",
+    "totalPrice": "Total price",
+    "seller": "Seller",
+    "listingPda": "Listing PDA",
+    "escrow": "Escrow account",
+    "buy": "Buy",
+    "buying": "Buying...",
+    "ownListing": "Your listing",
+    "buySuccess": "Listing filled successfully",
+    "buyError": "Failed to fill listing",
+    "createListingTx": "Create listing transaction"
   }
 }

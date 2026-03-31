@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { fetchPortfolio, PortfolioPosition } from '@/lib/api/portfolio';
 import { fetchEnergyMe } from '@/lib/api/energy';
 import { loadEnergySession } from '@/lib/session';
+import { formatKzte } from '@/lib/formatters';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) {
@@ -114,14 +115,14 @@ export default function PortfolioPage() {
                     <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                       <div className="text-xs text-zinc-500">{t('spent')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {position.totalKzteSpent} KZTE
+                        {formatKzte(position.totalKzteSpent)} KZTE
                       </div>
                     </div>
 
                     <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                       <div className="text-xs text-zinc-500">{t('averagePrice')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {position.averagePricePerShare} KZTE
+                        {formatKzte(position.averagePricePerShare)} KZTE
                       </div>
                     </div>
                   </div>
