@@ -28,4 +28,13 @@ pub enum TokenizationError {
 
     #[msg("Nothing to claim")]
     NothingToClaim,
+
+    #[msg("Invalid listing status")]
+    InvalidListingStatus,
+
+    #[msg("Invalid seller")]
+    InvalidSeller,
+
+    #[msg("Invalid share amount")]
+    InvalidShareAmount,
 }

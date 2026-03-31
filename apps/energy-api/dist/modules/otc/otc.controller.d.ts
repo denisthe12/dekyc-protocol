@@ -1,0 +1,86 @@
+import { OtcService } from './otc.service';
+import { CreateDemoListingDto } from './dto/create-demo-listing.dto';
+import { FillDemoListingDto } from './dto/fill-demo-listing.dto';
+export declare class OtcController {
+    private readonly otcService;
+    constructor(otcService: OtcService);
+    createDemoListing(dto: CreateDemoListingDto): Promise<{
+        listingPda: string;
+        escrowShareAccount: string;
+        tx: string;
+        db: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyOtcListingStatus;
+            energyAssetId: string;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            pricePerShareKzte: number;
+            shareAmount: number;
+            listingPda: string;
+            sellerShareAccount: string;
+            sellerKzteAccount: string;
+            escrowShareAccount: string;
+            listingId: string;
+            sellerEnergyUserId: string;
+            buyerEnergyUserId: string | null;
+            sellerWalletAddress: string;
+            totalPriceKzte: number;
+            createListingTx: string | null;
+            fillListingTx: string | null;
+        };
+    }>;
+    fillDemoListing(dto: FillDemoListingDto): Promise<{
+        buyerWallet: string;
+        buyerShareAccount: string;
+        tx: string;
+        db: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyOtcListingStatus;
+            energyAssetId: string;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            pricePerShareKzte: number;
+            shareAmount: number;
+            listingPda: string;
+            sellerShareAccount: string;
+            sellerKzteAccount: string;
+            escrowShareAccount: string;
+            listingId: string;
+            sellerEnergyUserId: string;
+            buyerEnergyUserId: string | null;
+            sellerWalletAddress: string;
+            totalPriceKzte: number;
+            createListingTx: string | null;
+            fillListingTx: string | null;
+        };
+    }>;
+    listOpenListings(): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyOtcListingStatus;
+        energyAssetId: string;
+        assetId: string;
+        assetPda: string;
+        shareMintAddress: string;
+        pricePerShareKzte: number;
+        shareAmount: number;
+        listingPda: string;
+        sellerShareAccount: string;
+        sellerKzteAccount: string;
+        escrowShareAccount: string;
+        listingId: string;
+        sellerEnergyUserId: string;
+        buyerEnergyUserId: string | null;
+        sellerWalletAddress: string;
+        totalPriceKzte: number;
+        createListingTx: string | null;
+        fillListingTx: string | null;
+    }[]>;
+}

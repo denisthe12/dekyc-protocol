@@ -11,6 +11,8 @@ import { EnergyAssetsModule } from '@/modules/energy-assets/energy-assets.module
 import { PositionsModule } from '@/modules/positions/positions.module';
 import { PayoutsModule } from '@/modules/payouts/payouts.module';
 import { JudgeModule } from '@/modules/judge/judge.module';
+import { OtcModule } from '@/modules/otc/otc.module';
+import { DevModule } from '@/modules/dev/dev.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { JudgeModule } from '@/modules/judge/judge.module';
     PositionsModule,
     PayoutsModule,
     JudgeModule,
+    OtcModule,
+    DevModule,
   ],
   controllers: [AppController],
   providers: [AppService],

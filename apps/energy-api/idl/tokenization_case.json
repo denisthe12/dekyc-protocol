@@ -284,6 +284,101 @@
       ]
     },
     {
+      "name": "create_listing",
+      "discriminator": [
+        18,
+        168,
+        45,
+        24,
+        191,
+        31,
+        117,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "relayer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "energy_asset",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true
+        },
+        {
+          "name": "seller_share_account",
+          "writable": true
+        },
+        {
+          "name": "seller_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "escrow_share_account",
+          "writable": true
+        },
+        {
+          "name": "listing",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "energy_asset.asset_id",
+                "account": "EnergyAsset"
+              },
+              {
+                "kind": "arg",
+                "path": "listing_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "listing_id",
+          "type": "u64"
+        },
+        {
+          "name": "share_amount",
+          "type": "u64"
+        },
+        {
+          "name": "price_per_share_kzte",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "create_registry",
       "discriminator": [
         210,
@@ -424,6 +519,61 @@
       ]
     },
     {
+      "name": "fill_listing",
+      "discriminator": [
+        207,
+        127,
+        12,
+        109,
+        233,
+        168,
+        239,
+        173
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "listing",
+          "writable": true
+        },
+        {
+          "name": "energy_asset"
+        },
+        {
+          "name": "kzte_mint",
+          "writable": true
+        },
+        {
+          "name": "share_mint",
+          "writable": true
+        },
+        {
+          "name": "buyer_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "buyer_share_account",
+          "writable": true
+        },
+        {
+          "name": "seller_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "escrow_share_account",
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "issue_shares",
       "discriminator": [
         110,
@@ -491,6 +641,19 @@
         6,
         115,
         35
+      ]
+    },
+    {
+      "name": "Listing",
+      "discriminator": [
+        218,
+        32,
+        50,
+        73,
+        43,
+        134,
+        26,
+        58
       ]
     },
     {
@@ -606,6 +769,21 @@
       "code": 6008,
       "name": "NothingToClaim",
       "msg": "Nothing to claim"
+    },
+    {
+      "code": 6009,
+      "name": "InvalidListingStatus",
+      "msg": "Invalid listing status"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidSeller",
+      "msg": "Invalid seller"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidShareAmount",
+      "msg": "Invalid share amount"
     }
   ],
   "types": [
@@ -774,6 +952,87 @@
           {
             "name": "treasury_share_account",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Listing",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "listing_id",
+            "type": "u64"
+          },
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_id",
+            "type": "u64"
+          },
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "seller_kzte_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "escrow_share_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "share_amount",
+            "type": "u64"
+          },
+          {
+            "name": "price_per_share_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "total_price_kzte",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "ListingStatus"
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ListingStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "Filled"
+          },
+          {
+            "name": "Cancelled"
           }
         ]
       }

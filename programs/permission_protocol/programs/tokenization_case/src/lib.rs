@@ -62,4 +62,22 @@ pub mod tokenization_case {
     pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
         instructions::claim_payout::handler(ctx)
     }
+
+    pub fn create_listing(
+        ctx: Context<CreateListing>,
+        listing_id: u64,
+        share_amount: u64,
+        price_per_share_kzte: u64,
+    ) -> Result<()> {
+        instructions::create_listing::handler(
+            ctx,
+            listing_id,
+            share_amount,
+            price_per_share_kzte,
+        )
+    }
+
+    pub fn fill_listing(ctx: Context<FillListing>) -> Result<()> {
+        instructions::fill_listing::handler(ctx)
+    }
 }

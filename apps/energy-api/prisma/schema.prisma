@@ -39,6 +39,12 @@ enum EnergyRevenueEpochStatus {
   CLOSED
 }
 
+enum EnergyOtcListingStatus {
+  OPEN
+  FILLED
+  CANCELLED
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -211,4 +217,39 @@ model EnergyPayoutClaim {
   @@index([energyUserId])
   @@index([energyAssetId])
   @@index([energyRevenueEpochId])
+}
+
+model EnergyOtcListing {
+  id                    String                 @id @default(cuid())
+  listingId             String                 @unique @db.VarChar(64)
+
+  energyAssetId         String                 @db.VarChar(191)
+  sellerEnergyUserId    String                 @db.VarChar(191)
+  buyerEnergyUserId     String?                @db.VarChar(191)
+
+  assetId               String                 @db.VarChar(64)
+  assetPda              String                 @db.VarChar(128)
+  listingPda            String                 @unique @db.VarChar(128)
+
+  shareMintAddress      String                 @db.VarChar(128)
+  sellerWalletAddress   String                 @db.VarChar(128)
+  sellerShareAccount    String                 @db.VarChar(128)
+  sellerKzteAccount     String                 @db.VarChar(128)
+  escrowShareAccount    String                 @unique @db.VarChar(128)
+
+  shareAmount           Int
+  pricePerShareKzte     Int
+  totalPriceKzte        Int
+
+  createListingTx       String?                @db.VarChar(128)
+  fillListingTx         String?                @db.VarChar(128)
+  status                EnergyOtcListingStatus @default(OPEN)
+
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@index([energyAssetId])
+  @@index([sellerEnergyUserId])
+  @@index([buyerEnergyUserId])
+  @@index([status])
 }
