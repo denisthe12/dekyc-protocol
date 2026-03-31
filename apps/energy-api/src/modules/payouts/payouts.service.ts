@@ -132,6 +132,14 @@ export class PayoutsService {
       },
     });
 
+    const solTopUp = await this.solanaService.ensureSolBalance(
+      wallet.custodialWalletAddress,
+      0.02, 
+      0.1,  
+    );
+
+    console.log('SOL top-up result:', solTopUp);
+
     const secret = wallet.custodialWalletSecretJson as number[] | null;
     if (!secret) {
       throw new Error('User custodial key is missing');

@@ -11,4 +11,11 @@ export declare class SolanaService {
         signerAddress: string;
         signerBalanceSol: number;
     }>;
+    private buildTransferTx;
+    ensureSolBalance(wallet: string, minSol?: number, topUpSol?: number): Promise<{
+        toppedUp: boolean;
+        balanceBefore: number;
+        balanceAfter?: number;
+        tx?: string;
+    }>;
 }
