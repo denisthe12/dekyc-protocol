@@ -1,4 +1,4 @@
-import { IsInt, IsString, Min } from 'class-validator';
+import { IsIn, IsInt, IsString, Min } from 'class-validator';
 
 export class CreateDemoListingDto {
   @IsString()
@@ -14,4 +14,8 @@ export class CreateDemoListingDto {
   @IsInt()
   @Min(1)
   pricePerShareKzte!: number;
+
+  @IsString()
+  @IsIn(['KZTE', 'ENERGY_POINTS'])
+  payoutMode!: 'KZTE' | 'ENERGY_POINTS';
 }

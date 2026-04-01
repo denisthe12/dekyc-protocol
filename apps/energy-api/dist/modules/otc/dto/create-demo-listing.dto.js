@@ -32,4 +32,9 @@ __decorate([
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], CreateDemoListingDto.prototype, "pricePerShareKzte", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['KZTE', 'ENERGY_POINTS']),
+    __metadata("design:type", String)
+], CreateDemoListingDto.prototype, "payoutMode", void 0);
 //# sourceMappingURL=create-demo-listing.dto.js.map

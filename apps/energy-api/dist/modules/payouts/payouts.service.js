@@ -111,16 +111,32 @@ let PayoutsService = class PayoutsService {
             Buffer.from('investor_position'),
             new web3_js_1.PublicKey(asset.assetPda).toBuffer(),
             claimerKeypair.publicKey.toBuffer(),
+            Buffer.from('kzte'),
         ], program.programId);
         const investorPosition = await program.account.investorPosition.fetch(investorPositionPda);
-        const position = await this.prisma.energyInvestorPosition.findUniqueOrThrow({
+        const positions = await this.prisma.energyInvestorPosition.findMany({
             where: {
-                energyUserId_energyAssetId: {
-                    energyUserId: params.energyUserId,
-                    energyAssetId: asset.id,
-                },
+                energyUserId: params.energyUserId,
+                energyAssetId: asset.id,
+                status: 'ACTIVE',
+            },
+            orderBy: {
+                createdAt: 'asc',
             },
         });
+        if (positions.length === 0) {
+            throw new Error('Investor positions not found for this asset');
+        }
+        const kztePosition = positions.find((item) => item.payoutMode === 'KZTE') ?? null;
+        const energyPointsPosition = positions.find((item) => item.payoutMode === 'ENERGY_POINTS') ?? null;
+        if (!kztePosition && !energyPointsPosition) {
+            throw new Error('No active payout positions found for this asset');
+        }
+        const shareAccountAddress = kztePosition?.buyerShareAccount ??
+            energyPointsPosition?.buyerShareAccount;
+        if (!shareAccountAddress) {
+            throw new Error('Claimer share account is missing');
+        }
         const solTopUp = await this.solanaService.ensureSolBalance(wallet.custodialWalletAddress, 0.02, 0.1);
         console.log('SOL top-up result:', solTopUp);
         const epochPda = new web3_js_1.PublicKey(epoch.revenueEpochPda);
@@ -129,9 +145,19 @@ let PayoutsService = class PayoutsService {
             epochPda.toBuffer(),
             claimerKeypair.publicKey.toBuffer(),
         ], program.programId);
-        const claimerShareAccountInfo = await (0, spl_token_1.getAccount)(provider.connection, new web3_js_1.PublicKey(position.buyerShareAccount), undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
+        const claimerShareAccountInfo = await (0, spl_token_1.getAccount)(provider.connection, new web3_js_1.PublicKey(shareAccountAddress), undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const sharesOwned = Number(claimerShareAccountInfo.amount);
-        const claimedAmountKzte = position.totalSharesPurchased * epoch.amountPerShareKzte;
+        const kzteShares = kztePosition?.totalSharesPurchased ?? 0;
+        const energyPointsShares = energyPointsPosition?.totalSharesPurchased ?? 0;
+        const kzteClaimAmount = kzteShares * epoch.amountPerShareKzte;
+        const energyPointsClaimAmount = energyPointsShares * epoch.amountPerShareKzte;
+        const claimedAmountKzte = kzteClaimAmount + energyPointsClaimAmount;
+        if (claimedAmountKzte <= 0) {
+            throw new Error('Nothing to claim for this asset');
+        }
+        if (!kztePosition) {
+            throw new Error('KZTE investor position is required for current on-chain claim flow');
+        }
         const tx = await program.methods
             .claimPayout()
             .accounts({
@@ -142,7 +168,7 @@ let PayoutsService = class PayoutsService {
             kzteMint: this.solanaService.getKzteMint(),
             treasuryKzteAccount: new web3_js_1.PublicKey(epoch.treasuryKzteAccount),
             claimerKzteAccount: new web3_js_1.PublicKey(wallet.kzteTokenAccountAddress ?? ''),
-            claimerShareAccount: new web3_js_1.PublicKey(position.buyerShareAccount),
+            claimerShareAccount: new web3_js_1.PublicKey(shareAccountAddress),
             claimReceipt: web3_js_1.PublicKey.findProgramAddressSync([
                 Buffer.from('claim_receipt'),
                 new web3_js_1.PublicKey(epoch.revenueEpochPda).toBuffer(),
@@ -153,14 +179,15 @@ let PayoutsService = class PayoutsService {
         })
             .signers([claimerKeypair])
             .rpc();
-        const payoutMode = investorPosition.payoutMode?.energyPoints !== undefined
-            ? 'ENERGY_POINTS'
-            : 'KZTE';
+        const payoutMode = 'KZTE';
         let energyPointsMintTx = null;
-        if (payoutMode === 'ENERGY_POINTS') {
+        if (energyPointsClaimAmount > 0) {
+            if (!wallet.energyPointsTokenAccountAddress) {
+                throw new Error('User ENERGY_POINTS token account is missing');
+            }
             const mintResult = await this.energyPointsService.mintEnergyPointsToUser({
                 recipientTokenAccount: wallet.energyPointsTokenAccountAddress,
-                amountBaseUnits: BigInt(claimedAmountKzte),
+                amountBaseUnits: BigInt(energyPointsClaimAmount),
             });
             energyPointsMintTx = mintResult.tx;
         }

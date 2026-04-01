@@ -14,3 +14,12 @@ pub enum PayoutMode {
     Kzte,
     EnergyPoints,
 }
+
+impl PayoutMode {
+    pub fn as_seed(&self) -> [u8; 1] {
+        match self {
+            PayoutMode::Kzte => [0],
+            PayoutMode::EnergyPoints => [1],
+        }
+    }
+}

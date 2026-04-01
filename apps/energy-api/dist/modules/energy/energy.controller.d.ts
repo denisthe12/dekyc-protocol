@@ -66,10 +66,10 @@ export declare class EnergyController {
             buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         };
     }>;
@@ -92,10 +92,10 @@ export declare class EnergyController {
             buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         };
     }>;
@@ -140,10 +140,10 @@ export declare class EnergyController {
         buyerWalletAddress: string;
         buyerKzteAccount: string | null;
         buyerShareAccount: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;
-        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         lastPurchaseTx: string | null;
     }[]>;
     getInvestorPosition(assetPda: string, investorWallet: string): Promise<{

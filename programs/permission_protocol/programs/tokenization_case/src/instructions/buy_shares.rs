@@ -8,6 +8,7 @@ use crate::errors::TokenizationError;
 use crate::state::{EnergyAsset, InvestorPosition, PayoutMode};
 
 #[derive(Accounts)]
+#[instruction(share_amount: u64, payout_mode: PayoutMode)]
 pub struct BuyShares<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
@@ -22,7 +23,8 @@ pub struct BuyShares<'info> {
         seeds = [
             INVESTOR_POSITION_SEED,
             energy_asset.key().as_ref(),
-            buyer.key().as_ref()
+            buyer.key().as_ref(),
+            payout_mode.as_seed().as_ref()
         ],
         bump
     )]

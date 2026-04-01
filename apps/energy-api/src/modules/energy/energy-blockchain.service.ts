@@ -256,6 +256,7 @@ export class EnergyBlockchainService {
             Buffer.from('investor_position'),
             new PublicKey(asset.assetPda).toBuffer(),
             buyerKeypair.publicKey.toBuffer(),
+            params.payoutMode === 'KZTE' ? Buffer.from([0]) : Buffer.from([1]),
           ],
           program.programId,
         )[0],
@@ -276,9 +277,9 @@ export class EnergyBlockchainService {
       buyerKzteAccount: wallet.kzteTokenAccountAddress,
       buyerShareAccount: buyerShareAccount.address.toBase58(),
       purchasedShares: params.shareAmount,
-      totalKzteSpent,
+      spentKzte: totalKzteSpent,
       payoutMode: params.payoutMode,
-      tx,
+      purchaseTx: tx,
     });
 
     return {
@@ -297,6 +298,7 @@ export class EnergyBlockchainService {
   public async getInvestorPosition(params: {
     assetPda: string;
     investorWallet: string;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
   }) {
     const program = this.anchorService.program;
 
@@ -305,6 +307,7 @@ export class EnergyBlockchainService {
         Buffer.from('investor_position'),
         new PublicKey(params.assetPda).toBuffer(),
         new PublicKey(params.investorWallet).toBuffer(),
+        params.payoutMode === 'KZTE' ? Buffer.from([0]) : Buffer.from([1]),
       ],
       program.programId,
     );

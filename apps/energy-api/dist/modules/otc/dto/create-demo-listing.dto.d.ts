@@ -3,4 +3,5 @@ export declare class CreateDemoListingDto {
     assetId: string;
     shareAmount: number;
     pricePerShareKzte: number;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
 }

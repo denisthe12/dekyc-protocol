@@ -32,9 +32,10 @@ let OtcService = class OtcService {
         });
         const position = await this.prisma.energyInvestorPosition.findUniqueOrThrow({
             where: {
-                energyUserId_energyAssetId: {
+                energyUserId_energyAssetId_payoutMode: {
                     energyUserId: params.energyUserId,
                     energyAssetId: asset.id,
+                    payoutMode: params.payoutMode,
                 },
             },
         });
@@ -93,6 +94,7 @@ let OtcService = class OtcService {
                 shareAmount: params.shareAmount,
                 pricePerShareKzte: params.pricePerShareKzte,
                 totalPriceKzte,
+                payoutMode: params.payoutMode,
                 createListingTx: tx,
                 fillListingTx: null,
                 status: 'OPEN',
@@ -158,12 +160,12 @@ let OtcService = class OtcService {
             assetId: listing.assetId,
             assetPda: listing.assetPda,
             shareMintAddress: listing.shareMintAddress,
-            sellerBuyerShareAccount: listing.sellerShareAccount,
             buyerWalletAddress: buyerWallet.custodialWalletAddress,
             buyerKzteAccount: buyerWallet.kzteTokenAccountAddress,
             buyerShareAccount: buyerShareAccount.address.toBase58(),
             shareAmount: listing.shareAmount,
             totalPriceKzte: listing.totalPriceKzte,
+            payoutMode: listing.payoutMode,
         });
         return {
             buyerWallet: buyerWallet.custodialWalletAddress,
@@ -185,9 +187,10 @@ let OtcService = class OtcService {
     async reconcilePositionsAfterFill(params) {
         const sellerPosition = await this.prisma.energyInvestorPosition.findUnique({
             where: {
-                energyUserId_energyAssetId: {
+                energyUserId_energyAssetId_payoutMode: {
                     energyUserId: params.sellerEnergyUserId,
                     energyAssetId: params.energyAssetId,
+                    payoutMode: params.payoutMode,
                 },
             },
         });
@@ -208,9 +211,10 @@ let OtcService = class OtcService {
         }
         const buyerPosition = await this.prisma.energyInvestorPosition.findUnique({
             where: {
-                energyUserId_energyAssetId: {
+                energyUserId_energyAssetId_payoutMode: {
                     energyUserId: params.buyerEnergyUserId,
                     energyAssetId: params.energyAssetId,
+                    payoutMode: params.payoutMode,
                 },
             },
         });
@@ -229,6 +233,7 @@ let OtcService = class OtcService {
                     totalKzteSpent: params.totalPriceKzte,
                     averagePricePerShare: Math.floor(params.totalPriceKzte / params.shareAmount),
                     lastPurchaseTx: null,
+                    payoutMode: params.payoutMode,
                     status: 'ACTIVE',
                 },
             });
@@ -248,6 +253,7 @@ let OtcService = class OtcService {
                 totalSharesPurchased: newShares,
                 totalKzteSpent: newTotalSpent,
                 averagePricePerShare: Math.floor(newTotalSpent / newShares),
+                payoutMode: params.payoutMode,
                 status: 'ACTIVE',
             },
         });

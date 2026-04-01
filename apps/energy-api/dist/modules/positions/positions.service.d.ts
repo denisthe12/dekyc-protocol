@@ -14,9 +14,9 @@ export declare class PositionsService {
         buyerKzteAccount: string | null;
         buyerShareAccount: string;
         purchasedShares: number;
-        totalKzteSpent: number;
+        spentKzte: number;
         payoutMode: 'KZTE' | 'ENERGY_POINTS';
-        tx: string;
+        purchaseTx: string;
     }): Promise<{
         id: string;
         energyUserId: string;
@@ -30,15 +30,16 @@ export declare class PositionsService {
         buyerWalletAddress: string;
         buyerKzteAccount: string | null;
         buyerShareAccount: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;
-        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         lastPurchaseTx: string | null;
     }>;
     reconcilePosition(params: {
         energyUserId: string;
         assetId: string;
+        payoutMode: 'KZTE' | 'ENERGY_POINTS';
     }): Promise<{
         assetId: string;
         energyAssetId: string;
@@ -58,10 +59,10 @@ export declare class PositionsService {
             buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         };
     }>;
@@ -78,10 +79,10 @@ export declare class PositionsService {
         buyerWalletAddress: string;
         buyerKzteAccount: string | null;
         buyerShareAccount: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;
-        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         lastPurchaseTx: string | null;
     }[]>;
 }

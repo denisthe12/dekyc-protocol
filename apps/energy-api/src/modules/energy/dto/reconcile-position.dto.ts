@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsIn } from 'class-validator';
 
 export class ReconcilePositionDto {
   @IsString()
@@ -6,4 +6,8 @@ export class ReconcilePositionDto {
 
   @IsString()
   assetId!: string;
+
+  @IsString()
+  @IsIn(['KZTE', 'ENERGY_POINTS'])
+  payoutMode!: 'KZTE' | 'ENERGY_POINTS';
 }

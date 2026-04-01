@@ -160,9 +160,9 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             buyerKzteAccount: wallet.kzteTokenAccountAddress,
             buyerShareAccount: buyerShareAccount.address.toBase58(),
             purchasedShares: params.shareAmount,
-            totalKzteSpent,
+            spentKzte: totalKzteSpent,
             payoutMode: params.payoutMode,
-            tx,
+            purchaseTx: tx,
         });
         return {
             assetId: asset.assetId,

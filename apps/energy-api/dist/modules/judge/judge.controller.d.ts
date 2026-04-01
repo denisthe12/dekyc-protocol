@@ -91,10 +91,10 @@ export declare class JudgeController {
             buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         }[];
         epochs: {

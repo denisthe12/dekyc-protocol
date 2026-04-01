@@ -22,4 +22,9 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], ReconcilePositionDto.prototype, "assetId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['KZTE', 'ENERGY_POINTS']),
+    __metadata("design:type", String)
+], ReconcilePositionDto.prototype, "payoutMode", void 0);
 //# sourceMappingURL=reconcile-position.dto.js.map

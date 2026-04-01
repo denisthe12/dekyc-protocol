@@ -11,11 +11,11 @@ export declare class PayoutsController {
         createEpochTx: string;
         db: {
             id: string;
+            treasuryKzteAccount: string;
+            status: import("prisma/generated/client").$Enums.EnergyRevenueEpochStatus;
             createdAt: Date;
             updatedAt: Date;
-            status: import("prisma/generated/client").$Enums.EnergyRevenueEpochStatus;
             energyAssetId: string;
-            treasuryKzteAccount: string;
             epochIndex: number;
             revenueEpochPda: string;
             totalAmountKzte: number;
@@ -29,20 +29,20 @@ export declare class PayoutsController {
         epochIndex: number;
         claimReceiptPda: string;
         claimedAmountKzte: number;
-        payoutMode: string;
+        payoutMode: "KZTE";
         tx: string;
         energyPointsMintTx: string | null;
         db: {
             id: string;
-            energyUserId: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             createdAt: Date;
             updatedAt: Date;
             energyAssetId: string;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
-            claimReceiptPda: string;
+            energyUserId: string;
             claimerKzteAccount: string;
             claimerShareAccount: string;
             energyRevenueEpochId: string;
+            claimReceiptPda: string;
             claimerWalletAddress: string;
             claimedAmountKzte: number;
             claimTx: string | null;
@@ -51,11 +51,11 @@ export declare class PayoutsController {
     }>;
     listEpochs(assetId: string): Promise<{
         id: string;
+        treasuryKzteAccount: string;
+        status: import("prisma/generated/client").$Enums.EnergyRevenueEpochStatus;
         createdAt: Date;
         updatedAt: Date;
-        status: import("prisma/generated/client").$Enums.EnergyRevenueEpochStatus;
         energyAssetId: string;
-        treasuryKzteAccount: string;
         epochIndex: number;
         revenueEpochPda: string;
         totalAmountKzte: number;
@@ -65,15 +65,15 @@ export declare class PayoutsController {
     }[]>;
     listClaims(energyUserId: string, assetId?: string): Promise<{
         id: string;
-        energyUserId: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         createdAt: Date;
         updatedAt: Date;
         energyAssetId: string;
-        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
-        claimReceiptPda: string;
+        energyUserId: string;
         claimerKzteAccount: string;
         claimerShareAccount: string;
         energyRevenueEpochId: string;
+        claimReceiptPda: string;
         claimerWalletAddress: string;
         claimedAmountKzte: number;
         claimTx: string | null;

@@ -153,33 +153,35 @@ model EnergyAsset {
 }
 
 model EnergyInvestorPosition {
-  id                    String               @id @default(cuid())
-  energyUserId          String               @db.VarChar(191)
-  energyAssetId         String               @db.VarChar(191)
+  id                     String                   @id @default(cuid())
+  energyUserId           String                   @db.VarChar(191)
+  energyAssetId          String                   @db.VarChar(191)
 
-  assetId               String               @db.VarChar(64)
-  assetPda              String               @db.VarChar(128)
-  shareMintAddress      String               @db.VarChar(128)
+  assetId                String                   @db.VarChar(64)
+  assetPda               String                   @db.VarChar(128)
+  shareMintAddress       String                   @db.VarChar(128)
 
-  buyerWalletAddress    String               @db.VarChar(128)
-  buyerKzteAccount      String?              @db.VarChar(128)
-  buyerShareAccount     String               @db.VarChar(128)
+  buyerWalletAddress     String                   @db.VarChar(128)
+  buyerKzteAccount       String?                  @db.VarChar(128)
+  buyerShareAccount      String                   @db.VarChar(128)
 
-  totalSharesPurchased  Int                  @default(0)
-  totalKzteSpent        Int                  @default(0)
-  averagePricePerShare  Int                  @default(0)
+  payoutMode             EnergyPositionPayoutMode @default(KZTE)
 
-  payoutMode            EnergyPositionPayoutMode @default(KZTE)
+  totalSharesPurchased   Int                      @default(0)
+  totalKzteSpent         Int                      @default(0)
+  averagePricePerShare   Int                      @default(0)
 
-  lastPurchaseTx        String?              @db.VarChar(128)
-  status                EnergyPositionStatus @default(ACTIVE)
+  lastPurchaseTx         String?                  @db.VarChar(128)
+  status                 EnergyPositionStatus     @default(ACTIVE)
 
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
 
-  @@unique([energyUserId, energyAssetId])
   @@index([energyUserId])
   @@index([energyAssetId])
+  @@index([assetId])
+  @@index([payoutMode])
+  @@unique([energyUserId, energyAssetId, payoutMode], map: "energy_position_user_asset_mode_unique")
 }
 
 model EnergyRevenueEpoch {
@@ -216,6 +218,7 @@ model EnergyPayoutClaim {
   claimerShareAccount   String      @db.VarChar(128)
 
   claimedAmountKzte     Int
+  claimedAmountEnergyPoints Int     @default(0)
   payoutMode            EnergyPositionPayoutMode @default(KZTE)
   claimTx               String?     @db.VarChar(128)
   energyPointsMintTx    String?     @db.VarChar(128)
@@ -250,6 +253,7 @@ model EnergyOtcListing {
   shareAmount           Int
   pricePerShareKzte     Int
   totalPriceKzte        Int
+  payoutMode            EnergyPositionPayoutMode @default(KZTE)
 
   createListingTx       String?                @db.VarChar(128)
   fillListingTx         String?                @db.VarChar(128)

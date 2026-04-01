@@ -147,6 +147,7 @@ export class PayoutsService {
         Buffer.from('investor_position'),
         new PublicKey(asset.assetPda).toBuffer(),
         claimerKeypair.publicKey.toBuffer(),
+        Buffer.from([0]),
       ],
       program.programId,
     );
@@ -156,14 +157,38 @@ export class PayoutsService {
     );
 
 
-    const position = await this.prisma.energyInvestorPosition.findUniqueOrThrow({
+    const positions = await this.prisma.energyInvestorPosition.findMany({
       where: {
-        energyUserId_energyAssetId: {
-          energyUserId: params.energyUserId,
-          energyAssetId: asset.id,
-        },
+        energyUserId: params.energyUserId,
+        energyAssetId: asset.id,
+        status: 'ACTIVE',
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
+
+    if (positions.length === 0) {
+      throw new Error('Investor positions not found for this asset');
+    }
+
+    const kztePosition =
+      positions.find((item) => item.payoutMode === 'KZTE') ?? null;
+
+    const energyPointsPosition =
+      positions.find((item) => item.payoutMode === 'ENERGY_POINTS') ?? null;
+
+    if (!kztePosition && !energyPointsPosition) {
+      throw new Error('No active payout positions found for this asset');
+    }
+
+    const shareAccountAddress =
+      kztePosition?.buyerShareAccount ??
+      energyPointsPosition?.buyerShareAccount;
+
+    if (!shareAccountAddress) {
+      throw new Error('Claimer share account is missing');
+    }
 
     const solTopUp = await this.solanaService.ensureSolBalance(
       wallet.custodialWalletAddress,
@@ -186,15 +211,31 @@ export class PayoutsService {
 
     const claimerShareAccountInfo = await getAccount(
       provider.connection,
-      new PublicKey(position.buyerShareAccount),
+      new PublicKey(shareAccountAddress),
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
 
     const sharesOwned = Number(claimerShareAccountInfo.amount);
     
-    const claimedAmountKzte =
-      position.totalSharesPurchased * epoch.amountPerShareKzte;
+    const kzteShares = kztePosition?.totalSharesPurchased ?? 0;
+    const energyPointsShares = energyPointsPosition?.totalSharesPurchased ?? 0;
+
+    const kzteClaimAmount = kzteShares * epoch.amountPerShareKzte;
+    const energyPointsClaimAmount =
+      energyPointsShares * epoch.amountPerShareKzte;
+
+    const claimedAmountKzte = kzteClaimAmount + energyPointsClaimAmount;
+
+    if (claimedAmountKzte <= 0) {
+      throw new Error('Nothing to claim for this asset');
+    }
+
+    if (!kztePosition) {
+      throw new Error(
+        'KZTE investor position is required for current on-chain claim flow',
+      );
+    }
 
     const tx = await program.methods
       .claimPayout()
@@ -206,7 +247,7 @@ export class PayoutsService {
         kzteMint: this.solanaService.getKzteMint(),
         treasuryKzteAccount: new PublicKey(epoch.treasuryKzteAccount),
         claimerKzteAccount: new PublicKey(wallet.kzteTokenAccountAddress ?? ''),
-        claimerShareAccount: new PublicKey(position.buyerShareAccount),
+        claimerShareAccount: new PublicKey(shareAccountAddress),
         claimReceipt: PublicKey.findProgramAddressSync(
           [
             Buffer.from('claim_receipt'),
@@ -221,17 +262,17 @@ export class PayoutsService {
       .signers([claimerKeypair])
       .rpc();
 
-    const payoutMode =
-      investorPosition.payoutMode?.energyPoints !== undefined
-        ? 'ENERGY_POINTS'
-        : 'KZTE';
-
+    const payoutMode: 'KZTE' = 'KZTE';
     let energyPointsMintTx: string | null = null;
 
-    if (payoutMode === 'ENERGY_POINTS') {
+    if (energyPointsClaimAmount > 0) {
+      if (!wallet.energyPointsTokenAccountAddress) {
+        throw new Error('User ENERGY_POINTS token account is missing');
+      }
+
       const mintResult = await this.energyPointsService.mintEnergyPointsToUser({
         recipientTokenAccount: wallet.energyPointsTokenAccountAddress,
-        amountBaseUnits: BigInt(claimedAmountKzte),
+        amountBaseUnits: BigInt(energyPointsClaimAmount),
       });
 
       energyPointsMintTx = mintResult.tx;
@@ -245,9 +286,15 @@ export class PayoutsService {
         claimReceiptPda: claimReceiptPda.toBase58(),
         claimerWalletAddress: wallet.custodialWalletAddress,
         claimerKzteAccount: wallet.kzteTokenAccountAddress ?? '',
-        claimerShareAccount: position.buyerShareAccount,
-        claimedAmountKzte,
-        payoutMode,
+        claimerShareAccount: shareAccountAddress,
+        claimedAmountKzte: kzteClaimAmount,
+        claimedAmountEnergyPoints: energyPointsClaimAmount,
+        payoutMode:
+          kzteClaimAmount > 0 && energyPointsClaimAmount > 0
+            ? 'KZTE'
+            : energyPointsClaimAmount > 0
+              ? 'ENERGY_POINTS'
+              : 'KZTE',
         claimTx: tx,
         energyPointsMintTx,
       },
@@ -257,7 +304,8 @@ export class PayoutsService {
       assetId: asset.assetId,
       epochIndex: epoch.epochIndex,
       claimReceiptPda: claimReceiptPda.toBase58(),
-      claimedAmountKzte,
+      kzteClaimAmount,
+      energyPointsClaimAmount,
       payoutMode,
       tx,
       energyPointsMintTx,
