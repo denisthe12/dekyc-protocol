@@ -45,6 +45,11 @@ enum EnergyOtcListingStatus {
   CANCELLED
 }
 
+enum EnergyPositionPayoutMode {
+  KZTE
+  ENERGY_POINTS
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -162,6 +167,8 @@ model EnergyInvestorPosition {
   totalSharesPurchased  Int                  @default(0)
   totalKzteSpent        Int                  @default(0)
   averagePricePerShare  Int                  @default(0)
+
+  payoutMode            EnergyPositionPayoutMode @default(KZTE)
 
   lastPurchaseTx        String?              @db.VarChar(128)
   status                EnergyPositionStatus @default(ACTIVE)

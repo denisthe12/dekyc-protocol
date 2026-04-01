@@ -196,6 +196,7 @@ export class EnergyBlockchainService {
     energyUserId: string;
     assetId: string;
     shareAmount: number;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
   }) {
     const provider = this.anchorService.provider;
     const program = this.anchorService.program;
@@ -264,6 +265,7 @@ export class EnergyBlockchainService {
       buyerShareAccount: buyerShareAccount.address.toBase58(),
       purchasedShares: params.shareAmount,
       totalKzteSpent,
+      payoutMode: params.payoutMode,
       tx,
     });
 

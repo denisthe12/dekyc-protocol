@@ -148,11 +148,23 @@
   },
   "BuySharesDialog": {
     "title": "Buy shares",
-    "description": "Choose quantity, payout mode and confirm the action with your password.",
-    "quantity": "Quantity",
+    "description": "Choose share quantity, payout mode and confirm the action with your password.",
+    "quantity": "Share quantity",
+    "quantityPlaceholder": "Enter share quantity",
     "payoutMode": "Payout mode",
     "totalPrice": "Total price",
     "continue": "Continue",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "confirmTitle": "Confirm share purchase",
+    "confirmDescription": "Confirm purchase of {quantity} shares with payout mode {payoutMode}.",
+    "modes": {
+      "kzte": "KZTE",
+      "energyPoints": "Energy points"
+    },
+    "errors": {
+      "invalidQuantity": "Enter a valid share quantity.",
+      "sessionNotFound": "Energy session not found.",
+      "buyFailed": "Failed to complete purchase."
+    }
   }
 }

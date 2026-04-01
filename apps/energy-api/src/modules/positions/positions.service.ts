@@ -22,6 +22,7 @@ export class PositionsService {
     buyerShareAccount: string;
     purchasedShares: number;
     totalKzteSpent: number;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
     tx: string;
   }) {
     const existing = await this.prisma.energyInvestorPosition.findUnique({
@@ -46,6 +47,7 @@ export class PositionsService {
           buyerShareAccount: params.buyerShareAccount,
           totalSharesPurchased: params.purchasedShares,
           totalKzteSpent: params.totalKzteSpent,
+          payoutMode: params.payoutMode,
           averagePricePerShare: Math.floor(
             params.totalKzteSpent / params.purchasedShares,
           ),
@@ -73,6 +75,7 @@ export class PositionsService {
         buyerShareAccount: params.buyerShareAccount,
         totalSharesPurchased: nextTotalShares,
         totalKzteSpent: nextTotalSpent,
+        payoutMode: params.payoutMode,
         averagePricePerShare: nextAveragePrice,
         lastPurchaseTx: params.tx,
         status: 'ACTIVE',

@@ -149,10 +149,22 @@
   "BuySharesDialog": {
     "title": "Покупка долей",
     "description": "Укажите количество долей, режим выплат и подтвердите действие паролем.",
-    "quantity": "Количество",
+    "quantity": "Количество долей",
+    "quantityPlaceholder": "Введите количество долей",
     "payoutMode": "Режим выплат",
     "totalPrice": "Итоговая цена",
     "continue": "Продолжить",
-    "cancel": "Отмена"
+    "cancel": "Отмена",
+    "confirmTitle": "Подтвердите покупку долей",
+    "confirmDescription": "Подтвердите покупку {quantity} долей с режимом выплат {payoutMode}.",
+    "modes": {
+      "kzte": "KZTE",
+      "energyPoints": "Энергетические баллы"
+    },
+    "errors": {
+      "invalidQuantity": "Введите корректное количество долей.",
+      "sessionNotFound": "Сессия energy не найдена.",
+      "buyFailed": "Не удалось выполнить покупку."
+    }
   }
 }

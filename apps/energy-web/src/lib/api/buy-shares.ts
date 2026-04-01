@@ -4,6 +4,7 @@ export async function buyDemoShares(params: {
   energyUserId: string;
   assetId: string;
   shareAmount: number;
+  payoutMode: 'KZTE' | 'ENERGY_POINTS';
 }) {
   const response = await fetch(`${ENERGY_API_BASE_URL}/energy/buy-demo-shares`, {
     method: 'POST',
@@ -14,6 +15,7 @@ export async function buyDemoShares(params: {
       energyUserId: params.energyUserId,
       assetId: params.assetId,
       shareAmount: params.shareAmount,
+      payoutMode: params.payoutMode,
     }),
   });
 

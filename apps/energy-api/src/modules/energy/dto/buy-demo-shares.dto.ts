@@ -1,4 +1,4 @@
-import { IsInt, IsPositive, IsString, Min } from 'class-validator';
+import { IsIn, IsInt, IsString, Min } from 'class-validator';
 
 export class BuyDemoSharesDto {
   @IsString()
@@ -10,4 +10,8 @@ export class BuyDemoSharesDto {
   @IsInt()
   @Min(1)
   shareAmount!: number;
+
+  @IsString()
+  @IsIn(['KZTE', 'ENERGY_POINTS'])
+  payoutMode!: 'KZTE' | 'ENERGY_POINTS';
 }

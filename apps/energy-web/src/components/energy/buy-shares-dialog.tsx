@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogTitle,
@@ -32,6 +33,8 @@ export function BuySharesDialog({
   pricePerShareKzte,
   onSuccess,
 }: BuySharesDialogProps) {
+  const t = useTranslations('BuySharesDialog');
+
   const [quantity, setQuantity] = useState('1');
   const [payoutMode, setPayoutMode] = useState<PayoutMode>('KZTE');
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -60,7 +63,7 @@ export function BuySharesDialog({
 
   function handleContinue(): void {
     if (!Number.isInteger(quantityNumber) || quantityNumber <= 0) {
-      setError('Enter a valid share quantity');
+      setError(t('errors.invalidQuantity'));
       return;
     }
 
@@ -75,7 +78,7 @@ export function BuySharesDialog({
 
       const session = loadEnergySession();
       if (!session) {
-        throw new Error('Energy session not found');
+        throw new Error(t('errors.sessionNotFound'));
       }
 
       const me = await fetchEnergyMe(session.accessToken);
@@ -84,13 +87,14 @@ export function BuySharesDialog({
         energyUserId: me.id,
         assetId,
         shareAmount: quantityNumber,
+        payoutMode,
       });
 
       await onSuccess?.();
       setConfirmOpen(false);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Buy action failed');
+      setError(err instanceof Error ? err.message : t('errors.buyFailed'));
       throw err;
     } finally {
       setSubmitting(false);
@@ -104,47 +108,47 @@ export function BuySharesDialog({
           <div className="space-y-5">
             <div>
               <DialogTitle className="text-xl font-semibold">
-                Buy shares
+                {t('title')}
               </DialogTitle>
               <DialogDescription className="mt-2 text-sm text-zinc-400">
-                Choose quantity, payout mode and confirm the purchase with your action password.
+                {t('description')}
               </DialogDescription>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm text-zinc-400">Quantity</label>
+              <label className="block text-sm text-zinc-400">{t('quantity')}</label>
               <Input
                 type="number"
                 min={1}
                 step={1}
                 value={quantity}
                 onChange={(event) => setQuantity(event.target.value)}
-                placeholder="Enter share quantity"
+                placeholder={t('quantityPlaceholder')}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm text-zinc-400">Payout mode</label>
+              <label className="block text-sm text-zinc-400">{t('payoutMode')}</label>
               <div className="flex gap-2">
                 <Button
                   type="button"
                   variant={payoutMode === 'KZTE' ? 'default' : 'outline'}
                   onClick={() => setPayoutMode('KZTE')}
                 >
-                  KZTE
+                  {t('modes.kzte')}
                 </Button>
                 <Button
                   type="button"
                   variant={payoutMode === 'ENERGY_POINTS' ? 'default' : 'outline'}
                   onClick={() => setPayoutMode('ENERGY_POINTS')}
                 >
-                  ENERGY_POINTS
+                  {t('modes.energyPoints')}
                 </Button>
               </div>
             </div>
 
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-300">
-              Total price: <span className="font-semibold">{totalPriceLabel} KZTE</span>
+              {t('totalPrice')}: <span className="font-semibold">{totalPriceLabel} KZTE</span>
             </div>
 
             {error ? (
@@ -155,10 +159,10 @@ export function BuySharesDialog({
 
             <div className="flex gap-2">
               <Button type="button" onClick={handleContinue} disabled={submitting}>
-                Continue
+                {t('continue')}
               </Button>
               <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
-                Cancel
+                {t('cancel')}
               </Button>
             </div>
           </div>
@@ -169,8 +173,11 @@ export function BuySharesDialog({
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
         onConfirm={handleConfirmedBuy}
-        title="Confirm share purchase"
-        description={`Confirm purchase of ${quantityNumber || 0} shares with payout mode ${payoutMode}.`}
+        title={t('confirmTitle')}
+        description={t('confirmDescription', {
+          quantity: quantityNumber || 0,
+          payoutMode: payoutMode === 'KZTE' ? t('modes.kzte') : t('modes.energyPoints'),
+        })}
       />
     </>
   );
