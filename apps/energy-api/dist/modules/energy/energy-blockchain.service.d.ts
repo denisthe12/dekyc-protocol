@@ -43,6 +43,7 @@ export declare class EnergyBlockchainService {
         energyUserId: string;
         assetId: string;
         shareAmount: number;
+        payoutMode: 'KZTE' | 'ENERGY_POINTS';
     }): Promise<{
         assetId: string;
         assetPda: string;
@@ -68,7 +69,15 @@ export declare class EnergyBlockchainService {
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         };
+    }>;
+    getInvestorPosition(params: {
+        assetPda: string;
+        investorWallet: string;
+    }): Promise<{
+        investorPositionPda: string;
+        investorPosition: any;
     }>;
 }

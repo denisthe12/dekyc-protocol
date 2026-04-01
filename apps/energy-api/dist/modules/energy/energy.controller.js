@@ -19,6 +19,7 @@ const energy_assets_service_1 = require("../energy-assets/energy-assets.service"
 const buy_demo_shares_dto_1 = require("./dto/buy-demo-shares.dto");
 const positions_service_1 = require("../positions/positions.service");
 const reconcile_position_dto_1 = require("./dto/reconcile-position.dto");
+const common_2 = require("@nestjs/common");
 let EnergyController = class EnergyController {
     constructor(energyBlockchainService, energyAssetsService, positionsService) {
         this.energyBlockchainService = energyBlockchainService;
@@ -50,6 +51,12 @@ let EnergyController = class EnergyController {
     }
     async getPortfolio(energyUserId) {
         return this.positionsService.getPortfolio(energyUserId);
+    }
+    async getInvestorPosition(assetPda, investorWallet) {
+        return this.energyBlockchainService.getInvestorPosition({
+            assetPda,
+            investorWallet,
+        });
     }
 };
 exports.EnergyController = EnergyController;
@@ -98,6 +105,14 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], EnergyController.prototype, "getPortfolio", null);
+__decorate([
+    (0, common_1.Get)('investor-position'),
+    __param(0, (0, common_2.Query)('assetPda')),
+    __param(1, (0, common_2.Query)('investorWallet')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], EnergyController.prototype, "getInvestorPosition", null);
 exports.EnergyController = EnergyController = __decorate([
     (0, common_1.Controller)('energy'),
     __metadata("design:paramtypes", [energy_blockchain_service_1.EnergyBlockchainService,

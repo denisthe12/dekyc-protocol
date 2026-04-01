@@ -37,6 +37,7 @@ export declare class JudgeService {
                 kzteTokenAccountAddress: string | null;
                 energyPointsAccountAddress: string | null;
                 custodialWalletSecretJson: import("prisma/generated/client/runtime/library").JsonValue | null;
+                energyPointsTokenAccountAddress: string | null;
                 walletStatus: import("prisma/generated/client").$Enums.EnergyWalletStatus;
                 initialKzteAirdropped: boolean;
                 initialKzteAirdropTx: string | null;
@@ -61,6 +62,7 @@ export declare class JudgeService {
             assetId: string;
             assetPda: string;
             shareMintAddress: string;
+            payoutMode: string;
             treasuryShareAccount: string;
             treasuryKzteAccount: string;
             issuerEnergyUserId: string | null;
@@ -72,7 +74,6 @@ export declare class JudgeService {
             pricePerShareKzte: number;
             investorBps: number;
             operatorBps: number;
-            payoutMode: string;
             registryPda: string;
             proofRootHash: string;
             metadataUriHash: string;
@@ -97,6 +98,7 @@ export declare class JudgeService {
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         }[];
         epochs: {

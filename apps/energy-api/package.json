@@ -7,7 +7,8 @@
     "start:dev": "nest start --watch --port 3201",
     "build": "nest build",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "backfill:energy-points-wallets": "ts-node -r tsconfig-paths/register test-scripts/backfill-energy-points-wallets.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",
@@ -37,7 +38,7 @@
     "@nestjs/testing": "^11.0.1",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.10.7",
+    "@types/node": "^22.19.15",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",

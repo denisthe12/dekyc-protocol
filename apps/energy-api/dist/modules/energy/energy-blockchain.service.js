@@ -129,7 +129,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
         const buyerKeypair = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(secret));
         const buyerShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, backendSigner, new web3_js_1.PublicKey(asset.shareMintAddress), buyerKeypair.publicKey, false, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const tx = await program.methods
-            .buyShares(new anchor.BN(params.shareAmount))
+            .buyShares(new anchor.BN(params.shareAmount), params.payoutMode === 'KZTE' ? { kzte: {} } : { energyPoints: {} })
             .accounts({
             buyer: buyerKeypair.publicKey,
             energyAsset: new web3_js_1.PublicKey(asset.assetPda),
@@ -140,6 +140,12 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             buyerKzteAccount: new web3_js_1.PublicKey(wallet.kzteTokenAccountAddress ?? ''),
             buyerShareAccount: buyerShareAccount.address,
             tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID,
+            investorPosition: web3_js_1.PublicKey.findProgramAddressSync([
+                Buffer.from('investor_position'),
+                new web3_js_1.PublicKey(asset.assetPda).toBuffer(),
+                buyerKeypair.publicKey.toBuffer(),
+            ], program.programId)[0],
+            systemProgram: anchor.web3.SystemProgram.programId,
         })
             .signers([buyerKeypair])
             .rpc();
@@ -155,6 +161,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             buyerShareAccount: buyerShareAccount.address.toBase58(),
             purchasedShares: params.shareAmount,
             totalKzteSpent,
+            payoutMode: params.payoutMode,
             tx,
         });
         return {
@@ -167,6 +174,19 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             treasuryShareAccount: asset.treasuryShareAccount,
             tx,
             position,
+        };
+    }
+    async getInvestorPosition(params) {
+        const program = this.anchorService.program;
+        const [investorPositionPda] = web3_js_1.PublicKey.findProgramAddressSync([
+            Buffer.from('investor_position'),
+            new web3_js_1.PublicKey(params.assetPda).toBuffer(),
+            new web3_js_1.PublicKey(params.investorWallet).toBuffer(),
+        ], program.programId);
+        const investorPosition = await program.account.investorPosition.fetchNullable(investorPositionPda);
+        return {
+            investorPositionPda: investorPositionPda.toBase58(),
+            investorPosition,
         };
     }
 };

@@ -30,6 +30,44 @@
           "writable": true
         },
         {
+          "name": "investor_position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "energy_asset"
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              }
+            ]
+          }
+        },
+        {
           "name": "kzte_mint",
           "writable": true
         },
@@ -55,12 +93,24 @@
         },
         {
           "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
           "name": "share_amount",
           "type": "u64"
+        },
+        {
+          "name": "payout_mode",
+          "type": {
+            "defined": {
+              "name": "PayoutMode"
+            }
+          }
         }
       ]
     },
@@ -91,7 +141,48 @@
           "writable": true
         },
         {
+          "name": "investor_position",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  110,
+                  118,
+                  101,
+                  115,
+                  116,
+                  111,
+                  114,
+                  95,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "energy_asset"
+              },
+              {
+                "kind": "account",
+                "path": "claimer"
+              }
+            ]
+          }
+        },
+        {
           "name": "kzte_mint",
+          "writable": true
+        },
+        {
+          "name": "energy_points_mint",
           "writable": true
         },
         {
@@ -100,6 +191,10 @@
         },
         {
           "name": "claimer_kzte_account",
+          "writable": true
+        },
+        {
+          "name": "claimer_energy_points_account",
           "writable": true
         },
         {
@@ -644,6 +739,19 @@
       ]
     },
     {
+      "name": "InvestorPosition",
+      "discriminator": [
+        145,
+        143,
+        236,
+        150,
+        229,
+        40,
+        195,
+        88
+      ]
+    },
+    {
       "name": "Listing",
       "discriminator": [
         218,
@@ -952,6 +1060,38 @@
           {
             "name": "treasury_share_account",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InvestorPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "asset",
+            "type": "pubkey"
+          },
+          {
+            "name": "investor",
+            "type": "pubkey"
+          },
+          {
+            "name": "payout_mode",
+            "type": {
+              "defined": {
+                "name": "PayoutMode"
+              }
+            }
+          },
+          {
+            "name": "total_shares_bought",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }

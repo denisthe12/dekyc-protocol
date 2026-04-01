@@ -12,6 +12,7 @@ const solana_controller_1 = require("./solana.controller");
 const solana_service_1 = require("./solana.service");
 const token_2022_service_1 = require("./token-2022.service");
 const anchor_service_1 = require("./anchor.service");
+const energy_points_service_1 = require("./energy-points.service");
 let SolanaModule = class SolanaModule {
 };
 exports.SolanaModule = SolanaModule;
@@ -21,6 +22,7 @@ exports.SolanaModule = SolanaModule = __decorate([
         providers: [
             solana_service_1.SolanaService,
             token_2022_service_1.Token2022Service,
+            energy_points_service_1.EnergyPointsService,
             {
                 provide: anchor_service_1.AnchorService,
                 useFactory: async (solanaService) => {
@@ -29,7 +31,7 @@ exports.SolanaModule = SolanaModule = __decorate([
                 inject: [solana_service_1.SolanaService],
             },
         ],
-        exports: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service, anchor_service_1.AnchorService],
+        exports: [solana_service_1.SolanaService, token_2022_service_1.Token2022Service, anchor_service_1.AnchorService, energy_points_service_1.EnergyPointsService],
     })
 ], SolanaModule);
 //# sourceMappingURL=solana.module.js.map

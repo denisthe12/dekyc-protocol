@@ -27,4 +27,9 @@ __decorate([
     (0, class_validator_1.Min)(1),
     __metadata("design:type", Number)
 ], BuyDemoSharesDto.prototype, "shareAmount", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['KZTE', 'ENERGY_POINTS']),
+    __metadata("design:type", String)
+], BuyDemoSharesDto.prototype, "payoutMode", void 0);
 //# sourceMappingURL=buy-demo-shares.dto.js.map

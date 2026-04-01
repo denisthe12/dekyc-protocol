@@ -3,9 +3,9 @@ use anchor_spl::token_interface::{
     transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked,
 };
 
-use crate::constants::ENERGY_ASSET_SEED;
+use crate::constants::{ENERGY_ASSET_SEED, INVESTOR_POSITION_SEED};
 use crate::errors::TokenizationError;
-use crate::state::EnergyAsset;
+use crate::state::{EnergyAsset, InvestorPosition, PayoutMode};
 
 #[derive(Accounts)]
 pub struct BuyShares<'info> {
@@ -15,10 +15,26 @@ pub struct BuyShares<'info> {
     #[account(mut)]
     pub energy_asset: Account<'info, EnergyAsset>,
 
+    #[account(
+        init_if_needed,
+        payer = buyer,
+        space = 8 + InvestorPosition::LEN,
+        seeds = [
+            INVESTOR_POSITION_SEED,
+            energy_asset.key().as_ref(),
+            buyer.key().as_ref()
+        ],
+        bump
+    )]
+    pub investor_position: Account<'info, InvestorPosition>,
+
     #[account(mut)]
     pub kzte_mint: InterfaceAccount<'info, Mint>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        constraint = energy_asset.share_mint == share_mint.key()
+    )]
     pub share_mint: InterfaceAccount<'info, Mint>,
 
     #[account(
@@ -40,49 +56,42 @@ pub struct BuyShares<'info> {
     pub buyer_share_account: InterfaceAccount<'info, TokenAccount>,
 
     pub token_program: Interface<'info, TokenInterface>,
+    pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
-    // Сначала читаем все нужные данные из asset без долгого mutable borrow
+pub fn handler(
+    ctx: Context<BuyShares>,
+    share_amount: u64,
+    payout_mode: PayoutMode,
+) -> Result<()> {
+    require!(share_amount > 0, TokenizationError::InvalidShareAmount);
+
+    let price_per_share_kzte = ctx.accounts.energy_asset.price_per_share_kzte;
     let asset_id = ctx.accounts.energy_asset.asset_id;
     let asset_bump = ctx.accounts.energy_asset.bump;
-    let price_per_share_kzte = ctx.accounts.energy_asset.price_per_share_kzte;
-    let issued_shares = ctx.accounts.energy_asset.issued_shares;
-    let sold_shares = ctx.accounts.energy_asset.sold_shares;
-    let asset_account_info = ctx.accounts.energy_asset.to_account_info();
 
     let total_cost = share_amount
         .checked_mul(price_per_share_kzte)
         .ok_or(TokenizationError::MathOverflow)?;
 
-    require!(
-        sold_shares
-            .checked_add(share_amount)
-            .ok_or(TokenizationError::MathOverflow)?
-            <= issued_shares,
-        TokenizationError::MathOverflow
-    );
-
-    // 1. Перевод KZTE от покупателя в treasury
-    let kzte_transfer_accounts = TransferChecked {
+    let buyer_to_treasury_accounts = TransferChecked {
         from: ctx.accounts.buyer_kzte_account.to_account_info(),
         mint: ctx.accounts.kzte_mint.to_account_info(),
         to: ctx.accounts.treasury_kzte_account.to_account_info(),
         authority: ctx.accounts.buyer.to_account_info(),
     };
 
-    let kzte_transfer_ctx = CpiContext::new(
+    let buyer_to_treasury_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
-        kzte_transfer_accounts,
+        buyer_to_treasury_accounts,
     );
 
     transfer_checked(
-        kzte_transfer_ctx,
+        buyer_to_treasury_ctx,
         total_cost,
         ctx.accounts.kzte_mint.decimals,
     )?;
 
-    // 2. Перевод share tokens из treasury проекта покупателю
     let asset_id_bytes = asset_id.to_le_bytes();
     let signer_seeds: &[&[u8]] = &[
         ENERGY_ASSET_SEED,
@@ -91,31 +100,40 @@ pub fn handler(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
     ];
     let signer_binding = [signer_seeds];
 
-    let share_transfer_accounts = TransferChecked {
+    let treasury_to_buyer_accounts = TransferChecked {
         from: ctx.accounts.treasury_share_account.to_account_info(),
         mint: ctx.accounts.share_mint.to_account_info(),
         to: ctx.accounts.buyer_share_account.to_account_info(),
-        authority: asset_account_info,
+        authority: ctx.accounts.energy_asset.to_account_info(),
     };
 
-    let share_transfer_ctx = CpiContext::new_with_signer(
+    let treasury_to_buyer_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
-        share_transfer_accounts,
+        treasury_to_buyer_accounts,
         &signer_binding,
     );
 
     transfer_checked(
-        share_transfer_ctx,
+        treasury_to_buyer_ctx,
         share_amount,
         ctx.accounts.share_mint.decimals,
     )?;
 
-    // Только теперь берём mutable borrow для обновления состояния
     let asset = &mut ctx.accounts.energy_asset;
     asset.sold_shares = asset
         .sold_shares
         .checked_add(share_amount)
         .ok_or(TokenizationError::MathOverflow)?;
+
+    let investor_position = &mut ctx.accounts.investor_position;
+    investor_position.asset = ctx.accounts.energy_asset.key();
+    investor_position.investor = ctx.accounts.buyer.key();
+    investor_position.payout_mode = payout_mode;
+    investor_position.total_shares_bought = investor_position
+        .total_shares_bought
+        .checked_add(share_amount)
+        .ok_or(TokenizationError::MathOverflow)?;
+    investor_position.bump = ctx.bumps.investor_position;
 
     Ok(())
 }

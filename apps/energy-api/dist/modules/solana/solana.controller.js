@@ -16,20 +16,24 @@ exports.SolanaController = void 0;
 const common_1 = require("@nestjs/common");
 const solana_service_1 = require("./solana.service");
 const token_2022_service_1 = require("./token-2022.service");
+const energy_points_service_1 = require("./energy-points.service");
 let SolanaController = class SolanaController {
-    constructor(solanaService, token2022Service) {
+    constructor(solanaService, token2022Service, energyPointsService) {
         this.solanaService = solanaService;
         this.token2022Service = token2022Service;
+        this.energyPointsService = energyPointsService;
     }
     async getStatus() {
         const signer = await this.solanaService.getSignerStatus();
         const kzte = await this.token2022Service.getKzteMintStatus();
+        const energyPoints = await this.energyPointsService.getEnergyPointsMintStatus();
         return {
             rpcUrl: signer.rpcUrl,
             signerAddress: signer.signerAddress,
             signerBalanceSol: signer.signerBalanceSol,
             kzte,
             tokenizationProgramId: this.solanaService.getProgramId().toBase58(),
+            energyPoints,
         };
     }
     async createKzteMint() {
@@ -39,6 +43,9 @@ let SolanaController = class SolanaController {
         return this.token2022Service.mintKzteToSigner({
             amountKzte: body?.amountKzte,
         });
+    }
+    async createEnergyPointsMint() {
+        return this.energyPointsService.createEnergyPointsMint();
     }
 };
 exports.SolanaController = SolanaController;
@@ -61,9 +68,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SolanaController.prototype, "mintKzteToSigner", null);
+__decorate([
+    (0, common_1.Post)('energy-points/init'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], SolanaController.prototype, "createEnergyPointsMint", null);
 exports.SolanaController = SolanaController = __decorate([
     (0, common_1.Controller)('solana'),
     __metadata("design:paramtypes", [solana_service_1.SolanaService,
-        token_2022_service_1.Token2022Service])
+        token_2022_service_1.Token2022Service,
+        energy_points_service_1.EnergyPointsService])
 ], SolanaController);
 //# sourceMappingURL=solana.controller.js.map

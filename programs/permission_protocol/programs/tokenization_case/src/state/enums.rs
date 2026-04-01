@@ -9,7 +9,7 @@ pub enum AssetStatus {
     Closed,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, InitSpace)]
 pub enum PayoutMode {
     Kzte,
     EnergyPoints,

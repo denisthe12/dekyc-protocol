@@ -47,8 +47,12 @@ pub mod tokenization_case {
         instructions::issue_shares::handler(ctx)
     }
 
-    pub fn buy_shares(ctx: Context<BuyShares>, share_amount: u64) -> Result<()> {
-        instructions::buy_shares::handler(ctx, share_amount)
+    pub fn buy_shares(
+        ctx: Context<BuyShares>,
+        share_amount: u64,
+        payout_mode: PayoutMode,
+    ) -> Result<()> {
+        instructions::buy_shares::handler(ctx, share_amount, payout_mode)
     }
 
     pub fn create_revenue_epoch(

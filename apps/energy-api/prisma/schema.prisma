@@ -90,6 +90,7 @@ model EnergyUserWallet {
   custodialWalletAddress     String             @unique @db.VarChar(128)
   custodialWalletSecretJson  Json?
   kzteTokenAccountAddress    String?            @unique @db.VarChar(128)
+  energyPointsTokenAccountAddress String? @db.VarChar(128)
   energyPointsAccountAddress String?            @unique @db.VarChar(128)
   walletStatus               EnergyWalletStatus @default(PENDING)
   initialKzteAirdropped      Boolean            @default(false)

@@ -26,6 +26,7 @@ export declare class DevController {
                 kzteTokenAccountAddress: string | null;
                 energyPointsAccountAddress: string | null;
                 custodialWalletSecretJson: import("prisma/generated/client/runtime/library").JsonValue | null;
+                energyPointsTokenAccountAddress: string | null;
                 walletStatus: import("prisma/generated/client").$Enums.EnergyWalletStatus;
                 initialKzteAirdropped: boolean;
                 initialKzteAirdropTx: string | null;

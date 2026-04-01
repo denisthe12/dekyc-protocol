@@ -235,7 +235,10 @@ export class EnergyBlockchainService {
     );
 
     const tx = await program.methods
-      .buyShares(new anchor.BN(params.shareAmount))
+      .buyShares(
+        new anchor.BN(params.shareAmount),
+        params.payoutMode === 'KZTE' ? { kzte: {} } : { energyPoints: {} },
+      )
       .accounts({
         buyer: buyerKeypair.publicKey,
         energyAsset: new PublicKey(asset.assetPda),
@@ -248,6 +251,15 @@ export class EnergyBlockchainService {
         ),
         buyerShareAccount: buyerShareAccount.address,
         tokenProgram: TOKEN_2022_PROGRAM_ID,
+        investorPosition: PublicKey.findProgramAddressSync(
+          [
+            Buffer.from('investor_position'),
+            new PublicKey(asset.assetPda).toBuffer(),
+            buyerKeypair.publicKey.toBuffer(),
+          ],
+          program.programId,
+        )[0],
+        systemProgram: anchor.web3.SystemProgram.programId,
       })
       .signers([buyerKeypair])
       .rpc();
@@ -279,6 +291,31 @@ export class EnergyBlockchainService {
       treasuryShareAccount: asset.treasuryShareAccount,
       tx,
       position,
+    };
+  }
+
+  public async getInvestorPosition(params: {
+    assetPda: string;
+    investorWallet: string;
+  }) {
+    const program = this.anchorService.program;
+
+    const [investorPositionPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('investor_position'),
+        new PublicKey(params.assetPda).toBuffer(),
+        new PublicKey(params.investorWallet).toBuffer(),
+      ],
+      program.programId,
+    );
+
+    const investorPosition = await (program.account as any).investorPosition.fetchNullable(
+      investorPositionPda,
+    );
+
+    return {
+      investorPositionPda: investorPositionPda.toBase58(),
+      investorPosition,
     };
   }
 }

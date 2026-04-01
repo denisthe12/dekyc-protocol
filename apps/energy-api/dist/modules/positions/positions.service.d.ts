@@ -15,6 +15,7 @@ export declare class PositionsService {
         buyerShareAccount: string;
         purchasedShares: number;
         totalKzteSpent: number;
+        payoutMode: 'KZTE' | 'ENERGY_POINTS';
         tx: string;
     }): Promise<{
         id: string;
@@ -32,6 +33,7 @@ export declare class PositionsService {
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         lastPurchaseTx: string | null;
     }>;
     reconcilePosition(params: {
@@ -59,6 +61,7 @@ export declare class PositionsService {
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             lastPurchaseTx: string | null;
         };
     }>;
@@ -78,6 +81,7 @@ export declare class PositionsService {
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         lastPurchaseTx: string | null;
     }[]>;
 }

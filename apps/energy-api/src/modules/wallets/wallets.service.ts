@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Keypair } from '@solana/web3.js';
 import {
-  createAssociatedTokenAccount,
+  getOrCreateAssociatedTokenAccount,
   getAccount,
   mintTo,
   TOKEN_2022_PROGRAM_ID,
@@ -9,24 +9,33 @@ import {
 import { Prisma } from '../../../prisma/generated/client';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { SolanaService } from '@/modules/solana/solana.service';
+import { EnergyPointsService } from '../solana/energy-points.service';
 
 @Injectable()
 export class WalletsService {
   public constructor(
     private readonly prisma: PrismaService,
     private readonly solanaService: SolanaService,
+    private readonly energyPointsService: EnergyPointsService,
   ) {}
 
   public async ensureUserWallet(params: {
     energyUserId: string;
   }): Promise<void> {
+    console.log('WalletsService prisma exists:', !!this.prisma);
+    console.log('WalletsService solanaService exists:', !!this.solanaService);
+    console.log('WalletsService energyPointsService exists:', !!this.energyPointsService);
     const existing = await this.prisma.energyUserWallet.findUnique({
       where: {
         energyUserId: params.energyUserId,
       },
     });
 
-    if (existing?.custodialWalletSecretJson && existing.kzteTokenAccountAddress) {
+    if (
+      existing?.custodialWalletSecretJson &&
+      existing.kzteTokenAccountAddress &&
+      existing.energyPointsTokenAccountAddress
+    ) {
       return;
     }
 
@@ -53,32 +62,43 @@ export class WalletsService {
       userSecretJson = Array.from(userKeypair.secretKey) as Prisma.InputJsonValue;
     }
 
-    const kzteTokenAccount = await createAssociatedTokenAccount(
+    const kzteTokenAccount = await getOrCreateAssociatedTokenAccount(
       connection,
       signer,
       new (await import('@solana/web3.js')).PublicKey(mintAddress),
       userKeypair.publicKey,
+      false,
+      undefined,
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
 
-    const oneMillionKzteBaseUnits = BigInt(1000000 * 100);
+    const energyPointsAccount =
+      await this.energyPointsService.ensureUserEnergyPointsAccount(
+        walletAddress,
+      );
 
-    const mintTx = await mintTo(
-      connection,
-      signer,
-      new (await import('@solana/web3.js')).PublicKey(mintAddress),
-      kzteTokenAccount,
-      signer,
-      oneMillionKzteBaseUnits,
-      [],
-      undefined,
-      TOKEN_2022_PROGRAM_ID,
-    );
+    let mintTx: string | null = existing?.initialKzteAirdropTx ?? null;
+
+    if (!existing?.initialKzteAirdropped) {
+      const oneMillionKzteBaseUnits = BigInt(1000000 * 100);
+
+      mintTx = await mintTo(
+        connection,
+        signer,
+        new (await import('@solana/web3.js')).PublicKey(mintAddress),
+        kzteTokenAccount.address,
+        signer,
+        oneMillionKzteBaseUnits,
+        [],
+        undefined,
+        TOKEN_2022_PROGRAM_ID,
+      );
+    }
 
     await getAccount(
       connection,
-      kzteTokenAccount,
+      kzteTokenAccount.address,
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
@@ -90,7 +110,8 @@ export class WalletsService {
       update: {
         custodialWalletAddress: walletAddress,
         custodialWalletSecretJson: userSecretJson,
-        kzteTokenAccountAddress: kzteTokenAccount.toBase58(),
+        kzteTokenAccountAddress: kzteTokenAccount.address.toBase58(),
+        energyPointsTokenAccountAddress: energyPointsAccount.tokenAccountAddress,
         walletStatus: 'ACTIVE',
         initialKzteAirdropped: true,
         initialKzteAirdropTx: mintTx,
@@ -99,7 +120,8 @@ export class WalletsService {
         energyUserId: params.energyUserId,
         custodialWalletAddress: walletAddress,
         custodialWalletSecretJson: userSecretJson,
-        kzteTokenAccountAddress: kzteTokenAccount.toBase58(),
+        kzteTokenAccountAddress: kzteTokenAccount.address.toBase58(),
+        energyPointsTokenAccountAddress: energyPointsAccount.tokenAccountAddress,
         walletStatus: 'ACTIVE',
         initialKzteAirdropped: true,
         initialKzteAirdropTx: mintTx,

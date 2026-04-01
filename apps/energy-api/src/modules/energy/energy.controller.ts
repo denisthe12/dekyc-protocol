@@ -4,6 +4,7 @@ import { EnergyAssetsService } from '@/modules/energy-assets/energy-assets.servi
 import { BuyDemoSharesDto } from './dto/buy-demo-shares.dto';
 import { PositionsService } from '@/modules/positions/positions.service';
 import { ReconcilePositionDto } from './dto/reconcile-position.dto';
+import { Query } from '@nestjs/common';
 
 @Controller('energy')
 export class EnergyController {
@@ -52,5 +53,16 @@ export class EnergyController {
   @Get('portfolio/:energyUserId')
   public async getPortfolio(@Param('energyUserId') energyUserId: string) {
     return this.positionsService.getPortfolio(energyUserId);
+  }
+
+  @Get('investor-position')
+  public async getInvestorPosition(
+    @Query('assetPda') assetPda: string,
+    @Query('investorWallet') investorWallet: string,
+  ) {
+    return this.energyBlockchainService.getInvestorPosition({
+      assetPda,
+      investorWallet,
+    });
   }
 }

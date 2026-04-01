@@ -11,6 +11,7 @@ export declare class EnergyAssetsService {
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
+        payoutMode: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -22,7 +23,6 @@ export declare class EnergyAssetsService {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
         registryPda: string;
         proofRootHash: string;
         metadataUriHash: string;
@@ -39,6 +39,7 @@ export declare class EnergyAssetsService {
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
+        payoutMode: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -50,7 +51,6 @@ export declare class EnergyAssetsService {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
         registryPda: string;
         proofRootHash: string;
         metadataUriHash: string;

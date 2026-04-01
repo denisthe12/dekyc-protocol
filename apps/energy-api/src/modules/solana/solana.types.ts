@@ -11,3 +11,11 @@ export type KzteMintStatus = {
   supply: string | null;
   tokenProgram: string;
 };
+
+export type TokenMintStatus = {
+  exists: boolean;
+  mintAddress: string | null;
+  decimals: number | null;
+  supply: string | null;
+  tokenProgram: string;
+};
