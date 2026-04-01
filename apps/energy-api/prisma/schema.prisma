@@ -253,3 +253,13 @@ model EnergyOtcListing {
   @@index([buyerEnergyUserId])
   @@index([status])
 }
+
+model EnergyUserActionPassword {
+  id            String   @id @default(cuid())
+  energyUserId  String   @unique @db.VarChar(191)
+  passwordHash  String   @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([energyUserId])
+}

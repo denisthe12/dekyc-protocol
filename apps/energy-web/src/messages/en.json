@@ -125,5 +125,25 @@
       "OTC_LISTING_CREATED": "OTC listing created",
       "OTC_LISTING_FILLED": "OTC listing filled"
     }
+  },
+  "SettingsPage": {
+    "eyebrow": "Settings",
+    "title": "Action confirmation password",
+    "description": "This password is used to confirm sensitive actions: buying shares, claiming payouts and OTC operations.",
+    "loading": "Loading...",
+    "statusSet": "Password is already set.",
+    "statusNotSet": "Password is not set yet.",
+    "password": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordPlaceholder": "Enter password",
+    "confirmPasswordPlaceholder": "Repeat password",
+    "save": "Save password",
+    "saving": "Saving...",
+    "saved": "Password saved successfully.",
+    "errors": {
+      "required": "Fill in both password fields.",
+      "mismatch": "Passwords do not match.",
+      "saveFailed": "Failed to save password."
+    }
   }
 }

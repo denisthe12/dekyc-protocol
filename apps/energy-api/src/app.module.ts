@@ -14,6 +14,7 @@ import { JudgeModule } from '@/modules/judge/judge.module';
 import { OtcModule } from '@/modules/otc/otc.module';
 import { DevModule } from '@/modules/dev/dev.module';
 import { HistoryModule } from '@/modules/history/history.module';
+import { SettingsModule } from '@/modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { HistoryModule } from '@/modules/history/history.module';
     OtcModule,
     DevModule,
     HistoryModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

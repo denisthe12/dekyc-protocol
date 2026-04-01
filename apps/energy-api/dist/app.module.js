@@ -23,6 +23,7 @@ const judge_module_1 = require("./modules/judge/judge.module");
 const otc_module_1 = require("./modules/otc/otc.module");
 const dev_module_1 = require("./modules/dev/dev.module");
 const history_module_1 = require("./modules/history/history.module");
+const settings_module_1 = require("./modules/settings/settings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -42,6 +43,7 @@ exports.AppModule = AppModule = __decorate([
             otc_module_1.OtcModule,
             dev_module_1.DevModule,
             history_module_1.HistoryModule,
+            settings_module_1.SettingsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

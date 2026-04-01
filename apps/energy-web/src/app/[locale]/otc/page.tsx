@@ -7,6 +7,7 @@ import { fetchOtcListings, fillOtcListing, OtcListingItem } from '@/lib/api/otc'
 import { fetchEnergyMe } from '@/lib/api/energy';
 import { loadEnergySession } from '@/lib/session';
 import { formatKzte } from '@/lib/formatters';
+import { ConfirmActionDialog } from '@/components/security/confirm-action-dialog';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) {
@@ -27,6 +28,7 @@ export default function OtcPage() {
   const [buyingListingId, setBuyingListingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [confirmListingId, setConfirmListingId] = useState<string | null>(null);
 
   useEffect(() => {
     void loadPage();
@@ -192,25 +194,36 @@ export default function OtcPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                        {(() => {
+                      {(() => {
                         const isOwnListing = energyUserId === listing.sellerEnergyUserId;
                         const isBuying = buyingListingId === listing.listingId;
 
                         return (
+                          <>
                             <button
-                            type="button"
-                            onClick={() => void handleBuy(listing.listingId)}
-                            disabled={isBuying || isOwnListing}
-                            className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                              type="button"
+                              onClick={() => setConfirmListingId(listing.listingId)}
+                              disabled={isBuying || isOwnListing}
+                              className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                            {isBuying
+                              {isBuying
                                 ? t('buying')
                                 : isOwnListing
-                                ? t('ownListing')
-                                : t('buy')}
+                                  ? t('ownListing')
+                                  : t('buy')}
                             </button>
+
+                            <ConfirmActionDialog
+                              open={confirmListingId === listing.listingId}
+                              onClose={() => setConfirmListingId(null)}
+                              onConfirm={async () => {
+                                await handleBuy(listing.listingId);
+                              }}
+                              title="Confirm OTC purchase"
+                            />
+                          </>
                         );
-                        })()}
+                      })()}
 
                       {createTxUrl ? (
                         <a

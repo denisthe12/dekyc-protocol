@@ -125,5 +125,25 @@
       "OTC_LISTING_CREATED": "Создание OTC listing",
       "OTC_LISTING_FILLED": "Исполнение OTC listing"
     }
+  },
+  "SettingsPage": {
+    "eyebrow": "Настройки",
+    "title": "Пароль подтверждения действий",
+    "description": "Этот пароль используется для подтверждения чувствительных действий: покупки долей, claim выплат и OTC-операций.",
+    "loading": "Загрузка...",
+    "statusSet": "Пароль уже установлен.",
+    "statusNotSet": "Пароль пока не установлен.",
+    "password": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "confirmPasswordPlaceholder": "Повторите пароль",
+    "save": "Сохранить пароль",
+    "saving": "Сохранение...",
+    "saved": "Пароль успешно сохранён.",
+    "errors": {
+      "required": "Заполните оба поля пароля.",
+      "mismatch": "Пароли не совпадают.",
+      "saveFailed": "Не удалось сохранить пароль."
+    }
   }
 }
