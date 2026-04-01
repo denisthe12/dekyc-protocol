@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -13,24 +14,22 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button
-        type="button"
-        className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-400"
-      >
+      <Button type="button" variant="outline" size="sm">
         •••
-      </button>
+      </Button>
     );
   }
 
   const isDark = theme !== 'light';
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300 transition hover:bg-zinc-800 dark:border-zinc-800 dark:bg-zinc-900"
     >
       {isDark ? '🌙' : '☀️'}
-    </button>
+    </Button>
   );
 }
