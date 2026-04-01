@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import * as anchor from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
+import { EnergyPointsService } from '@/modules/solana/energy-points.service';
 import {
   getOrCreateAssociatedTokenAccount,
   TOKEN_2022_PROGRAM_ID,
+  getAccount,
 } from '@solana/spl-token';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { AnchorService } from '@/modules/solana/anchor.service';
@@ -15,6 +17,7 @@ export class PayoutsService {
     private readonly prisma: PrismaService,
     private readonly anchorService: AnchorService,
     private readonly solanaService: SolanaService,
+    private readonly energyPointsService: EnergyPointsService,
   ) {}
 
   public async createRevenueEpoch(params: {
@@ -123,6 +126,36 @@ export class PayoutsService {
       },
     });
 
+    if (!wallet.energyPointsTokenAccountAddress) {
+      throw new Error('User ENERGY_POINTS token account is missing');
+    }
+
+    const program = this.anchorService.program;
+    const provider = this.anchorService.provider;
+
+    const secret = wallet.custodialWalletSecretJson as number[] | null;
+    if (!secret) {
+      throw new Error('User custodial key is missing');
+    }
+
+    const claimerKeypair = anchor.web3.Keypair.fromSecretKey(
+      Uint8Array.from(secret),
+    );
+
+    const [investorPositionPda] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('investor_position'),
+        new PublicKey(asset.assetPda).toBuffer(),
+        claimerKeypair.publicKey.toBuffer(),
+      ],
+      program.programId,
+    );
+
+    const investorPosition = await (program.account as any).investorPosition.fetch(
+      investorPositionPda,
+    );
+
+
     const position = await this.prisma.energyInvestorPosition.findUniqueOrThrow({
       where: {
         energyUserId_energyAssetId: {
@@ -140,17 +173,6 @@ export class PayoutsService {
 
     console.log('SOL top-up result:', solTopUp);
 
-    const secret = wallet.custodialWalletSecretJson as number[] | null;
-    if (!secret) {
-      throw new Error('User custodial key is missing');
-    }
-
-    const claimerKeypair = anchor.web3.Keypair.fromSecretKey(
-      Uint8Array.from(secret),
-    );
-
-    const program = this.anchorService.program;
-
     const epochPda = new PublicKey(epoch.revenueEpochPda);
 
     const [claimReceiptPda] = PublicKey.findProgramAddressSync(
@@ -162,24 +184,58 @@ export class PayoutsService {
       program.programId,
     );
 
+    const claimerShareAccountInfo = await getAccount(
+      provider.connection,
+      new PublicKey(position.buyerShareAccount),
+      undefined,
+      TOKEN_2022_PROGRAM_ID,
+    );
+
+    const sharesOwned = Number(claimerShareAccountInfo.amount);
+    
+    const claimedAmountKzte =
+      position.totalSharesPurchased * epoch.amountPerShareKzte;
+
     const tx = await program.methods
       .claimPayout()
       .accounts({
         claimer: claimerKeypair.publicKey,
         energyAsset: new PublicKey(asset.assetPda),
-        revenueEpoch: epochPda,
+        revenueEpoch: new PublicKey(epoch.revenueEpochPda),
+        investorPosition: investorPositionPda,
         kzteMint: this.solanaService.getKzteMint(),
-        treasuryKzteAccount: new PublicKey(asset.treasuryKzteAccount),
+        treasuryKzteAccount: new PublicKey(epoch.treasuryKzteAccount),
         claimerKzteAccount: new PublicKey(wallet.kzteTokenAccountAddress ?? ''),
         claimerShareAccount: new PublicKey(position.buyerShareAccount),
-        claimReceipt: claimReceiptPda,
+        claimReceipt: PublicKey.findProgramAddressSync(
+          [
+            Buffer.from('claim_receipt'),
+            new PublicKey(epoch.revenueEpochPda).toBuffer(),
+            claimerKeypair.publicKey.toBuffer(),
+          ],
+          program.programId,
+        )[0],
         tokenProgram: TOKEN_2022_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
       })
       .signers([claimerKeypair])
       .rpc();
 
-    const claimedAmountKzte =
-      position.totalSharesPurchased * epoch.amountPerShareKzte;
+    const payoutMode =
+      investorPosition.payoutMode?.energyPoints !== undefined
+        ? 'ENERGY_POINTS'
+        : 'KZTE';
+
+    let energyPointsMintTx: string | null = null;
+
+    if (payoutMode === 'ENERGY_POINTS') {
+      const mintResult = await this.energyPointsService.mintEnergyPointsToUser({
+        recipientTokenAccount: wallet.energyPointsTokenAccountAddress,
+        amountBaseUnits: BigInt(claimedAmountKzte),
+      });
+
+      energyPointsMintTx = mintResult.tx;
+    }
 
     const claim = await this.prisma.energyPayoutClaim.create({
       data: {
@@ -191,7 +247,9 @@ export class PayoutsService {
         claimerKzteAccount: wallet.kzteTokenAccountAddress ?? '',
         claimerShareAccount: position.buyerShareAccount,
         claimedAmountKzte,
+        payoutMode,
         claimTx: tx,
+        energyPointsMintTx,
       },
     });
 
@@ -200,7 +258,9 @@ export class PayoutsService {
       epochIndex: epoch.epochIndex,
       claimReceiptPda: claimReceiptPda.toBase58(),
       claimedAmountKzte,
+      payoutMode,
       tx,
+      energyPointsMintTx,
       db: claim,
     };
   }

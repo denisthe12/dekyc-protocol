@@ -121,6 +121,7 @@ export declare class JudgeService {
             createdAt: Date;
             updatedAt: Date;
             energyAssetId: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             claimReceiptPda: string;
             claimerKzteAccount: string;
             claimerShareAccount: string;
@@ -128,6 +129,7 @@ export declare class JudgeService {
             claimerWalletAddress: string;
             claimedAmountKzte: number;
             claimTx: string | null;
+            energyPointsMintTx: string | null;
         }[];
     }>;
 }

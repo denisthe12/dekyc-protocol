@@ -182,19 +182,11 @@
           "writable": true
         },
         {
-          "name": "energy_points_mint",
-          "writable": true
-        },
-        {
           "name": "treasury_kzte_account",
           "writable": true
         },
         {
           "name": "claimer_kzte_account",
-          "writable": true
-        },
-        {
-          "name": "claimer_energy_points_account",
           "writable": true
         },
         {

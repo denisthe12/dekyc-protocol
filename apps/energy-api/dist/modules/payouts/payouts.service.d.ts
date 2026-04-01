@@ -1,3 +1,4 @@
+import { EnergyPointsService } from '@/modules/solana/energy-points.service';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { AnchorService } from '@/modules/solana/anchor.service';
 import { SolanaService } from '@/modules/solana/solana.service';
@@ -5,7 +6,8 @@ export declare class PayoutsService {
     private readonly prisma;
     private readonly anchorService;
     private readonly solanaService;
-    constructor(prisma: PrismaService, anchorService: AnchorService, solanaService: SolanaService);
+    private readonly energyPointsService;
+    constructor(prisma: PrismaService, anchorService: AnchorService, solanaService: SolanaService, energyPointsService: EnergyPointsService);
     createRevenueEpoch(params: {
         assetId: string;
         totalAmountKzte: number;
@@ -38,13 +40,16 @@ export declare class PayoutsService {
         epochIndex: number;
         claimReceiptPda: string;
         claimedAmountKzte: number;
+        payoutMode: string;
         tx: string;
+        energyPointsMintTx: string | null;
         db: {
             id: string;
             energyUserId: string;
             createdAt: Date;
             updatedAt: Date;
             energyAssetId: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             claimReceiptPda: string;
             claimerKzteAccount: string;
             claimerShareAccount: string;
@@ -52,6 +57,7 @@ export declare class PayoutsService {
             claimerWalletAddress: string;
             claimedAmountKzte: number;
             claimTx: string | null;
+            energyPointsMintTx: string | null;
         };
     }>;
     listEpochs(assetId: string): Promise<{
@@ -77,6 +83,7 @@ export declare class PayoutsService {
         createdAt: Date;
         updatedAt: Date;
         energyAssetId: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         claimReceiptPda: string;
         claimerKzteAccount: string;
         claimerShareAccount: string;
@@ -84,5 +91,6 @@ export declare class PayoutsService {
         claimerWalletAddress: string;
         claimedAmountKzte: number;
         claimTx: string | null;
+        energyPointsMintTx: string | null;
     }[]>;
 }

@@ -78,13 +78,16 @@ export class HistoryService {
     }
 
     for (const claim of claims) {
+      const payoutLabel =
+        claim.payoutMode === 'ENERGY_POINTS' ? 'ENERGY_POINTS' : 'KZTE';
+
       events.push({
         id: `claim-${claim.id}`,
         type: 'PAYOUT_CLAIM',
         title: 'Payout claim',
-        description: `Claimed ${claim.claimedAmountKzte} base units from revenue epoch.`,
+        description: `Claimed ${claim.claimedAmountKzte} base units in ${payoutLabel}.`,
         assetId: null,
-        txSignature: claim.claimTx,
+        txSignature: claim.energyPointsMintTx ?? claim.claimTx,
         createdAt: claim.createdAt.toISOString(),
       });
     }
