@@ -22,6 +22,7 @@ const payouts_module_1 = require("./modules/payouts/payouts.module");
 const judge_module_1 = require("./modules/judge/judge.module");
 const otc_module_1 = require("./modules/otc/otc.module");
 const dev_module_1 = require("./modules/dev/dev.module");
+const history_module_1 = require("./modules/history/history.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             judge_module_1.JudgeModule,
             otc_module_1.OtcModule,
             dev_module_1.DevModule,
+            history_module_1.HistoryModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

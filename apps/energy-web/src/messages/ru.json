@@ -110,5 +110,20 @@
     "history": "История",
     "settings": "Настройки",
     "logout": "Выйти"
+  },
+  "HistoryPage": {
+    "eyebrow": "История",
+    "title": "История операций",
+    "description": "Здесь отображаются все ключевые действия пользователя с ссылками на реальные транзакции в блокчейне.",
+    "empty": "История пока пуста.",
+    "openTx": "Открыть транзакцию",
+    "types": {
+      "INITIAL_KZTE_AIRDROP": "Начальное начисление KZTE",
+      "PRIMARY_BUY": "Покупка на primary market",
+      "REVENUE_EPOCH_CREATED": "Создание revenue epoch",
+      "PAYOUT_CLAIM": "Получение выплаты",
+      "OTC_LISTING_CREATED": "Создание OTC listing",
+      "OTC_LISTING_FILLED": "Исполнение OTC listing"
+    }
   }
 }

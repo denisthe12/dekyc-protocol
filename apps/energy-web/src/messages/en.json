@@ -110,5 +110,20 @@
     "history": "History",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "HistoryPage": {
+    "eyebrow": "History",
+    "title": "Activity history",
+    "description": "This page shows all key user actions with links to real blockchain transactions.",
+    "empty": "History is empty.",
+    "openTx": "Open transaction",
+    "types": {
+      "INITIAL_KZTE_AIRDROP": "Initial KZTE airdrop",
+      "PRIMARY_BUY": "Primary market purchase",
+      "REVENUE_EPOCH_CREATED": "Revenue epoch created",
+      "PAYOUT_CLAIM": "Payout claim",
+      "OTC_LISTING_CREATED": "OTC listing created",
+      "OTC_LISTING_FILLED": "OTC listing filled"
+    }
   }
 }

@@ -1,22 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-  }, [theme]);
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-400"
+      >
+        •••
+      </button>
+    );
+  }
+
+  const isDark = theme !== 'light';
 
   return (
     <button
-      onClick={() =>
-        setTheme(theme === 'dark' ? 'light' : 'dark')
-      }
-      className="rounded-lg bg-zinc-800 px-3 py-1.5 text-sm text-zinc-300 hover:bg-zinc-700"
+      type="button"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-300 transition hover:bg-zinc-800 dark:border-zinc-800 dark:bg-zinc-900"
     >
-      {theme === 'dark' ? '🌙' : '☀️'}
+      {isDark ? '🌙' : '☀️'}
     </button>
   );
 }

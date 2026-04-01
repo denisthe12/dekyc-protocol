@@ -13,6 +13,7 @@ import { PayoutsModule } from '@/modules/payouts/payouts.module';
 import { JudgeModule } from '@/modules/judge/judge.module';
 import { OtcModule } from '@/modules/otc/otc.module';
 import { DevModule } from '@/modules/dev/dev.module';
+import { HistoryModule } from '@/modules/history/history.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DevModule } from '@/modules/dev/dev.module';
     JudgeModule,
     OtcModule,
     DevModule,
+    HistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
