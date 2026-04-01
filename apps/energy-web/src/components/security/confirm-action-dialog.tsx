@@ -1,7 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Dialog, StyledDialogContent } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogTitle,
+  DialogDescription,
+  StyledDialogContent,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { loadEnergySession } from '@/lib/session';
@@ -15,11 +20,13 @@ export function ConfirmActionDialog({
   onClose,
   onConfirm,
   title = 'Confirm action',
+  description = 'Enter your action password to continue.',
 }: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   title?: string;
+  description?: string;
 }) {
   const [password, setPasswordValue] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +104,10 @@ export function ConfirmActionDialog({
     <Dialog open={open} onOpenChange={(nextOpen) => (!nextOpen ? onClose() : undefined)}>
       <StyledDialogContent>
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <DialogTitle className="text-xl font-semibold">{title}</DialogTitle>
+          <DialogDescription className="text-sm text-zinc-400">
+            {description}
+          </DialogDescription>
 
           {!statusChecked ? (
             <div className="text-sm text-zinc-400">Loading...</div>
@@ -116,11 +126,20 @@ export function ConfirmActionDialog({
               ) : null}
 
               <div className="flex gap-2">
-                <Button type="button" onClick={() => void handleConfirm()} disabled={submitting || !passwordIsSet}>
+                <Button
+                  type="button"
+                  onClick={() => void handleConfirm()}
+                  disabled={submitting || !passwordIsSet}
+                >
                   {submitting ? 'Confirming...' : 'Confirm'}
                 </Button>
 
-                <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={submitting}
+                >
                   Cancel
                 </Button>
               </div>

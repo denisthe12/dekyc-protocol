@@ -1,15 +1,19 @@
 'use client';
 
+import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { cn } from '@/lib/utils';
 
-export const Dialog = DialogPrimitive.Root;
-export const DialogTrigger = DialogPrimitive.Trigger;
-export const DialogContent = DialogPrimitive.Content;
-export const DialogOverlay = DialogPrimitive.Overlay;
+const Dialog = DialogPrimitive.Root;
+const DialogTrigger = DialogPrimitive.Trigger;
+const DialogContent = DialogPrimitive.Content;
+const DialogOverlay = DialogPrimitive.Overlay;
+const DialogTitle = DialogPrimitive.Title;
+const DialogDescription = DialogPrimitive.Description;
 
-export function StyledDialogContent({
+function StyledDialogContent({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof DialogContent>) {
   return (
@@ -22,7 +26,19 @@ export function StyledDialogContent({
           className,
         )}
         {...props}
-      />
+      >
+        {children}
+      </DialogContent>
     </DialogPrimitive.Portal>
   );
 }
+
+export {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogOverlay,
+  DialogTitle,
+  DialogDescription,
+  StyledDialogContent,
+};
