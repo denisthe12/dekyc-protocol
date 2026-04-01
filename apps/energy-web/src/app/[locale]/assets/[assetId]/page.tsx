@@ -11,6 +11,7 @@ import { loadEnergySession } from '@/lib/session';
 import { EnergyAssetListItem } from '@/lib/api/assets';
 import { formatKzte } from '@/lib/formatters';
 import { format } from 'path';
+import { BuySharesDialog } from '@/components/energy/buy-shares-dialog';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) {
@@ -36,6 +37,7 @@ export default function AssetDetailPage() {
   const [claimingEpochIndex, setClaimingEpochIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [claimMessage, setClaimMessage] = useState<string | null>(null);
+  const [buyOpen, setBuyOpen] = useState(false);
 
   const claimedEpochIndexes = useMemo(() => {
     return new Set(claims.map((_, index) => claims[index]).map(() => 0));
@@ -187,6 +189,15 @@ export default function AssetDetailPage() {
               </div>
             </div>
           </div>
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setBuyOpen(true)}
+              className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200"
+            >
+              Buy shares
+            </button>
+          </div>
         </section>
 
         <section className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
@@ -326,6 +337,15 @@ export default function AssetDetailPage() {
           )}
         </section>
       </div>
+      <BuySharesDialog
+        open={buyOpen}
+        onClose={() => setBuyOpen(false)}
+        assetId={asset.assetId}
+        pricePerShareKzte={asset.pricePerShareKzte}
+        onSuccess={async () => {
+          await loadPage();
+        }}
+      />
     </main>
   );
 }

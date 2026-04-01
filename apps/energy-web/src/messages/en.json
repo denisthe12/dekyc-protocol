@@ -145,5 +145,14 @@
       "mismatch": "Passwords do not match.",
       "saveFailed": "Failed to save password."
     }
+  },
+  "BuySharesDialog": {
+    "title": "Buy shares",
+    "description": "Choose quantity, payout mode and confirm the action with your password.",
+    "quantity": "Quantity",
+    "payoutMode": "Payout mode",
+    "totalPrice": "Total price",
+    "continue": "Continue",
+    "cancel": "Cancel"
   }
 }
