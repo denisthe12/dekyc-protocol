@@ -79,7 +79,23 @@
     "metadataHash": "Metadata hash",
     "canonicalJson": "Canonical JSON",
     "openExplorer": "Open in Explorer",
-    "empty": "No data"
+    "empty": "No data",
+    "createEpochTitle": "Create revenue epoch",
+    "createEpochDescription": "The judge can manually create a revenue epoch for a selected asset and immediately verify the claim flow.",
+    "createEpochButton": "Create epoch",
+    "creatingEpoch": "Creating epoch...",
+    "assetSelect": "Select asset",
+    "selectedAssetShares": "Total shares",
+    "selectedAssetPrice": "Price per share",
+    "epochAmount": "Epoch amount",
+    "epochAmountPlaceholder": "Enter epoch amount in KZTE",
+    "epochCreatedSuccess": "Revenue epoch created successfully.",
+    "cancel": "Cancel",
+    "errors": {
+      "assetRequired": "Select an asset.",
+      "invalidEpochAmount": "Enter a valid epoch amount.",
+      "createEpochFailed": "Failed to create revenue epoch."
+    }
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",

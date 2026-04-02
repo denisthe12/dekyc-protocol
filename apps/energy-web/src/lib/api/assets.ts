@@ -12,12 +12,13 @@ export type EnergyAssetListItem = {
   pricePerShareKzte: number;
   investorBps: number;
   operatorBps: number;
-  payoutMode: string;
+  payoutMode: 'KZTE' | 'ENERGY_POINTS' | string;
   status: string;
   assetPda: string;
   registryPda: string;
   shareMintAddress: string;
   treasuryShareAccount: string;
+  treasuryKzteAccount?: string;
   proofRootHash: string;
   metadataUriHash: string;
   createAssetTx: string | null;

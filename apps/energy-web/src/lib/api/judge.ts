@@ -79,6 +79,27 @@ export type JudgeSummary = {
   }>;
 };
 
+export type JudgeCreateEpochResponse = {
+  assetId: string;
+  epochIndex: number;
+  revenueEpochPda: string;
+  createEpochTx: string;
+  db: {
+    id: string;
+    energyAssetId: string;
+    epochIndex: number;
+    revenueEpochPda: string;
+    treasuryKzteAccount: string;
+    totalAmountKzte: number;
+    amountPerShareKzte: number;
+    totalSharesSnapshot: number;
+    createEpochTx: string | null;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
 export async function fetchJudgeSummary(): Promise<JudgeSummary> {
   const response = await fetch(`${ENERGY_API_BASE_URL}/judge/summary`, {
     method: 'GET',
@@ -92,4 +113,25 @@ export async function fetchJudgeSummary(): Promise<JudgeSummary> {
   }
 
   return JSON.parse(rawText) as JudgeSummary;
+}
+
+export async function createRevenueEpoch(params: {
+  assetId: string;
+  totalAmountKzte: number;
+}): Promise<JudgeCreateEpochResponse> {
+  const response = await fetch(`${ENERGY_API_BASE_URL}/payouts/create-epoch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  const rawText = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`Failed to create revenue epoch: ${response.status} ${rawText}`);
+  }
+
+  return JSON.parse(rawText) as JudgeCreateEpochResponse;
 }

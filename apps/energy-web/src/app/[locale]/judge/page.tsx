@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { fetchJudgeSummary } from '@/lib/api/judge';
 import { formatKzte } from '@/lib/formatters';
+import { JudgeEpochControls } from '@/components/judge/judge-epoch-controls';
 
 type JudgePageProps = {
   params: Promise<{ locale: string }>;
@@ -33,6 +34,7 @@ export default async function JudgePage({ params }: JudgePageProps) {
   const programUrl = explorerAddressUrl(summary.solana.tokenizationProgramId);
   const signerUrl = explorerAddressUrl(summary.solana.signerAddress);
   const mintUrl = explorerAddressUrl(summary.kzte.mintAddress);
+ 
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
@@ -53,13 +55,16 @@ export default async function JudgePage({ params }: JudgePageProps) {
                 {t('generatedAt')}: {new Date(summary.generatedAt).toLocaleString()}
               </div>
             </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <JudgeEpochControls />
 
-            <Link
-              href={`/${locale}`}
-              className="rounded-2xl border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
-            >
-              {common('backHome')}
-            </Link>
+                <Link
+                  href={`/${locale}`}
+                  className="rounded-2xl border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
+                >
+                  {common('backHome')}
+                </Link>
+              </div>
           </div>
         </div>
 

@@ -79,7 +79,23 @@
     "metadataHash": "Metadata hash",
     "canonicalJson": "Canonical JSON",
     "openExplorer": "Открыть в Explorer",
-    "empty": "Нет данных"
+    "empty": "Нет данных",
+    "createEpochTitle": "Создать revenue epoch",
+    "createEpochDescription": "Судья может вручную создать эпоху дохода для выбранного актива и сразу проверить flow claim.",
+    "createEpochButton": "Создать epoch",
+    "creatingEpoch": "Создание epoch...",
+    "assetSelect": "Выберите актив",
+    "selectedAssetShares": "Всего долей",
+    "selectedAssetPrice": "Цена одной доли",
+    "epochAmount": "Сумма эпохи",
+    "epochAmountPlaceholder": "Введите сумму эпохи в KZTE",
+    "epochCreatedSuccess": "Эпоха успешно создана.",
+    "cancel": "Отмена",
+    "errors": {
+      "assetRequired": "Выберите актив.",
+      "invalidEpochAmount": "Введите корректную сумму эпохи.",
+      "createEpochFailed": "Не удалось создать эпоху."
+    }
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",
