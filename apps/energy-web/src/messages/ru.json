@@ -217,5 +217,29 @@
       "sessionNotFound": "Сессия energy не найдена.",
       "createFailed": "Не удалось создать OTC listing."
     }
+  },
+  "ProfilePage": {
+    "eyebrow": "Профиль",
+    "title": "Профиль пользователя",
+    "description": "DeKYC identity, custodial wallet, token balances и security status в одном месте.",
+    "empty": "Профиль не найден.",
+    "fullName": "Полное имя",
+    "email": "Email",
+    "iin": "ИИН",
+    "dekycUserId": "DeKYC User ID",
+    "balances": "Балансы",
+    "wallet": "Кошелёк",
+    "custodialWallet": "Custodial wallet",
+    "kzteTokenAccount": "KZTE token account",
+    "energyPointsTokenAccount": "ENERGY_POINTS token account",
+    "security": "Безопасность",
+    "actionPassword": "Action password",
+    "configured": "Настроен",
+    "notConfigured": "Не настроен",
+    "openExplorer": "Открыть в explorer",
+    "errors": {
+      "sessionNotFound": "Energy session не найдена.",
+      "loadFailed": "Не удалось загрузить профиль."
+    }
   }
 }

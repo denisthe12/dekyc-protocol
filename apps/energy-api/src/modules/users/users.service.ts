@@ -9,12 +9,18 @@ import { CurrentUser } from './current-user.type';
 import { AuthMeResponseDto } from '@/modules/auth/dto/auth-me.response.dto';
 import { WalletsService } from '@/modules/wallets/wallets.service';
 import { toPrismaJson } from './users-json.helper';
+import { PublicKey } from '@solana/web3.js';
+import { getAccount, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
+import { SolanaService } from '../solana/solana.service';
+import { EnergyPointsService } from '../solana/energy-points.service';
 
 @Injectable()
 export class UsersService {
   public constructor(
     private readonly prisma: PrismaService,
     private readonly walletsService: WalletsService,
+    private readonly solanaService: SolanaService,
+    private readonly energyPointsService: EnergyPointsService
   ) {}
 
   public async findById(id: string): Promise<CurrentUser | null> {
@@ -198,6 +204,100 @@ export class UsersService {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
+    };
+  }
+
+  public async getProfile(energyUserId: string) {
+    const user = await this.prisma.energyUser.findUniqueOrThrow({
+      where: {
+        id: energyUserId,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    const wallet = await this.prisma.energyUserWallet.findUnique({
+      where: {
+        energyUserId,
+      },
+    });
+
+    const actionPassword = await this.prisma.energyUserActionPassword.findUnique({
+      where: {
+        energyUserId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    const connection = this.solanaService.getConnection();
+
+    let kzteAmountBaseUnits = '0';
+    let energyPointsAmountBaseUnits = '0';
+
+    if (wallet?.kzteTokenAccountAddress) {
+      try {
+        const account = await getAccount(
+          connection,
+          new PublicKey(wallet.kzteTokenAccountAddress),
+          undefined,
+          TOKEN_2022_PROGRAM_ID,
+        );
+        kzteAmountBaseUnits = account.amount.toString();
+      } catch {
+        kzteAmountBaseUnits = '0';
+      }
+    }
+
+    if (wallet?.energyPointsTokenAccountAddress) {
+      try {
+        const account = await getAccount(
+          connection,
+          new PublicKey(wallet.energyPointsTokenAccountAddress),
+          undefined,
+          TOKEN_2022_PROGRAM_ID,
+        );
+        energyPointsAmountBaseUnits = account.amount.toString();
+      } catch {
+        energyPointsAmountBaseUnits = '0';
+      }
+    }
+
+    const energyPointsStatus =
+      await this.energyPointsService.getEnergyPointsMintStatus();
+
+    return {
+      user: {
+        id: user.id,
+        dekycUserId: user.dekycUserId,
+        fullName: user.fullName,
+        email: user.email,
+        iin: user.profile?.iin,
+        createdAt: user.createdAt.toISOString(),
+      },
+      wallet: wallet
+        ? {
+            custodialWalletAddress: wallet.custodialWalletAddress,
+            kzteTokenAccountAddress: wallet.kzteTokenAccountAddress,
+            energyPointsTokenAccountAddress:
+              wallet.energyPointsTokenAccountAddress,
+          }
+        : null,
+      balances: {
+        kzte: {
+          amountBaseUnits: kzteAmountBaseUnits,
+          decimals: 2,
+        },
+        energyPoints: {
+          amountBaseUnits: energyPointsAmountBaseUnits,
+          decimals: energyPointsStatus.decimals ?? 2,
+        },
+      },
+      security: {
+        actionPasswordIsSet: Boolean(actionPassword),
+      },
     };
   }
 }
