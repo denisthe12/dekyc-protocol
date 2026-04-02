@@ -37,4 +37,7 @@ pub enum TokenizationError {
 
     #[msg("Invalid share amount")]
     InvalidShareAmount,
+
+    #[msg("Invalid payout mode")]
+    InvalidPayoutMode,
 }

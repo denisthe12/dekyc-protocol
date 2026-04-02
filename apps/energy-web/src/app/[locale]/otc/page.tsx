@@ -17,6 +17,11 @@ function explorerTxUrl(signature: string | null): string | null {
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
 }
 
+const payoutModeStyles: Record<string, string> = {
+  KZTE: 'text-emerald-400',
+  ENERGY_POINTS: 'text-amber-400',
+};
+
 export default function OtcPage() {
   const locale = useLocale();
   const t = useTranslations('OtcPage');
@@ -138,13 +143,21 @@ export default function OtcPage() {
                   className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8"
                 >
                   <div className="flex flex-col gap-6">
-                    <div>
+                    <div className="flex flex-col gap-2">
                       <div className="text-sm uppercase tracking-[0.2em] text-zinc-500">
                         Asset {listing.assetId}
                       </div>
-                      <h2 className="mt-3 text-2xl font-semibold">
-                        OTC Listing #{listing.listingId}
-                      </h2>
+
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="text-2xl font-semibold">
+                          OTC Listing #{listing.listingId}
+                        </h2>
+
+                        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1 text-xs font-medium text-zinc-300">
+                          <span className="text-zinc-500">{t('bucket')}</span>
+                          <span className={`${payoutModeStyles[listing.payoutMode]}`}>{listing.payoutMode}</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

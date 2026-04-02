@@ -120,10 +120,11 @@ export declare class JudgeController {
             payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             claimReceiptPda: string;
             claimerKzteAccount: string;
-            claimerShareAccount: string;
             energyRevenueEpochId: string;
             claimerWalletAddress: string;
+            claimerShareAccount: string;
             claimedAmountKzte: number;
+            claimedAmountEnergyPoints: number;
             claimTx: string | null;
             energyPointsMintTx: string | null;
         }[];

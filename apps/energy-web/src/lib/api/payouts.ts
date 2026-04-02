@@ -25,7 +25,10 @@ export type PayoutClaimItem = {
   claimerKzteAccount: string;
   claimerShareAccount: string;
   claimedAmountKzte: number;
+  claimedAmountEnergyPoints: number;
+  payoutMode: 'KZTE' | 'ENERGY_POINTS';
   claimTx: string | null;
+  energyPointsMintTx: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -92,8 +95,16 @@ export async function claimPayout(params: {
   return JSON.parse(rawText) as {
     assetId: string;
     epochIndex: number;
-    claimReceiptPda: string;
-    claimedAmountKzte: number;
-    tx: string;
+    totalKzteClaimAmount: number;
+    totalEnergyPointsClaimAmount: number;
+    claims: Array<{
+      investorPositionPda: string;
+      claimReceiptPda: string;
+      claimAmount: number;
+      payoutMode: 'KZTE' | 'ENERGY_POINTS';
+      tx: string;
+      energyPointsMintTx: string | null;
+      db: PayoutClaimItem;
+    }>;
   };
 }

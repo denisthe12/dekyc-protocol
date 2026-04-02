@@ -207,29 +207,34 @@ model EnergyRevenueEpoch {
 }
 
 model EnergyPayoutClaim {
-  id                    String      @id @default(cuid())
-  energyUserId          String      @db.VarChar(191)
-  energyAssetId         String      @db.VarChar(191)
-  energyRevenueEpochId  String      @db.VarChar(191)
+  id                        String                   @id @default(cuid())
+  energyUserId              String                   @db.VarChar(191)
+  energyAssetId             String                   @db.VarChar(191)
+  energyRevenueEpochId      String                   @db.VarChar(191)
 
-  claimReceiptPda       String      @unique @db.VarChar(128)
-  claimerWalletAddress  String      @db.VarChar(128)
-  claimerKzteAccount    String      @db.VarChar(128)
-  claimerShareAccount   String      @db.VarChar(128)
+  claimReceiptPda           String                   @unique @db.VarChar(128)
 
-  claimedAmountKzte     Int
-  claimedAmountEnergyPoints Int     @default(0)
-  payoutMode            EnergyPositionPayoutMode @default(KZTE)
-  claimTx               String?     @db.VarChar(128)
-  energyPointsMintTx    String?     @db.VarChar(128)
+  claimerWalletAddress      String                   @db.VarChar(128)
+  claimerKzteAccount        String                   @db.VarChar(128)
+  claimerShareAccount       String                   @db.VarChar(128)
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  claimedAmountKzte         Int                      @default(0)
+  claimedAmountEnergyPoints Int                      @default(0)
 
-  @@unique([energyUserId, energyRevenueEpochId])
+  payoutMode                EnergyPositionPayoutMode @default(KZTE)
+
+  claimTx                   String?                  @db.VarChar(128)
+  energyPointsMintTx        String?                  @db.VarChar(128)
+
+  createdAt                 DateTime                 @default(now())
+  updatedAt                 DateTime                 @updatedAt
+
   @@index([energyUserId])
   @@index([energyAssetId])
   @@index([energyRevenueEpochId])
+  @@index([payoutMode])
+
+  @@unique([energyUserId, energyRevenueEpochId, payoutMode], map: "energy_claim_user_epoch_mode_unique")
 }
 
 model EnergyOtcListing {

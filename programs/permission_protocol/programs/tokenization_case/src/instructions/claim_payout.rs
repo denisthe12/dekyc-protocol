@@ -8,6 +8,7 @@ use crate::errors::TokenizationError;
 use crate::state::{ClaimReceipt, EnergyAsset, InvestorPosition, PayoutMode, RevenueEpoch};
 
 #[derive(Accounts)]
+#[instruction(claimed_amount: u64, payout_mode: PayoutMode)]
 pub struct ClaimPayout<'info> {
     #[account(mut)]
     pub claimer: Signer<'info>,
@@ -25,7 +26,8 @@ pub struct ClaimPayout<'info> {
         seeds = [
             INVESTOR_POSITION_SEED,
             energy_asset.key().as_ref(),
-            claimer.key().as_ref()
+            claimer.key().as_ref(),
+            payout_mode.as_seed().as_ref()
         ],
         bump = investor_position.bump
     )]
@@ -43,9 +45,6 @@ pub struct ClaimPayout<'info> {
     #[account(mut)]
     pub claimer_kzte_account: InterfaceAccount<'info, TokenAccount>,
 
-    #[account(mut)]
-    pub claimer_share_account: InterfaceAccount<'info, TokenAccount>,
-
     #[account(
         init,
         payer = claimer,
@@ -53,7 +52,8 @@ pub struct ClaimPayout<'info> {
         seeds = [
             CLAIM_RECEIPT_SEED,
             revenue_epoch.key().as_ref(),
-            claimer.key().as_ref()
+            claimer.key().as_ref(),
+            payout_mode.as_seed().as_ref()
         ],
         bump
     )]
@@ -63,19 +63,18 @@ pub struct ClaimPayout<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<ClaimPayout>) -> Result<()> {
-    let shares_owned = u64::try_from(ctx.accounts.claimer_share_account.amount)
-        .map_err(|_| error!(TokenizationError::MathOverflow))?;
+pub fn handler(
+    ctx: Context<ClaimPayout>,
+    claimed_amount: u64,
+    payout_mode: PayoutMode,
+) -> Result<()> {
+    require!(claimed_amount > 0, TokenizationError::NothingToClaim);
+    require!(
+        ctx.accounts.investor_position.payout_mode == payout_mode,
+        TokenizationError::InvalidPayoutMode
+    );
 
-    require!(shares_owned > 0, TokenizationError::NoSharesOwned);
-
-    let claim_amount = shares_owned
-        .checked_mul(ctx.accounts.revenue_epoch.amount_per_share_kzte)
-        .ok_or(TokenizationError::MathOverflow)?;
-
-    require!(claim_amount > 0, TokenizationError::NothingToClaim);
-
-    if ctx.accounts.investor_position.payout_mode == PayoutMode::Kzte {
+    if payout_mode == PayoutMode::Kzte {
         let asset_id_bytes = ctx.accounts.energy_asset.asset_id.to_le_bytes();
         let signer_seeds: &[&[u8]] = &[
             ENERGY_ASSET_SEED,
@@ -99,7 +98,7 @@ pub fn handler(ctx: Context<ClaimPayout>) -> Result<()> {
 
         transfer_checked(
             transfer_ctx,
-            claim_amount,
+            claimed_amount,
             ctx.accounts.kzte_mint.decimals,
         )?;
     }
@@ -108,7 +107,7 @@ pub fn handler(ctx: Context<ClaimPayout>) -> Result<()> {
     receipt.epoch = ctx.accounts.revenue_epoch.key();
     receipt.asset = ctx.accounts.energy_asset.key();
     receipt.claimer = ctx.accounts.claimer.key();
-    receipt.claimed_amount_kzte = claim_amount;
+    receipt.claimed_amount_kzte = claimed_amount;
     receipt.bump = ctx.bumps.claim_receipt;
 
     Ok(())

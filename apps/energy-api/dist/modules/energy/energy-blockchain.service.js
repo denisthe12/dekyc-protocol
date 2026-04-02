@@ -144,6 +144,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
                 Buffer.from('investor_position'),
                 new web3_js_1.PublicKey(asset.assetPda).toBuffer(),
                 buyerKeypair.publicKey.toBuffer(),
+                params.payoutMode === 'KZTE' ? Buffer.from([0]) : Buffer.from([1]),
             ], program.programId)[0],
             systemProgram: anchor.web3.SystemProgram.programId,
         })
@@ -182,6 +183,7 @@ let EnergyBlockchainService = class EnergyBlockchainService {
             Buffer.from('investor_position'),
             new web3_js_1.PublicKey(params.assetPda).toBuffer(),
             new web3_js_1.PublicKey(params.investorWallet).toBuffer(),
+            params.payoutMode === 'KZTE' ? Buffer.from([0]) : Buffer.from([1]),
         ], program.programId);
         const investorPosition = await program.account.investorPosition.fetchNullable(investorPositionPda);
         return {

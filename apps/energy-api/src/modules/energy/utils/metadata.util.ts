@@ -7,23 +7,24 @@ export type EnergyMetadata = {
   pricePerShareKzte: number;
   investorBps: number;
   operatorBps: number;
-  payoutMode: string;
+  supportedPayoutModes: Array<'KZTE' | 'ENERGY_POINTS'>;
   createdAt: string;
 };
 
 export function buildEnergyMetadata(params: {
   assetId: string;
-}) : EnergyMetadata {
+}): EnergyMetadata {
   return {
-    title: `Solar Roof ${params.assetId}`,
-    description: 'Demo asset created from energy-api and Anchor program',
-    location: 'Aktau, Kazakhstan',
+    title: `Solar Microgrid ${params.assetId}`,
+    description:
+      'Tokenized solar microgrid revenue rights with dual payout modes: KZTE or ENERGY_POINTS.',
+    location: 'Mangystau Region, Kazakhstan',
     assetType: 'SOLAR',
     totalShares: 1000,
     pricePerShareKzte: 10000,
     investorBps: 8000,
     operatorBps: 2000,
-    payoutMode: 'KZTE',
+    supportedPayoutModes: ['KZTE', 'ENERGY_POINTS'],
     createdAt: new Date().toISOString(),
   };
 }

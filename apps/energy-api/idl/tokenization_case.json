@@ -63,6 +63,10 @@
               {
                 "kind": "account",
                 "path": "buyer"
+              },
+              {
+                "kind": "arg",
+                "path": "payout_mode"
               }
             ]
           }
@@ -173,6 +177,10 @@
               {
                 "kind": "account",
                 "path": "claimer"
+              },
+              {
+                "kind": "arg",
+                "path": "payout_mode"
               }
             ]
           }
@@ -187,10 +195,6 @@
         },
         {
           "name": "claimer_kzte_account",
-          "writable": true
-        },
-        {
-          "name": "claimer_share_account",
           "writable": true
         },
         {
@@ -223,6 +227,10 @@
               {
                 "kind": "account",
                 "path": "claimer"
+              },
+              {
+                "kind": "arg",
+                "path": "payout_mode"
               }
             ]
           }
@@ -235,7 +243,20 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "claimed_amount",
+          "type": "u64"
+        },
+        {
+          "name": "payout_mode",
+          "type": {
+            "defined": {
+              "name": "PayoutMode"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "create_energy_asset",
@@ -884,6 +905,11 @@
       "code": 6011,
       "name": "InvalidShareAmount",
       "msg": "Invalid share amount"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidPayoutMode",
+      "msg": "Invalid payout mode"
     }
   ],
   "types": [

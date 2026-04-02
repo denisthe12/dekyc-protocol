@@ -146,7 +146,7 @@ export declare class EnergyController {
         averagePricePerShare: number;
         lastPurchaseTx: string | null;
     }[]>;
-    getInvestorPosition(assetPda: string, investorWallet: string): Promise<{
+    getInvestorPosition(assetPda: string, investorWallet: string, payoutMode: 'KZTE' | 'ENERGY_POINTS'): Promise<{
         investorPositionPda: string;
         investorPosition: any;
     }>;

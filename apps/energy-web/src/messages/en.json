@@ -34,7 +34,8 @@
     "assetPda": "Asset PDA",
     "shareMint": "Share mint",
     "buyerShareAccount": "User share account",
-    "lastPurchaseTx": "Last purchase"
+    "lastPurchaseTx": "Last purchase",
+    "sellButton": "Sell via OTC"
   },
   "AssetDetailPage": {
     "eyebrow": "Asset detail",
@@ -89,6 +90,7 @@
     "pricePerShare": "Price per share",
     "totalPrice": "Total price",
     "seller": "Seller",
+    "bucket": "Payout",
     "listingPda": "Listing PDA",
     "escrow": "Escrow account",
     "buy": "Buy",
@@ -165,6 +167,28 @@
       "invalidQuantity": "Enter a valid share quantity.",
       "sessionNotFound": "Energy session not found.",
       "buyFailed": "Failed to complete purchase."
+    }
+  },
+  "SellSharesDialog": {
+    "title": "Sell shares via OTC",
+    "description": "Enter share amount and price per share, then confirm the action with your password.",
+    "bucket": "Payout bucket",
+    "available": "Available shares",
+    "shareAmount": "Share amount",
+    "shareAmountPlaceholder": "Enter share amount",
+    "pricePerShare": "Price per share",
+    "pricePerSharePlaceholder": "Enter price per share",
+    "totalPrice": "Total price",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "confirmTitle": "Confirm OTC listing creation",
+    "confirmDescription": "Confirm OTC listing creation for {shareAmount} shares from {payoutMode} bucket.",
+    "errors": {
+      "invalidShareAmount": "Enter a valid share amount.",
+      "exceedsAvailable": "You cannot list more shares than available.",
+      "invalidPrice": "Enter a valid price per share.",
+      "sessionNotFound": "Energy session not found.",
+      "createFailed": "Failed to create OTC listing."
     }
   }
 }

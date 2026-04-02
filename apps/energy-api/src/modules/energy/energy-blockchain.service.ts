@@ -32,7 +32,7 @@ export type CreatedEnergyAssetResult = {
     pricePerShareKzte: number;
     investorBps: number;
     operatorBps: number;
-    payoutMode: string;
+    supportedPayoutModes: Array<'KZTE' | 'ENERGY_POINTS'>;
     createdAt: string;
   };
   metadataHash: string;

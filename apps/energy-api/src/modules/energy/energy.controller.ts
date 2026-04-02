@@ -59,10 +59,12 @@ export class EnergyController {
   public async getInvestorPosition(
     @Query('assetPda') assetPda: string,
     @Query('investorWallet') investorWallet: string,
+    @Query('payoutMode') payoutMode: 'KZTE' | 'ENERGY_POINTS',
   ) {
     return this.energyBlockchainService.getInvestorPosition({
       assetPda,
       investorWallet,
+      payoutMode,
     });
   }
 }

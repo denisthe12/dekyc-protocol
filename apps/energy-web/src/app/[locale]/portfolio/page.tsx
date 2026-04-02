@@ -7,6 +7,7 @@ import { fetchPortfolio, PortfolioPosition } from '@/lib/api/portfolio';
 import { fetchEnergyMe } from '@/lib/api/energy';
 import { loadEnergySession } from '@/lib/session';
 import { formatKzte } from '@/lib/formatters';
+import { SellSharesDialog } from '@/components/energy/sell-shares-dialog';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) {
@@ -24,6 +25,11 @@ export default function PortfolioPage() {
   const [positions, setPositions] = useState<PortfolioPosition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sellTarget, setSellTarget] = useState<{
+    assetId: string;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
+    maxShares: number;
+  } | null>(null);
 
   useEffect(() => {
     void loadPortfolio();
@@ -106,6 +112,11 @@ export default function PortfolioPage() {
                     </div>
 
                     <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                      <div className="text-xs text-zinc-500">Bucket</div>
+                      <div className="mt-2 text-sm text-zinc-300">{position.payoutMode}</div>
+                    </div>
+
+                    <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
                       <div className="text-xs text-zinc-500">{t('shares')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
                         {position.totalSharesPurchased}
@@ -152,21 +163,46 @@ export default function PortfolioPage() {
                     </div>
                   </div>
 
-                  {txUrl ? (
-                    <div className="mt-4">
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSellTarget({
+                          assetId: position.assetId,
+                          payoutMode: position.payoutMode,
+                          maxShares: position.totalSharesPurchased,
+                        })
+                      }
+                      className="rounded-2xl bg-white px-5 py-2 text-sm font-medium text-black transition hover:bg-zinc-200"
+                    >
+                      Sell via OTC
+                    </button>
+
+                    {txUrl ? (
                       <a
                         href={txUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200"
+                        className="rounded-2xl border border-zinc-700 px-5 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
                       >
                         {t('lastPurchaseTx')}
                       </a>
-                    </div>
-                  ) : null}
+                    ) : null}
+                  </div>
                 </article>
               );
+              
             })}
+            <SellSharesDialog
+              open={sellTarget !== null}
+              onClose={() => setSellTarget(null)}
+              assetId={sellTarget?.assetId ?? ''}
+              payoutMode={sellTarget?.payoutMode ?? 'KZTE'}
+              maxShares={sellTarget?.maxShares ?? 0}
+              onSuccess={async () => {
+                await loadPortfolio();
+              }}
+            />
           </div>
         )}
       </div>

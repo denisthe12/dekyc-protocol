@@ -13,6 +13,7 @@ export type PortfolioPosition = {
   totalSharesPurchased: number;
   totalKzteSpent: number;
   averagePricePerShare: number;
+  payoutMode: "KZTE" | "ENERGY_POINTS";
   lastPurchaseTx: string | null;
   status: string;
   createdAt: string;

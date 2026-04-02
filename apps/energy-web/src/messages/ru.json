@@ -34,7 +34,8 @@
     "assetPda": "Asset PDA",
     "shareMint": "Mint долей",
     "buyerShareAccount": "Аккаунт долей пользователя",
-    "lastPurchaseTx": "Последняя покупка"
+    "lastPurchaseTx": "Последняя покупка",
+    "sellButton": "Продать через OTC"
   },
   "AssetDetailPage": {
     "eyebrow": "Карточка актива",
@@ -89,6 +90,7 @@
     "pricePerShare": "Цена за долю",
     "totalPrice": "Итоговая цена",
     "seller": "Продавец",
+    "bucket": "Тип выплаты",
     "listingPda": "Listing PDA",
     "escrow": "Escrow account",
     "buy": "Купить",
@@ -165,6 +167,28 @@
       "invalidQuantity": "Введите корректное количество долей.",
       "sessionNotFound": "Сессия energy не найдена.",
       "buyFailed": "Не удалось выполнить покупку."
+    }
+  },
+  "SellSharesDialog": {
+    "title": "Продажа долей через OTC",
+    "description": "Укажите количество долей и цену за одну долю, затем подтвердите действие паролем.",
+    "bucket": "Корзина выплат",
+    "available": "Доступно долей",
+    "shareAmount": "Количество долей",
+    "shareAmountPlaceholder": "Введите количество долей",
+    "pricePerShare": "Цена за одну долю",
+    "pricePerSharePlaceholder": "Введите цену за одну долю",
+    "totalPrice": "Итоговая цена",
+    "continue": "Продолжить",
+    "cancel": "Отмена",
+    "confirmTitle": "Подтвердите создание OTC listing",
+    "confirmDescription": "Подтвердите создание listing на {shareAmount} долей из корзины {payoutMode}.",
+    "errors": {
+      "invalidShareAmount": "Введите корректное количество долей.",
+      "exceedsAvailable": "Нельзя выставить больше долей, чем доступно.",
+      "invalidPrice": "Введите корректную цену за одну долю.",
+      "sessionNotFound": "Сессия energy не найдена.",
+      "createFailed": "Не удалось создать OTC listing."
     }
   }
 }

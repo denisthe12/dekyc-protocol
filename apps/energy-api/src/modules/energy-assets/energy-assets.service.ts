@@ -20,7 +20,10 @@ export class EnergyAssetsService {
         pricePerShareKzte: onchain.metadata.pricePerShareKzte,
         investorBps: onchain.metadata.investorBps,
         operatorBps: onchain.metadata.operatorBps,
-        payoutMode: onchain.metadata.payoutMode,
+
+        // legacy/default field on asset level
+        payoutMode: 'KZTE',
+
         status: 'ACTIVE_SALE',
         assetPda: onchain.assetPda,
         registryPda: onchain.registryPda,

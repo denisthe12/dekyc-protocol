@@ -22,7 +22,7 @@ export type CreatedEnergyAssetResult = {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
+        supportedPayoutModes: Array<'KZTE' | 'ENERGY_POINTS'>;
         createdAt: string;
     };
     metadataHash: string;
@@ -76,6 +76,7 @@ export declare class EnergyBlockchainService {
     getInvestorPosition(params: {
         assetPda: string;
         investorWallet: string;
+        payoutMode: 'KZTE' | 'ENERGY_POINTS';
     }): Promise<{
         investorPositionPda: string;
         investorPosition: any;

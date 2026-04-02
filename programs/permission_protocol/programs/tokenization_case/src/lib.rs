@@ -63,8 +63,12 @@ pub mod tokenization_case {
         instructions::create_revenue_epoch::handler(ctx, epoch_index, total_amount_kzte)
     }
 
-    pub fn claim_payout(ctx: Context<ClaimPayout>) -> Result<()> {
-        instructions::claim_payout::handler(ctx)
+    pub fn claim_payout(
+        ctx: Context<ClaimPayout>,
+        claimed_amount: u64,
+        payout_mode: PayoutMode,
+    ) -> Result<()> {
+        instructions::claim_payout::handler(ctx, claimed_amount, payout_mode)
     }
 
     pub fn create_listing(

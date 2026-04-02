@@ -69,11 +69,14 @@ let HistoryService = class HistoryService {
         }
         for (const claim of claims) {
             const payoutLabel = claim.payoutMode === 'ENERGY_POINTS' ? 'ENERGY_POINTS' : 'KZTE';
+            const amount = claim.payoutMode === 'ENERGY_POINTS'
+                ? claim.claimedAmountEnergyPoints
+                : claim.claimedAmountKzte;
             events.push({
                 id: `claim-${claim.id}`,
                 type: 'PAYOUT_CLAIM',
                 title: 'Payout claim',
-                description: `Claimed ${claim.claimedAmountKzte} base units in ${payoutLabel}.`,
+                description: `Claimed ${amount} base units in ${payoutLabel}.`,
                 assetId: null,
                 txSignature: claim.energyPointsMintTx ?? claim.claimTx,
                 createdAt: claim.createdAt.toISOString(),

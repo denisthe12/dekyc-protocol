@@ -80,6 +80,79 @@ let PayoutsService = class PayoutsService {
             db: created,
         };
     }
+    async claimBucket(params) {
+        const modeSeed = params.position.payoutMode === 'KZTE' ? Buffer.from([0]) : Buffer.from([1]);
+        const [investorPositionPda] = web3_js_1.PublicKey.findProgramAddressSync([
+            Buffer.from('investor_position'),
+            new web3_js_1.PublicKey(params.asset.assetPda).toBuffer(),
+            params.claimerKeypair.publicKey.toBuffer(),
+            modeSeed,
+        ], params.program.programId);
+        const [claimReceiptPda] = web3_js_1.PublicKey.findProgramAddressSync([
+            Buffer.from('claim_receipt'),
+            new web3_js_1.PublicKey(params.epoch.revenueEpochPda).toBuffer(),
+            params.claimerKeypair.publicKey.toBuffer(),
+            modeSeed,
+        ], params.program.programId);
+        const claimAmount = params.position.totalSharesPurchased * params.epoch.amountPerShareKzte;
+        if (claimAmount <= 0) {
+            return null;
+        }
+        const tx = await params.program.methods
+            .claimPayout(new anchor.BN(claimAmount), params.position.payoutMode === 'KZTE'
+            ? { kzte: {} }
+            : { energyPoints: {} })
+            .accounts({
+            claimer: params.claimerKeypair.publicKey,
+            energyAsset: new web3_js_1.PublicKey(params.asset.assetPda),
+            revenueEpoch: new web3_js_1.PublicKey(params.epoch.revenueEpochPda),
+            investorPosition: investorPositionPda,
+            kzteMint: this.solanaService.getKzteMint(),
+            treasuryKzteAccount: new web3_js_1.PublicKey(params.epoch.treasuryKzteAccount),
+            claimerKzteAccount: new web3_js_1.PublicKey(params.wallet.kzteTokenAccountAddress ?? ''),
+            claimReceipt: claimReceiptPda,
+            tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID,
+            systemProgram: anchor.web3.SystemProgram.programId,
+        })
+            .signers([params.claimerKeypair])
+            .rpc();
+        let energyPointsMintTx = null;
+        if (params.position.payoutMode === 'ENERGY_POINTS') {
+            if (!params.wallet.energyPointsTokenAccountAddress) {
+                throw new Error('User ENERGY_POINTS token account is missing');
+            }
+            const mintResult = await this.energyPointsService.mintEnergyPointsToUser({
+                recipientTokenAccount: params.wallet.energyPointsTokenAccountAddress,
+                amountBaseUnits: BigInt(claimAmount),
+            });
+            energyPointsMintTx = mintResult.tx;
+        }
+        const claim = await this.prisma.energyPayoutClaim.create({
+            data: {
+                energyUserId: params.energyUserId,
+                energyAssetId: params.asset.id,
+                energyRevenueEpochId: params.epoch.id,
+                claimReceiptPda: claimReceiptPda.toBase58(),
+                claimerWalletAddress: params.wallet.custodialWalletAddress,
+                claimerKzteAccount: params.wallet.kzteTokenAccountAddress ?? '',
+                claimerShareAccount: params.position.buyerShareAccount,
+                claimedAmountKzte: params.position.payoutMode === 'KZTE' ? claimAmount : 0,
+                claimedAmountEnergyPoints: params.position.payoutMode === 'ENERGY_POINTS' ? claimAmount : 0,
+                payoutMode: params.position.payoutMode,
+                claimTx: tx,
+                energyPointsMintTx,
+            },
+        });
+        return {
+            investorPositionPda: investorPositionPda.toBase58(),
+            claimReceiptPda: claimReceiptPda.toBase58(),
+            claimAmount,
+            payoutMode: params.position.payoutMode,
+            tx,
+            energyPointsMintTx,
+            db: claim,
+        };
+    }
     async claimPayout(params) {
         const asset = await this.prisma.energyAsset.findUniqueOrThrow({
             where: { assetId: params.assetId },
@@ -100,20 +173,13 @@ let PayoutsService = class PayoutsService {
         if (!wallet.energyPointsTokenAccountAddress) {
             throw new Error('User ENERGY_POINTS token account is missing');
         }
-        const program = this.anchorService.program;
-        const provider = this.anchorService.provider;
         const secret = wallet.custodialWalletSecretJson;
         if (!secret) {
             throw new Error('User custodial key is missing');
         }
         const claimerKeypair = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(secret));
-        const [investorPositionPda] = web3_js_1.PublicKey.findProgramAddressSync([
-            Buffer.from('investor_position'),
-            new web3_js_1.PublicKey(asset.assetPda).toBuffer(),
-            claimerKeypair.publicKey.toBuffer(),
-            Buffer.from('kzte'),
-        ], program.programId);
-        const investorPosition = await program.account.investorPosition.fetch(investorPositionPda);
+        const program = this.anchorService.program;
+        const provider = this.anchorService.provider;
         const positions = await this.prisma.energyInvestorPosition.findMany({
             where: {
                 energyUserId: params.energyUserId,
@@ -132,89 +198,87 @@ let PayoutsService = class PayoutsService {
         if (!kztePosition && !energyPointsPosition) {
             throw new Error('No active payout positions found for this asset');
         }
-        const shareAccountAddress = kztePosition?.buyerShareAccount ??
-            energyPointsPosition?.buyerShareAccount;
-        if (!shareAccountAddress) {
-            throw new Error('Claimer share account is missing');
-        }
         const solTopUp = await this.solanaService.ensureSolBalance(wallet.custodialWalletAddress, 0.02, 0.1);
         console.log('SOL top-up result:', solTopUp);
-        const epochPda = new web3_js_1.PublicKey(epoch.revenueEpochPda);
-        const [claimReceiptPda] = web3_js_1.PublicKey.findProgramAddressSync([
-            Buffer.from('claim_receipt'),
-            epochPda.toBuffer(),
-            claimerKeypair.publicKey.toBuffer(),
-        ], program.programId);
-        const claimerShareAccountInfo = await (0, spl_token_1.getAccount)(provider.connection, new web3_js_1.PublicKey(shareAccountAddress), undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
-        const sharesOwned = Number(claimerShareAccountInfo.amount);
-        const kzteShares = kztePosition?.totalSharesPurchased ?? 0;
-        const energyPointsShares = energyPointsPosition?.totalSharesPurchased ?? 0;
-        const kzteClaimAmount = kzteShares * epoch.amountPerShareKzte;
-        const energyPointsClaimAmount = energyPointsShares * epoch.amountPerShareKzte;
-        const claimedAmountKzte = kzteClaimAmount + energyPointsClaimAmount;
-        if (claimedAmountKzte <= 0) {
-            throw new Error('Nothing to claim for this asset');
-        }
-        if (!kztePosition) {
-            throw new Error('KZTE investor position is required for current on-chain claim flow');
-        }
-        const tx = await program.methods
-            .claimPayout()
-            .accounts({
-            claimer: claimerKeypair.publicKey,
-            energyAsset: new web3_js_1.PublicKey(asset.assetPda),
-            revenueEpoch: new web3_js_1.PublicKey(epoch.revenueEpochPda),
-            investorPosition: investorPositionPda,
-            kzteMint: this.solanaService.getKzteMint(),
-            treasuryKzteAccount: new web3_js_1.PublicKey(epoch.treasuryKzteAccount),
-            claimerKzteAccount: new web3_js_1.PublicKey(wallet.kzteTokenAccountAddress ?? ''),
-            claimerShareAccount: new web3_js_1.PublicKey(shareAccountAddress),
-            claimReceipt: web3_js_1.PublicKey.findProgramAddressSync([
-                Buffer.from('claim_receipt'),
-                new web3_js_1.PublicKey(epoch.revenueEpochPda).toBuffer(),
-                claimerKeypair.publicKey.toBuffer(),
-            ], program.programId)[0],
-            tokenProgram: spl_token_1.TOKEN_2022_PROGRAM_ID,
-            systemProgram: anchor.web3.SystemProgram.programId,
-        })
-            .signers([claimerKeypair])
-            .rpc();
-        const payoutMode = 'KZTE';
-        let energyPointsMintTx = null;
-        if (energyPointsClaimAmount > 0) {
-            if (!wallet.energyPointsTokenAccountAddress) {
-                throw new Error('User ENERGY_POINTS token account is missing');
-            }
-            const mintResult = await this.energyPointsService.mintEnergyPointsToUser({
-                recipientTokenAccount: wallet.energyPointsTokenAccountAddress,
-                amountBaseUnits: BigInt(energyPointsClaimAmount),
-            });
-            energyPointsMintTx = mintResult.tx;
-        }
-        const claim = await this.prisma.energyPayoutClaim.create({
-            data: {
+        const bucketClaims = [];
+        if (kztePosition && kztePosition.totalSharesPurchased > 0) {
+            const claimResult = await this.claimBucket({
+                program,
+                provider,
                 energyUserId: params.energyUserId,
-                energyAssetId: asset.id,
-                energyRevenueEpochId: epoch.id,
-                claimReceiptPda: claimReceiptPda.toBase58(),
-                claimerWalletAddress: wallet.custodialWalletAddress,
-                claimerKzteAccount: wallet.kzteTokenAccountAddress ?? '',
-                claimerShareAccount: position.buyerShareAccount,
-                claimedAmountKzte,
-                payoutMode,
-                claimTx: tx,
-                energyPointsMintTx,
-            },
-        });
+                claimerKeypair,
+                asset: {
+                    id: asset.id,
+                    assetId: asset.assetId,
+                    assetPda: asset.assetPda,
+                },
+                epoch: {
+                    id: epoch.id,
+                    epochIndex: epoch.epochIndex,
+                    revenueEpochPda: epoch.revenueEpochPda,
+                    treasuryKzteAccount: epoch.treasuryKzteAccount,
+                    amountPerShareKzte: epoch.amountPerShareKzte,
+                },
+                wallet: {
+                    custodialWalletAddress: wallet.custodialWalletAddress,
+                    kzteTokenAccountAddress: wallet.kzteTokenAccountAddress,
+                    energyPointsTokenAccountAddress: wallet.energyPointsTokenAccountAddress,
+                },
+                position: {
+                    buyerShareAccount: kztePosition.buyerShareAccount,
+                    totalSharesPurchased: kztePosition.totalSharesPurchased,
+                    payoutMode: 'KZTE',
+                },
+            });
+            if (claimResult) {
+                bucketClaims.push(claimResult);
+            }
+        }
+        if (energyPointsPosition && energyPointsPosition.totalSharesPurchased > 0) {
+            const claimResult = await this.claimBucket({
+                program,
+                provider,
+                energyUserId: params.energyUserId,
+                claimerKeypair,
+                asset: {
+                    id: asset.id,
+                    assetId: asset.assetId,
+                    assetPda: asset.assetPda,
+                },
+                epoch: {
+                    id: epoch.id,
+                    epochIndex: epoch.epochIndex,
+                    revenueEpochPda: epoch.revenueEpochPda,
+                    treasuryKzteAccount: epoch.treasuryKzteAccount,
+                    amountPerShareKzte: epoch.amountPerShareKzte,
+                },
+                wallet: {
+                    custodialWalletAddress: wallet.custodialWalletAddress,
+                    kzteTokenAccountAddress: wallet.kzteTokenAccountAddress,
+                    energyPointsTokenAccountAddress: wallet.energyPointsTokenAccountAddress,
+                },
+                position: {
+                    buyerShareAccount: energyPointsPosition.buyerShareAccount,
+                    totalSharesPurchased: energyPointsPosition.totalSharesPurchased,
+                    payoutMode: 'ENERGY_POINTS',
+                },
+            });
+            if (claimResult) {
+                bucketClaims.push(claimResult);
+            }
+        }
+        const totalKzteClaimAmount = bucketClaims
+            .filter((item) => item.payoutMode === 'KZTE')
+            .reduce((sum, item) => sum + item.claimAmount, 0);
+        const totalEnergyPointsClaimAmount = bucketClaims
+            .filter((item) => item.payoutMode === 'ENERGY_POINTS')
+            .reduce((sum, item) => sum + item.claimAmount, 0);
         return {
             assetId: asset.assetId,
             epochIndex: epoch.epochIndex,
-            claimReceiptPda: claimReceiptPda.toBase58(),
-            claimedAmountKzte,
-            payoutMode,
-            tx,
-            energyPointsMintTx,
-            db: claim,
+            totalKzteClaimAmount,
+            totalEnergyPointsClaimAmount,
+            claims: bucketClaims,
         };
     }
     async listEpochs(assetId) {
