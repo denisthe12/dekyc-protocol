@@ -95,7 +95,18 @@
       "assetRequired": "Select an asset.",
       "invalidEpochAmount": "Enter a valid epoch amount.",
       "createEpochFailed": "Failed to create revenue epoch."
-    }
+    },
+    "bucket": "Payout",
+    "shares": "Shares",
+    "spent": "Spent",
+    "averagePrice": "Average price",
+    "claimAmountKzte": "Claimed in KZTE",
+    "claimAmountEnergyPoints": "Claimed in ENERGY_POINTS",
+    "claimReceipt": "Claim receipt",
+    "created": "Created",
+    "claimTx": "Claim tx",
+    "energyPointsMintTx": "Mint ENERGY_POINTS tx",
+    "supportedMode": "Supported"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",

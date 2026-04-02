@@ -21,6 +21,8 @@ export type EnergyAssetListItem = {
   treasuryKzteAccount?: string;
   proofRootHash: string;
   metadataUriHash: string;
+  metadataJson: Record<string, unknown> | null;
+  metadataCanonicalJson?: string | null;
   createAssetTx: string | null;
   issueSharesTx: string | null;
   createdAt: string;

@@ -189,6 +189,21 @@ export default async function JudgePage({ params }: JudgePageProps) {
                   className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6"
                 >
                   <div className="text-xl font-semibold">{asset.title}</div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {Array.isArray((asset.metadataJson as { supportedPayoutModes?: string[] } | null)?.supportedPayoutModes)
+                      ? ((asset.metadataJson as { supportedPayoutModes?: string[] }).supportedPayoutModes ?? []).map((mode) => (
+                          <div
+                            key={mode}
+                            className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300"
+                          >
+                            <span className="text-zinc-500">{t('supportedMode')}</span>
+                            <span className={mode === 'ENERGY_POINTS' ? 'text-yellow-400' : 'text-green-400'}>
+                              {mode}
+                            </span>
+                          </div>
+                        ))
+                      : null}
+                  </div>
                   <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
                       <div className="text-xs text-zinc-500">Asset ID</div>
@@ -266,27 +281,55 @@ export default async function JudgePage({ params }: JudgePageProps) {
                   key={position.id}
                   className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6"
                 >
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <div>
-                      <div className="text-xs text-zinc-500">Asset ID</div>
-                      <div className="mt-2 text-sm text-zinc-300">{position.assetId}</div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="text-sm font-semibold text-white">
+                      Asset {position.assetId}
                     </div>
+
+                    <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+                      <span className="text-zinc-500">{t('bucket')}</span>
+                      <span
+                        className={
+                          position.payoutMode === 'ENERGY_POINTS'
+                            ? 'text-yellow-400'
+                            : 'text-green-400'
+                        }
+                      >
+                        {position.payoutMode}
+                      </span>
+                    </div>
+
+                    <div className="inline-flex items-center rounded-full border border-zinc-800 bg-black/20 px-3 py-1 text-xs text-zinc-400">
+                      {position.status}
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
-                      <div className="text-xs text-zinc-500">Shares</div>
+                      <div className="text-xs text-zinc-500">{t('shares')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
                         {position.totalSharesPurchased}
                       </div>
                     </div>
+
                     <div>
-                      <div className="text-xs text-zinc-500">Spent</div>
+                      <div className="text-xs text-zinc-500">{t('spent')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {formatKzte(position.totalKzteSpent)}
+                        {formatKzte(position.totalKzteSpent)} KZTE
                       </div>
                     </div>
+
                     <div>
-                      <div className="text-xs text-zinc-500">Average price</div>
+                      <div className="text-xs text-zinc-500">{t('averagePrice')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {formatKzte(position.averagePricePerShare)}
+                        {formatKzte(position.averagePricePerShare)} KZTE
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-zinc-500">Share account</div>
+                      <div className="mt-2 break-all text-xs text-zinc-300">
+                        {position.buyerShareAccount}
                       </div>
                     </div>
                   </div>
@@ -363,45 +406,78 @@ export default async function JudgePage({ params }: JudgePageProps) {
                   key={claim.id}
                   className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6"
                 >
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <div>
-                      <div className="text-xs text-zinc-500">User</div>
-                      <div className="mt-2 break-all text-xs text-zinc-300">
-                        {claim.energyUserId}
-                      </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="text-sm font-semibold text-white">
+                      Claim · User {claim.energyUserId}
                     </div>
+
+                    <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900 px-3 py-1 text-xs font-medium text-zinc-300">
+                      <span className="text-zinc-500">{t('bucket')}</span>
+                      <span
+                        className={
+                          claim.payoutMode === 'ENERGY_POINTS'
+                            ? 'text-yellow-400'
+                            : 'text-green-400'
+                        }
+                      >
+                        {claim.payoutMode}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
-                      <div className="text-xs text-zinc-500">Amount</div>
+                      <div className="text-xs text-zinc-500">{t('claimAmountKzte')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
-                        {formatKzte(claim.claimedAmountKzte)}
+                        {formatKzte(claim.claimedAmountKzte)} KZTE
                       </div>
                     </div>
+
                     <div>
-                      <div className="text-xs text-zinc-500">Claim receipt</div>
+                      <div className="text-xs text-zinc-500">{t('claimAmountEnergyPoints')}</div>
+                      <div className="mt-2 text-sm text-zinc-300">
+                        {formatKzte(claim.claimedAmountEnergyPoints)} EP
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-zinc-500">{t('claimReceipt')}</div>
                       <div className="mt-2 break-all text-xs text-zinc-300">
                         {claim.claimReceiptPda}
                       </div>
                     </div>
+
                     <div>
-                      <div className="text-xs text-zinc-500">Created</div>
+                      <div className="text-xs text-zinc-500">{t('created')}</div>
                       <div className="mt-2 text-sm text-zinc-300">
                         {new Date(claim.createdAt).toLocaleString()}
                       </div>
                     </div>
                   </div>
 
-                  {explorerTxUrl(claim.claimTx) ? (
-                    <div className="mt-4">
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {explorerTxUrl(claim.claimTx) ? (
                       <a
                         href={explorerTxUrl(claim.claimTx)!}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black"
+                        className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200"
                       >
-                        Claim tx
+                        {t('claimTx')}
                       </a>
-                    </div>
-                  ) : null}
+                    ) : null}
+
+                    {explorerTxUrl(claim.energyPointsMintTx) ? (
+                      <a
+                        href={explorerTxUrl(claim.energyPointsMintTx)!}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-2xl border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
+                      >
+                        {t('energyPointsMintTx')}
+                      </a>
+                    ) : null}
+                  </div>
                 </article>
               ))}
             </div>

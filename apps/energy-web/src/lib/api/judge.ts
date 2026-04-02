@@ -43,6 +43,7 @@ export type JudgeSummary = {
     treasuryShareAccount: string;
     treasuryKzteAccount: string;
     metadataUriHash: string;
+    metadataJson: Record<string, unknown> | null;
     metadataCanonicalJson: string;
     createAssetTx: string | null;
     issueSharesTx: string | null;
@@ -51,12 +52,20 @@ export type JudgeSummary = {
   positions: Array<{
     id: string;
     energyUserId: string;
+    energyAssetId: string;
     assetId: string;
+    assetPda: string;
+    shareMintAddress: string;
+    buyerWalletAddress: string;
+    buyerKzteAccount: string | null;
+    buyerShareAccount: string;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
     totalSharesPurchased: number;
     totalKzteSpent: number;
     averagePricePerShare: number;
-    buyerShareAccount: string;
     lastPurchaseTx: string | null;
+    status: string;
+    createdAt: string;
     updatedAt: string;
   }>;
   epochs: Array<{
@@ -72,10 +81,19 @@ export type JudgeSummary = {
   claims: Array<{
     id: string;
     energyUserId: string;
+    energyAssetId: string;
+    energyRevenueEpochId: string;
     claimReceiptPda: string;
+    claimerWalletAddress: string;
+    claimerKzteAccount: string;
+    claimerShareAccount: string;
     claimedAmountKzte: number;
+    claimedAmountEnergyPoints: number;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
     claimTx: string | null;
+    energyPointsMintTx: string | null;
     createdAt: string;
+    updatedAt: string;
   }>;
 };
 

@@ -95,7 +95,18 @@
       "assetRequired": "Выберите актив.",
       "invalidEpochAmount": "Введите корректную сумму эпохи.",
       "createEpochFailed": "Не удалось создать эпоху."
-    }
+    },
+    "bucket": "Тип выплаты",
+    "shares": "Доли",
+    "spent": "Потрачено",
+    "averagePrice": "Средняя цена",
+    "claimAmountKzte": "Выплачено в KZTE",
+    "claimAmountEnergyPoints": "Выплачено в ENERGY_POINTS",
+    "claimReceipt": "Claim receipt",
+    "created": "Создано",
+    "claimTx": "Claim tx",
+    "energyPointsMintTx": "Mint ENERGY_POINTS tx",
+    "supportedMode": "Поддерживается"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",
