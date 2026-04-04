@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import type { AssetDetailResponse } from '@/lib/api/asset-detail';
+import { ENERGY_API_BASE_URL } from '@/lib/config';
 import { formatKzte } from '@/lib/formatters';
 
 type AssetDetailViewProps = {
@@ -13,12 +14,6 @@ type AssetDetailViewProps = {
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) return null;
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
-}
-
-function shortHash(value: string): string {
-  if (!value) return '—';
-  if (value.length <= 18) return value;
-  return `${value.slice(0, 10)}...${value.slice(-8)}`;
 }
 
 export function AssetDetailView({ asset }: AssetDetailViewProps) {
@@ -34,7 +29,7 @@ export function AssetDetailView({ asset }: AssetDetailViewProps) {
     <main className="min-h-screen bg-[var(--background)] px-6 py-10 text-[var(--foreground)]">
       <div className="mx-auto flex w-full max-w-[1880px] flex-col gap-8">
         <section className="overflow-hidden rounded-[32px] border border-[var(--border)] bg-[var(--card)] shadow-sm">
-          <div className="grid gap-8 px-8 py-8 xl:grid-cols-[1.1fr_0.9fr] xl:px-10">
+          <div className="grid gap-8 px-8 py-8 xl:grid-cols-[1.05fr_0.95fr] xl:px-10">
             <div className="relative min-h-[320px] overflow-hidden rounded-3xl">
               <Image
                 src={asset.coverImageUrl || '/demo-assets/solar.jpg'}
@@ -52,9 +47,11 @@ export function AssetDetailView({ asset }: AssetDetailViewProps) {
                   <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium">
                     {asset.assetType}
                   </span>
+
                   <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium">
                     {asset.status}
                   </span>
+
                   {supportedModes.map((mode) => (
                     <span
                       key={mode}
@@ -177,7 +174,7 @@ export function AssetDetailView({ asset }: AssetDetailViewProps) {
                         </div>
 
                         <a
-                          href={`${process.env.NEXT_PUBLIC_ENERGY_API_BASE_URL ?? ''}${doc.fileUrl}`}
+                          href={`${ENERGY_API_BASE_URL}${doc.fileUrl}`}
                           target="_blank"
                           rel="noreferrer"
                           className="rounded-2xl border border-[var(--border)] px-4 py-2 text-sm font-medium transition hover:bg-[var(--muted)]/40"
@@ -256,8 +253,8 @@ export function AssetDetailView({ asset }: AssetDetailViewProps) {
                   <div className="text-sm font-medium">
                     {t('bundleVersion')}: {asset.latestProofBundle.bundleVersion}
                   </div>
-                  <div className="mt-2 text-xs text-[var(--muted-foreground)]">
-                    {shortHash(asset.latestProofBundle.proofRootHash)}
+                  <div className="mt-2 break-all text-xs text-[var(--muted-foreground)]">
+                    {asset.latestProofBundle.proofRootHash}
                   </div>
                 </div>
               ) : null}
@@ -272,10 +269,10 @@ export function AssetDetailView({ asset }: AssetDetailViewProps) {
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
-      <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+      <div className="text-xs text-center uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
         {label}
       </div>
-      <div className="mt-4 text-2xl font-semibold">{value}</div>
+      <div className="mt-4 text-center text-2xl font-semibold">{value}</div>
     </div>
   );
 }
