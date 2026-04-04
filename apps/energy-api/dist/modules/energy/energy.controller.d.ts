@@ -36,6 +36,7 @@ export declare class EnergyController {
             investorBps: number;
             operatorBps: number;
             registryPda: string;
+            coverImageUrl: string | null;
             proofRootHash: string;
             metadataUriHash: string;
             metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
@@ -120,6 +121,7 @@ export declare class EnergyController {
         investorBps: number;
         operatorBps: number;
         registryPda: string;
+        coverImageUrl: string | null;
         proofRootHash: string;
         metadataUriHash: string;
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;

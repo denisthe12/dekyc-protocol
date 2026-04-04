@@ -71,6 +71,7 @@ export declare class JudgeController {
             investorBps: number;
             operatorBps: number;
             registryPda: string;
+            coverImageUrl: string | null;
             proofRootHash: string;
             metadataUriHash: string;
             metadataJson: import("prisma/generated/client/runtime/library").JsonValue;

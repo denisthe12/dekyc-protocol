@@ -24,6 +24,9 @@ const otc_module_1 = require("./modules/otc/otc.module");
 const dev_module_1 = require("./modules/dev/dev.module");
 const history_module_1 = require("./modules/history/history.module");
 const settings_module_1 = require("./modules/settings/settings.module");
+const asset_documents_module_1 = require("./modules/asset-documents/asset-documents.module");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +47,11 @@ exports.AppModule = AppModule = __decorate([
             dev_module_1.DevModule,
             history_module_1.HistoryModule,
             settings_module_1.SettingsModule,
+            asset_documents_module_1.AssetDocumentsModule,
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(process.cwd(), 'storage'),
+                serveRoot: '/uploads',
+            }),
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

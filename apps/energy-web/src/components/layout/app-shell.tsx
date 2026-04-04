@@ -1,8 +1,18 @@
+'use client'
 import { Navbar } from './navbar';
 import { ProfileDropdown } from './profile-dropdown';
 import { ThemeToggle } from './theme-toggle';
 import { LocaleSwitcher } from './locale-switcher';
 import { ToastProvider, ToastViewport } from '../ui/toast';
+import { usePathname } from 'next/navigation';
+import path from 'path';
+
+function isWideRoute (pathname: string): boolean {
+  return (
+    pathname.includes('/assets') ||
+    pathname.includes('/judge')
+  );
+}
 
 export function AppShell({
   children,
@@ -11,6 +21,9 @@ export function AppShell({
   children: React.ReactNode;
   email?: string;
 }) {
+  const pathname = usePathname();
+  const wide = isWideRoute(pathname);
+
   return (
     <ToastProvider>
       <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -31,7 +44,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto max-w-7xl px-6 py-6">{children}</main>
+        <main className={wide ? 'w-full px-6 py-6 xl:px-8 2x1:px-10' :'mx-auto max-w-7xl px-6 py-6'}>{children}</main>
       </div>
       <ToastViewport className="fixed bottom-4 right-4 z-50 flex flex-col gap-2" />
     </ToastProvider>

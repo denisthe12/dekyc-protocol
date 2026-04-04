@@ -50,6 +50,15 @@ enum EnergyPositionPayoutMode {
   ENERGY_POINTS
 }
 
+enum EnergyAssetDocumentType {
+  PHOTO
+  TECH_PASSPORT
+  INSTALLER_CERTIFICATE
+  MONTHLY_REPORT
+  GEO_PROOF
+  OTHER
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -136,6 +145,10 @@ model EnergyAsset {
   shareMintAddress          String            @unique @db.VarChar(128)
   treasuryShareAccount      String            @unique @db.VarChar(128)
   treasuryKzteAccount       String            @unique @db.VarChar(128)
+
+  coverImageUrl             String?           @db.VarChar(512)
+  documents                 EnergyAssetDocument[]
+  proofBundles              EnergyAssetProofBundle[]
 
   proofRootHash             String            @db.VarChar(128)
   metadataUriHash           String            @db.VarChar(128)
@@ -281,4 +294,39 @@ model EnergyUserActionPassword {
   updatedAt     DateTime @updatedAt
 
   @@index([energyUserId])
+}
+
+model EnergyAssetDocument {
+  id                     String                  @id @default(cuid())
+  energyAssetId          String                  @db.VarChar(191)
+  documentType           EnergyAssetDocumentType
+  fileName               String                  @db.VarChar(255)
+  mimeType               String                  @db.VarChar(128)
+  storageKey             String                  @db.VarChar(512)
+  fileUrl                String                  @db.VarChar(512)
+  sha256Hash             String                  @db.VarChar(64)
+  sizeBytes              Int
+  uploadedByEnergyUserId String?                 @db.VarChar(191)
+  createdAt              DateTime                @default(now())
+
+  asset                  EnergyAsset             @relation(fields: [energyAssetId], references: [id], onDelete: Cascade)
+
+  @@index([energyAssetId])
+  @@index([documentType])
+  @@index([sha256Hash])
+}
+
+model EnergyAssetProofBundle {
+  id                     String      @id @default(cuid())
+  energyAssetId          String      @db.VarChar(191)
+  bundleVersion          Int
+  proofRootHash          String      @db.VarChar(64)
+  manifestJson           Json
+  createdByEnergyUserId  String?     @db.VarChar(191)
+  createdAt              DateTime    @default(now())
+
+  asset                  EnergyAsset @relation(fields: [energyAssetId], references: [id], onDelete: Cascade)
+
+  @@index([energyAssetId])
+  @@unique([energyAssetId, bundleVersion], map: "energy_asset_bundle_version_unique")
 }

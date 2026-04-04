@@ -15,6 +15,9 @@ import { OtcModule } from '@/modules/otc/otc.module';
 import { DevModule } from '@/modules/dev/dev.module';
 import { HistoryModule } from '@/modules/history/history.module';
 import { SettingsModule } from '@/modules/settings/settings.module';
+import { AssetDocumentsModule } from '@/modules/asset-documents/asset-documents.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -32,6 +35,11 @@ import { SettingsModule } from '@/modules/settings/settings.module';
     DevModule,
     HistoryModule,
     SettingsModule,
+    AssetDocumentsModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'storage'),
+      serveRoot: '/uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

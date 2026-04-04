@@ -9,12 +9,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnergyAssetsModule = void 0;
 const common_1 = require("@nestjs/common");
 const energy_assets_service_1 = require("./energy-assets.service");
+const public_assets_controller_1 = require("./public-assets.controller");
+const private_assets_controller_1 = require("./private-assets.controller");
 let EnergyAssetsModule = class EnergyAssetsModule {
 };
 exports.EnergyAssetsModule = EnergyAssetsModule;
 exports.EnergyAssetsModule = EnergyAssetsModule = __decorate([
     (0, common_1.Module)({
         providers: [energy_assets_service_1.EnergyAssetsService],
+        controllers: [public_assets_controller_1.PublicAssetsController, private_assets_controller_1.PrivateAssetsController],
         exports: [energy_assets_service_1.EnergyAssetsService],
     })
 ], EnergyAssetsModule);

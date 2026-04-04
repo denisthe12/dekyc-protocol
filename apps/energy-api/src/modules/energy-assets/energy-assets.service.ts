@@ -47,4 +47,183 @@ export class EnergyAssetsService {
       },
     });
   }
+
+  public async listPublicAssets() {
+    const assets = await this.prisma.energyAsset.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const items = await Promise.all(
+      assets.map(async (asset) => {
+        const soldSharesAggregate =
+          await this.prisma.energyInvestorPosition.aggregate({
+            _sum: {
+              totalSharesPurchased: true,
+            },
+            where: {
+              energyAssetId: asset.id,
+              status: 'ACTIVE',
+            },
+          });
+
+        const soldShares = soldSharesAggregate._sum.totalSharesPurchased ?? 0;
+        const remainingShares = Math.max(asset.totalShares - soldShares, 0);
+
+        return {
+          assetId: asset.assetId,
+          title: asset.title,
+          description: asset.description,
+          location: asset.location,
+          assetType: asset.assetType,
+          totalShares: asset.totalShares,
+          soldShares,
+          remainingShares,
+          pricePerShareKzte: asset.pricePerShareKzte,
+          investorBps: asset.investorBps,
+          operatorBps: asset.operatorBps,
+          status: asset.status,
+          coverImageUrl:
+            asset.coverImageUrl ??
+            `/demo-assets/${asset.assetType.toLowerCase()}.jpg`,
+          metadataJson: asset.metadataJson,
+          supportedPayoutModes:
+            (asset.metadataJson as { supportedPayoutModes?: string[] } | null)
+              ?.supportedPayoutModes ?? ['KZTE'],
+        };
+      }),
+    );
+
+    return items;
+  }
+
+  public async getPublicAssetPreview(assetId: string) {
+    const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+      where: { assetId },
+    });
+
+    const soldSharesAggregate =
+      await this.prisma.energyInvestorPosition.aggregate({
+        _sum: {
+          totalSharesPurchased: true,
+        },
+        where: {
+          energyAssetId: asset.id,
+          status: 'ACTIVE',
+        },
+      });
+
+    const soldShares = soldSharesAggregate._sum.totalSharesPurchased ?? 0;
+    const remainingShares = Math.max(asset.totalShares - soldShares, 0);
+
+    const latestBundle = await this.prisma.energyAssetProofBundle.findFirst({
+      where: {
+        energyAssetId: asset.id,
+      },
+      orderBy: {
+        bundleVersion: 'desc',
+      },
+    });
+
+    return {
+      accessLevel: 'PREVIEW',
+      assetId: asset.assetId,
+      title: asset.title,
+      description: asset.description,
+      location: asset.location,
+      assetType: asset.assetType,
+      totalShares: asset.totalShares,
+      soldShares,
+      remainingShares,
+      pricePerShareKzte: asset.pricePerShareKzte,
+      investorBps: asset.investorBps,
+      operatorBps: asset.operatorBps,
+      status: asset.status,
+      coverImageUrl:
+        asset.coverImageUrl ??
+        `/demo-assets/${asset.assetType.toLowerCase()}.jpg`,
+      proofRootHash: asset.proofRootHash,
+      metadataUriHash: asset.metadataUriHash,
+      assetPda: asset.assetPda,
+      registryPda: asset.registryPda,
+      shareMintAddress: asset.shareMintAddress,
+      treasuryShareAccount: asset.treasuryShareAccount,
+      treasuryKzteAccount: asset.treasuryKzteAccount,
+      createAssetTx: asset.createAssetTx,
+      issueSharesTx: asset.issueSharesTx,
+      metadataJson: asset.metadataJson,
+      latestProofBundle: latestBundle,
+    };
+  }
+
+  public async getPrivateAssetDetail(assetId: string) {
+    const asset = await this.prisma.energyAsset.findUniqueOrThrow({
+      where: { assetId },
+    });
+
+    const soldSharesAggregate =
+      await this.prisma.energyInvestorPosition.aggregate({
+        _sum: {
+          totalSharesPurchased: true,
+        },
+        where: {
+          energyAssetId: asset.id,
+          status: 'ACTIVE',
+        },
+      });
+
+    const soldShares = soldSharesAggregate._sum.totalSharesPurchased ?? 0;
+    const remainingShares = Math.max(asset.totalShares - soldShares, 0);
+
+    const documents = await this.prisma.energyAssetDocument.findMany({
+      where: {
+        energyAssetId: asset.id,
+      },
+      orderBy: [
+        { documentType: 'asc' },
+        { createdAt: 'desc' },
+      ],
+    });
+
+    const latestBundle = await this.prisma.energyAssetProofBundle.findFirst({
+      where: {
+        energyAssetId: asset.id,
+      },
+      orderBy: {
+        bundleVersion: 'desc',
+      },
+    });
+
+    return {
+      accessLevel: 'FULL',
+      assetId: asset.assetId,
+      title: asset.title,
+      description: asset.description,
+      location: asset.location,
+      assetType: asset.assetType,
+      totalShares: asset.totalShares,
+      soldShares,
+      remainingShares,
+      pricePerShareKzte: asset.pricePerShareKzte,
+      investorBps: asset.investorBps,
+      operatorBps: asset.operatorBps,
+      status: asset.status,
+      coverImageUrl:
+        asset.coverImageUrl ??
+        `/demo-assets/${asset.assetType.toLowerCase()}.jpg`,
+      proofRootHash: asset.proofRootHash,
+      metadataUriHash: asset.metadataUriHash,
+      assetPda: asset.assetPda,
+      registryPda: asset.registryPda,
+      shareMintAddress: asset.shareMintAddress,
+      treasuryShareAccount: asset.treasuryShareAccount,
+      treasuryKzteAccount: asset.treasuryKzteAccount,
+      createAssetTx: asset.createAssetTx,
+      issueSharesTx: asset.issueSharesTx,
+      metadataJson: asset.metadataJson,
+      documents,
+      latestProofBundle: latestBundle,
+    };
+  }
 }
