@@ -22,50 +22,39 @@ export default function AssetDetailPage({ params }: AssetDetailPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadAsset(nextAssetId: string): Promise<void> {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const session = loadEnergySession();
+
+      try {
+        const data = session?.accessToken
+          ? await fetchPrivateAssetDetail(nextAssetId, session.accessToken)
+          : await fetchPublicAssetDetail(nextAssetId);
+
+        setAsset(data);
+      } catch {
+        const preview = await fetchPublicAssetDetail(nextAssetId);
+        setAsset(preview);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load asset');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     let isMounted = true;
 
     async function resolveParamsAndLoad() {
-      try {
-        const resolved = await params;
-        if (!isMounted) {
-          return;
-        }
+      const resolved = await params;
+      if (!isMounted) return;
 
-        setAssetId(resolved.assetId);
-
-        const session = loadEnergySession();
-
-        try {
-          const data = session?.accessToken
-            ? await fetchPrivateAssetDetail(resolved.assetId, session.accessToken)
-            : await fetchPublicAssetDetail(resolved.assetId);
-
-          if (!isMounted) {
-            return;
-          }
-
-          setAsset(data);
-        } catch {
-          const preview = await fetchPublicAssetDetail(resolved.assetId);
-
-          if (!isMounted) {
-            return;
-          }
-
-          setAsset(preview);
-        }
-      } catch (err) {
-        if (!isMounted) {
-          return;
-        }
-
-        setError(err instanceof Error ? err.message : 'Failed to load asset');
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
+      setAssetId(resolved.assetId);
+      await loadAsset(resolved.assetId);
     }
 
     void resolveParamsAndLoad();
@@ -99,5 +88,12 @@ export default function AssetDetailPage({ params }: AssetDetailPageProps) {
     );
   }
 
-  return <AssetDetailView asset={asset} />;
+  return (
+    <AssetDetailView
+      asset={asset}
+      onRefresh={async () => {
+        await loadAsset(asset.assetId);
+      }}
+    />
+  );
 }
