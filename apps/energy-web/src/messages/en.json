@@ -423,5 +423,64 @@
       "sessionNotFound": "Energy session not found.",
       "loadFailed": "Failed to load profile."
     }
+  },
+  "HomePage": {
+    "eyebrow": "DeKYC Energy",
+    "guestTitle": "Energy project tokenization service",
+    "guestDescription": "To buy shares, receive payouts and use the portfolio, first complete a mock face scan and then log in through DeKYC.",
+    "loginViaDekyc": "Log in via DeKYC",
+    "exploreAssets": "Explore assets",
+    "guestMetric1Label": "Identity layer",
+    "guestMetric1Description": "Login, access and private sections are protected through DeKYC service-auth.",
+    "guestMetric2Label": "Settlement layer",
+    "guestMetric2Description": "Purchases, OTC and claims are executed inside ENERGY through KZTE and custodial wallets.",
+    "authTitle": "Energy user profile created",
+    "authDescription": "The user now has a real custodial address, a real Token-2022 account for KZTE and an initial 1,000,000 KZTE allocation.",
+    "logout": "Log out",
+    "user": "User",
+    "nameMissing": "Name not provided",
+    "email": "Email",
+    "notProvided": "not provided",
+    "verification": "Verification",
+    "role": "Role",
+    "custodialAddress": "Custodial address",
+    "kzteAccount": "KZTE token account",
+    "notCreated": "not created",
+    "walletStatus": "Wallet status",
+    "initialAirdrop": "Initial KZTE airdrop",
+    "airdropTx": "Airdrop tx",
+    "notYet": "not yet",
+    "errors": {
+      "loadProfile": "Failed to load profile"
+    }
+  },
+  "FaceScan": {
+    "title": "Biometric verification",
+    "description": "Complete a mock face scan to continue logging into ENERGY through DeKYC.",
+    "cameraUnavailable": "Camera preview is unavailable. Mock scanning will continue without it.",
+    "scanComplete": "Scan complete",
+    "scanning": "Scanning... {seconds}s",
+    "mockNotice": "This is a mock biometric flow for demo purposes.",
+    "close": "Close"
+  },
+  "LoginPage": {
+    "title": "Log in via DeKYC",
+    "description": "After the mock face scan, enter your unique login code to create an ENERGY JWT session.",
+    "biometricCompleted": "Biometric verification completed successfully",
+    "connectedService": "Connected service",
+    "notSet": "not set",
+    "loginCode": "Login code",
+    "loggingIn": "Logging in...",
+    "loginButton": "Log in via DeKYC",
+    "whatChanged": "What changed",
+    "change1": "1. The browser no longer knows the clientSecret.",
+    "change2": "2. The DeKYC call is now made only by energy-api.",
+    "change3": "3. The frontend receives a ready-made JWT session of the energy service.",
+    "errors": {
+      "serviceIdMissing": "NEXT_PUBLIC_DEKYC_SERVICE_ID is not set",
+      "clientIdMissing": "NEXT_PUBLIC_DEKYC_CLIENT_ID is not set",
+      "codeRequired": "Enter the login code",
+      "loginFailed": "Login failed"
+    }
   }
 }

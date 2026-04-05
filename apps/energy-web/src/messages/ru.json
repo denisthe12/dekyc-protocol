@@ -423,5 +423,64 @@
       "sessionNotFound": "Energy session не найдена.",
       "loadFailed": "Не удалось загрузить профиль."
     }
+  },
+  "HomePage": {
+    "eyebrow": "DeKYC Energy",
+    "guestTitle": "Сервис токенизации энергетических проектов",
+    "guestDescription": "Чтобы покупать доли, получать начисления и пользоваться портфелем, сначала пройдите mock-сканирование лица, а затем войдите через DeKYC.",
+    "loginViaDekyc": "Войти через DeKYC",
+    "exploreAssets": "Открыть каталог активов",
+    "guestMetric1Label": "Identity layer",
+    "guestMetric1Description": "Вход, доступ и приватные разделы защищены через DeKYC service-auth.",
+    "guestMetric2Label": "Settlement layer",
+    "guestMetric2Description": "Покупка, OTC и claim происходят внутри ENERGY через KZTE и custodial wallets.",
+    "authTitle": "Профиль energy-пользователя создан",
+    "authDescription": "Теперь у пользователя есть реальный custodial-адрес, реальный Token-2022 account для KZTE и стартовое начисление 1 000 000 KZTE.",
+    "logout": "Выйти",
+    "user": "Пользователь",
+    "nameMissing": "Имя не передано",
+    "email": "Email",
+    "notProvided": "не указан",
+    "verification": "Проверка",
+    "role": "Роль",
+    "custodialAddress": "Custodial адрес",
+    "kzteAccount": "KZTE token account",
+    "notCreated": "не создан",
+    "walletStatus": "Статус кошелька",
+    "initialAirdrop": "Стартовый KZTE airdrop",
+    "airdropTx": "Tx начисления",
+    "notYet": "ещё нет",
+    "errors": {
+      "loadProfile": "Ошибка загрузки профиля"
+    }
+  },
+  "FaceScan": {
+    "title": "Биометрическая проверка",
+    "description": "Выполните mock-сканирование лица, чтобы продолжить вход в ENERGY через DeKYC.",
+    "cameraUnavailable": "Предпросмотр камеры недоступен. Mock scanning продолжится без него.",
+    "scanComplete": "Сканирование завершено",
+    "scanning": "Сканирование... {seconds}с",
+    "mockNotice": "Это mock biometric flow для demo-показа.",
+    "close": "Закрыть"
+  },
+  "LoginPage": {
+    "title": "Вход через DeKYC",
+    "description": "После mock-сканирования лица введите уникальный код входа, чтобы создать JWT-сессию energy-сервиса.",
+    "biometricCompleted": "Биометрическая проверка успешно завершена",
+    "connectedService": "Подключённый сервис",
+    "notSet": "не задан",
+    "loginCode": "Код входа",
+    "loggingIn": "Входим...",
+    "loginButton": "Войти через DeKYC",
+    "whatChanged": "Что изменилось",
+    "change1": "1. Браузер больше не знает clientSecret.",
+    "change2": "2. Вызов DeKYC теперь делает только energy-api.",
+    "change3": "3. На фронт возвращается уже готовая JWT-сессия energy-сервиса.",
+    "errors": {
+      "serviceIdMissing": "Не задан NEXT_PUBLIC_DEKYC_SERVICE_ID",
+      "clientIdMissing": "Не задан NEXT_PUBLIC_DEKYC_CLIENT_ID",
+      "codeRequired": "Введите код входа",
+      "loginFailed": "Ошибка входа"
+    }
   }
 }
