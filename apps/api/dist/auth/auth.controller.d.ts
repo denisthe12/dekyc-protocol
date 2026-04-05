@@ -11,14 +11,14 @@ export declare class AuthController {
     private readonly solanaService;
     constructor(authService: AuthService, hkdfService: HkdfService, solanaService: SolanaService);
     signup(body: SignupDto): Promise<{
-        accessToken: any;
+        accessToken: string;
         user: {
             id: string;
             email: string;
         };
     }>;
     login(body: LoginDto): Promise<{
-        accessToken: any;
+        accessToken: string;
         user: {
             id: string;
             email: string;

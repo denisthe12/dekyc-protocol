@@ -10,12 +10,20 @@ import {
   StyledDropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { clearEnergySession } from '@/lib/session';
 
 export function ProfileDropdown({ email }: { email?: string }) {
   const t = useTranslations('ProfileDropdown');
   const locale = useLocale();
 
   const initial = email?.[0]?.toUpperCase() ?? 'U';
+  const router = useRouter();
+  
+  function handleLogout(){
+    clearEnergySession();
+    router.push(`/${locale}/login`)
+  }
 
   return (
     <DropdownMenu>
@@ -43,7 +51,7 @@ export function ProfileDropdown({ email }: { email?: string }) {
 
         <StyledDropdownMenuSeparator />
 
-        <StyledDropdownMenuItem className="text-red-400">
+        <StyledDropdownMenuItem className="text-red-400" onClick={handleLogout}>
           {t('logout')}
         </StyledDropdownMenuItem>
       </StyledDropdownMenuContent>
