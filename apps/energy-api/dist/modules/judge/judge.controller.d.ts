@@ -129,5 +129,29 @@ export declare class JudgeController {
             claimTx: string | null;
             energyPointsMintTx: string | null;
         }[];
+        otcListings: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyOtcListingStatus;
+            energyAssetId: string;
+            assetId: string;
+            assetPda: string;
+            shareMintAddress: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
+            pricePerShareKzte: number;
+            shareAmount: number;
+            listingId: string;
+            sellerEnergyUserId: string;
+            buyerEnergyUserId: string | null;
+            listingPda: string;
+            sellerWalletAddress: string;
+            sellerShareAccount: string;
+            sellerKzteAccount: string;
+            escrowShareAccount: string;
+            totalPriceKzte: number;
+            createListingTx: string | null;
+            fillListingTx: string | null;
+        }[];
     }>;
 }

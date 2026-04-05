@@ -95,6 +95,32 @@ export type JudgeSummary = {
     createdAt: string;
     updatedAt: string;
   }>;
+  otcListings: JudgeOtcListingItem[];
+};
+
+export type JudgeOtcListingItem = {
+  id: string;
+  listingId: string;
+  energyAssetId: string;
+  sellerEnergyUserId: string;
+  buyerEnergyUserId: string | null;
+  assetId: string;
+  assetPda: string;
+  listingPda: string;
+  shareMintAddress: string;
+  sellerWalletAddress: string;
+  sellerShareAccount: string;
+  sellerKzteAccount: string;
+  escrowShareAccount: string;
+  shareAmount: number;
+  pricePerShareKzte: number;
+  totalPriceKzte: number;
+  payoutMode: 'KZTE' | 'ENERGY_POINTS';
+  createListingTx: string | null;
+  fillListingTx: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type JudgeCreateEpochResponse = {

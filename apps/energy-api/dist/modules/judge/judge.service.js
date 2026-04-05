@@ -25,7 +25,7 @@ let JudgeService = class JudgeService {
             this.solanaService.getSignerStatus(),
             this.token2022Service.getKzteMintStatus(),
         ]);
-        const [users, assets, positions, epochs, claims] = await Promise.all([
+        const [users, assets, positions, epochs, claims, otcListings] = await Promise.all([
             this.prisma.energyUser.findMany({
                 include: {
                     profile: true,
@@ -60,6 +60,12 @@ let JudgeService = class JudgeService {
                 },
                 take: 20,
             }),
+            this.prisma.energyOtcListing.findMany({
+                orderBy: {
+                    updatedAt: 'desc',
+                },
+                take: 20,
+            }),
         ]);
         return {
             generatedAt: new Date().toISOString(),
@@ -75,6 +81,7 @@ let JudgeService = class JudgeService {
             positions,
             epochs,
             claims,
+            otcListings,
         };
     }
 };
