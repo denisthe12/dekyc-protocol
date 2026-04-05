@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { hasPlatformSession } from '@/lib/platform-session';
-import { inputClassName } from '@/components/ui/input-class';
+import { inputClassName, inputClassNamePageLogin } from '@/components/ui/input-class';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 
 type AuthMode = 'login' | 'signup';
@@ -127,7 +127,7 @@ export default function LoginPage() {
                 <input
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`${inputClassName} border-zinc-700 bg-zinc-950 text-white placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-zinc-800`}
+                  className={`${inputClassNamePageLogin} border-zinc-700 bg-zinc-950 text-white placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-zinc-800`}
                   placeholder="you@example.com"
                 />
               </div>
@@ -140,7 +140,7 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`${inputClassName} border-zinc-700 bg-zinc-950 text-white placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-zinc-800`}
+                  className={`${inputClassNamePageLogin} border-zinc-700 bg-zinc-950 text-white placeholder:text-zinc-500 focus:border-zinc-500 focus:ring-zinc-800`}
                   placeholder="Enter your password"
                 />
               </div>
