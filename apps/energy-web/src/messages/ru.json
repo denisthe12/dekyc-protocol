@@ -284,12 +284,6 @@
       "otc": "OTC",
       "claims": "Claims"
     },
-    "labels": {
-      "primaryBuy": "Primary buy",
-      "otcCreated": "OTC listing created",
-      "otcFilled": "OTC listing filled",
-      "claim": "Claim"
-    },
     "amount": "Сумма",
     "shares": "Доли",
     "primaryTx": "Основной tx",
@@ -299,7 +293,22 @@
     "errors": {
       "sessionNotFound": "Energy session не найдена.",
       "loadFailed": "Не удалось загрузить историю."
-    }
+    },
+    "otcSubTabs": {
+      "all": "Все OTC",
+      "created": "Созданные",
+      "sold": "Проданные",
+      "bought": "Купленные"
+    },
+    "labels": {
+      "primaryBuy": "Primary buy",
+      "otcCreated": "OTC listing created",
+      "otcFilled": "OTC listing filled",
+      "claim": "Claim",
+      "otcSold": "Seller",
+      "otcBought": "Buyer"
+    },
+    "emptyOtcTab": "Для выбранного OTC-раздела событий пока нет."
   },
   "SettingsPage": {
     "eyebrow": "Настройки",

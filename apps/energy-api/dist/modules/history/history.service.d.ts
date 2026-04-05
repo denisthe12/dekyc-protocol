@@ -1,12 +1,16 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
 export type HistoryEventItem = {
     id: string;
-    type: 'INITIAL_KZTE_AIRDROP' | 'PRIMARY_BUY' | 'REVENUE_EPOCH_CREATED' | 'PAYOUT_CLAIM' | 'OTC_LISTING_CREATED' | 'OTC_LISTING_FILLED';
+    type: 'PRIMARY_BUY' | 'OTC_LISTING_CREATED' | 'OTC_LISTING_FILLED' | 'CLAIM';
+    assetId: string;
     title: string;
-    description: string;
-    assetId: string | null;
-    txSignature: string | null;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS' | null;
+    amountBaseUnits: number | null;
+    shareAmount: number | null;
+    tx: string | null;
+    secondaryTx: string | null;
     createdAt: string;
+    metadata?: Record<string, unknown> | null;
 };
 export declare class HistoryService {
     private readonly prisma;

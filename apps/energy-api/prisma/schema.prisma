@@ -172,6 +172,28 @@ model EnergyAsset {
   @@index([status])
 }
 
+model EnergyPrimaryBuyTx {
+  id                  String   @id @default(cuid())
+  energyUserId        String   @db.VarChar(191)
+  energyAssetId       String   @db.VarChar(191)
+  assetId             String   @db.VarChar(128)
+  assetPda            String   @db.VarChar(128)
+  shareMintAddress    String   @db.VarChar(128)
+  buyerWalletAddress  String   @db.VarChar(128)
+  buyerKzteAccount    String?  @db.VarChar(128)
+  buyerShareAccount   String   @db.VarChar(128)
+  payoutMode          EnergyPositionPayoutMode
+  shareAmount         Int
+  pricePerShareKzte   Int
+  totalKzteSpent      Int
+  txSignature         String   @unique @db.VarChar(128)
+  createdAt           DateTime @default(now())
+
+  @@index([energyUserId, createdAt])
+  @@index([energyAssetId, createdAt])
+  @@index([assetId, createdAt])
+}
+
 model EnergyInvestorPosition {
   id                     String                   @id @default(cuid())
   energyUserId           String                   @db.VarChar(191)

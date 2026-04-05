@@ -10,6 +10,7 @@ type HistoryTabsProps = {
 };
 
 type HistoryTab = 'ALL' | 'PRIMARY_BUY' | 'OTC' | 'CLAIM';
+type OtcSubTab = 'ALL' | 'CREATED' | 'SOLD' | 'BOUGHT';
 
 function explorerTxUrl(signature: string | null): string | null {
   if (!signature) return null;
@@ -19,27 +20,43 @@ function explorerTxUrl(signature: string | null): string | null {
 export function HistoryTabs({ items }: HistoryTabsProps) {
   const t = useTranslations('HistoryPage');
   const locale = useLocale();
+
   const [activeTab, setActiveTab] = useState<HistoryTab>('ALL');
+  const [activeOtcSubTab, setActiveOtcSubTab] = useState<OtcSubTab>('ALL');
 
   const filteredItems = useMemo(() => {
-    if (activeTab === 'ALL') {
-      return items;
-    }
+    let result = items;
 
     if (activeTab === 'PRIMARY_BUY') {
-      return items.filter((item) => item.type === 'PRIMARY_BUY');
-    }
-
-    if (activeTab === 'OTC') {
-      return items.filter(
+      result = result.filter((item) => item.type === 'PRIMARY_BUY');
+    } else if (activeTab === 'OTC') {
+      result = result.filter(
         (item) =>
           item.type === 'OTC_LISTING_CREATED' ||
           item.type === 'OTC_LISTING_FILLED',
       );
+
+      if (activeOtcSubTab === 'CREATED') {
+        result = result.filter((item) => item.type === 'OTC_LISTING_CREATED');
+      } else if (activeOtcSubTab === 'SOLD') {
+        result = result.filter(
+          (item) =>
+            item.type === 'OTC_LISTING_FILLED' &&
+            getMetadataRole(item) === 'SELLER',
+        );
+      } else if (activeOtcSubTab === 'BOUGHT') {
+        result = result.filter(
+          (item) =>
+            item.type === 'OTC_LISTING_FILLED' &&
+            getMetadataRole(item) === 'BUYER',
+        );
+      }
+    } else if (activeTab === 'CLAIM') {
+      result = result.filter((item) => item.type === 'CLAIM');
     }
 
-    return items.filter((item) => item.type === 'CLAIM');
-  }, [items, activeTab]);
+    return result;
+  }, [items, activeTab, activeOtcSubTab]);
 
   return (
     <div className="space-y-6">
@@ -66,15 +83,41 @@ export function HistoryTabs({ items }: HistoryTabsProps) {
         />
       </div>
 
+      {activeTab === 'OTC' ? (
+        <div className="flex flex-wrap gap-2">
+          <HistorySubTabButton
+            active={activeOtcSubTab === 'ALL'}
+            onClick={() => setActiveOtcSubTab('ALL')}
+            label={t('otcSubTabs.all')}
+          />
+          <HistorySubTabButton
+            active={activeOtcSubTab === 'CREATED'}
+            onClick={() => setActiveOtcSubTab('CREATED')}
+            label={t('otcSubTabs.created')}
+          />
+          <HistorySubTabButton
+            active={activeOtcSubTab === 'SOLD'}
+            onClick={() => setActiveOtcSubTab('SOLD')}
+            label={t('otcSubTabs.sold')}
+          />
+          <HistorySubTabButton
+            active={activeOtcSubTab === 'BOUGHT'}
+            onClick={() => setActiveOtcSubTab('BOUGHT')}
+            label={t('otcSubTabs.bought')}
+          />
+        </div>
+      ) : null}
+
       {filteredItems.length === 0 ? (
         <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-10 text-center text-[var(--muted-foreground)] shadow-sm">
-          {t('emptyTab')}
+          {activeTab === 'OTC' ? t('emptyOtcTab') : t('emptyTab')}
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-2">
           {filteredItems.map((item) => {
             const txUrl = explorerTxUrl(item.tx);
             const secondaryTxUrl = explorerTxUrl(item.secondaryTx);
+            const otcRole = getMetadataRole(item);
 
             return (
               <article
@@ -95,6 +138,12 @@ export function HistoryTabs({ items }: HistoryTabsProps) {
                   <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium">
                     Asset {item.assetId}
                   </span>
+
+                  {item.type === 'OTC_LISTING_FILLED' && otcRole ? (
+                    <span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs font-medium">
+                      {labelForOtcRole(otcRole, t)}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="mt-5">
@@ -113,7 +162,7 @@ export function HistoryTabs({ items }: HistoryTabsProps) {
                     label={t('amount')}
                     value={
                       item.amountBaseUnits !== null
-                        ? `${formatKzte(item.amountBaseUnits, locale === 'en' ? 'en' : 'ru')} KZTE`
+                        ? formatAmount(item, locale)
                         : '—'
                     }
                   />
@@ -179,6 +228,30 @@ function HistoryTabButton({
   );
 }
 
+function HistorySubTabButton({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={
+        active
+          ? 'rounded-2xl border border-[var(--border)] bg-[var(--muted)] px-3 py-1.5 text-sm font-semibold text-[var(--foreground)] transition'
+          : 'rounded-2xl border border-[var(--border)] px-3 py-1.5 text-sm font-medium text-[var(--muted-foreground)] transition hover:bg-[var(--muted)]/40'
+      }
+    >
+      {label}
+    </button>
+  );
+}
+
 function HistoryMetricTile({
   label,
   value,
@@ -214,4 +287,35 @@ function labelForType(
     default:
       return type;
   }
+}
+
+function labelForOtcRole(
+  role: 'SELLER' | 'BUYER',
+  t: ReturnType<typeof useTranslations<'HistoryPage'>>,
+): string {
+  return role === 'SELLER' ? t('labels.otcSold') : t('labels.otcBought');
+}
+
+function getMetadataRole(item: HistoryItem): 'SELLER' | 'BUYER' | null {
+  const role = item.metadata?.role;
+
+  if (role === 'SELLER' || role === 'BUYER') {
+    return role;
+  }
+
+  return null;
+}
+
+function formatAmount(item: HistoryItem, locale: string): string {
+  const normalizedLocale = locale === 'en' ? 'en' : 'ru';
+
+  if (item.amountBaseUnits === null) {
+    return '—';
+  }
+
+  // if (item.payoutMode === 'ENERGY_POINTS') {
+  //   return `${formatKzte(item.amountBaseUnits, normalizedLocale)} EP`;
+  // }
+
+  return `${formatKzte(item.amountBaseUnits, normalizedLocale)} KZTE`;
 }

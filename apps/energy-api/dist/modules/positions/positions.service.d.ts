@@ -85,4 +85,35 @@ export declare class PositionsService {
         averagePricePerShare: number;
         lastPurchaseTx: string | null;
     }[]>;
+    recordPrimaryBuyTx(params: {
+        energyUserId: string;
+        energyAssetId: string;
+        assetId: string;
+        assetPda: string;
+        shareMintAddress: string;
+        buyerWalletAddress: string;
+        buyerKzteAccount: string | null;
+        buyerShareAccount: string;
+        payoutMode: 'KZTE' | 'ENERGY_POINTS';
+        shareAmount: number;
+        pricePerShareKzte: number;
+        totalKzteSpent: number;
+        txSignature: string;
+    }): Promise<{
+        id: string;
+        energyUserId: string;
+        createdAt: Date;
+        energyAssetId: string;
+        assetId: string;
+        assetPda: string;
+        shareMintAddress: string;
+        buyerWalletAddress: string;
+        buyerKzteAccount: string | null;
+        buyerShareAccount: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
+        totalKzteSpent: number;
+        pricePerShareKzte: number;
+        shareAmount: number;
+        txSignature: string;
+    }>;
 }

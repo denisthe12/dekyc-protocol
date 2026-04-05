@@ -136,6 +136,25 @@ let PositionsService = class PositionsService {
             },
         });
     }
+    async recordPrimaryBuyTx(params) {
+        return this.prisma.energyPrimaryBuyTx.create({
+            data: {
+                energyUserId: params.energyUserId,
+                energyAssetId: params.energyAssetId,
+                assetId: params.assetId,
+                assetPda: params.assetPda,
+                shareMintAddress: params.shareMintAddress,
+                buyerWalletAddress: params.buyerWalletAddress,
+                buyerKzteAccount: params.buyerKzteAccount,
+                buyerShareAccount: params.buyerShareAccount,
+                payoutMode: params.payoutMode,
+                shareAmount: params.shareAmount,
+                pricePerShareKzte: params.pricePerShareKzte,
+                totalKzteSpent: params.totalKzteSpent,
+                txSignature: params.txSignature,
+            },
+        });
+    }
 };
 exports.PositionsService = PositionsService;
 exports.PositionsService = PositionsService = __decorate([

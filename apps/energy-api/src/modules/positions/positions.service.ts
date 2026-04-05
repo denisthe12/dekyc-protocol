@@ -164,4 +164,38 @@ export class PositionsService {
       },
     });
   }
+
+  public async recordPrimaryBuyTx(params: {
+    energyUserId: string;
+    energyAssetId: string;
+    assetId: string;
+    assetPda: string;
+    shareMintAddress: string;
+    buyerWalletAddress: string;
+    buyerKzteAccount: string | null;
+    buyerShareAccount: string;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
+    shareAmount: number;
+    pricePerShareKzte: number;
+    totalKzteSpent: number;
+    txSignature: string;
+  }) {
+    return this.prisma.energyPrimaryBuyTx.create({
+      data: {
+        energyUserId: params.energyUserId,
+        energyAssetId: params.energyAssetId,
+        assetId: params.assetId,
+        assetPda: params.assetPda,
+        shareMintAddress: params.shareMintAddress,
+        buyerWalletAddress: params.buyerWalletAddress,
+        buyerKzteAccount: params.buyerKzteAccount,
+        buyerShareAccount: params.buyerShareAccount,
+        payoutMode: params.payoutMode,
+        shareAmount: params.shareAmount,
+        pricePerShareKzte: params.pricePerShareKzte,
+        totalKzteSpent: params.totalKzteSpent,
+        txSignature: params.txSignature,
+      },
+    });
+  }
 }

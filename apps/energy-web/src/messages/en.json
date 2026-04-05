@@ -284,12 +284,6 @@
       "otc": "OTC",
       "claims": "Claims"
     },
-    "labels": {
-      "primaryBuy": "Primary buy",
-      "otcCreated": "OTC listing created",
-      "otcFilled": "OTC listing filled",
-      "claim": "Claim"
-    },
     "amount": "Amount",
     "shares": "Shares",
     "primaryTx": "Primary tx",
@@ -299,7 +293,22 @@
     "errors": {
       "sessionNotFound": "Energy session not found.",
       "loadFailed": "Failed to load history."
-    }
+    },
+    "otcSubTabs": {
+      "all": "All OTC",
+      "created": "Created",
+      "sold": "Sold",
+      "bought": "Bought"
+    },
+    "labels": {
+      "primaryBuy": "Primary buy",
+      "otcCreated": "OTC listing created",
+      "otcFilled": "OTC listing filled",
+      "claim": "Claim",
+      "otcSold": "Seller",
+      "otcBought": "Buyer"
+    },
+    "emptyOtcTab": "No events found for this OTC section."
   },
   "SettingsPage": {
     "eyebrow": "Settings",

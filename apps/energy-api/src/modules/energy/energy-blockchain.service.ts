@@ -282,6 +282,22 @@ export class EnergyBlockchainService {
       purchaseTx: tx,
     });
 
+    await this.positionsService.recordPrimaryBuyTx({
+      energyUserId: params.energyUserId,
+      energyAssetId: asset.id,
+      assetId: asset.assetId,
+      assetPda: asset.assetPda,
+      shareMintAddress: asset.shareMintAddress,
+      buyerWalletAddress: wallet.custodialWalletAddress,
+      buyerKzteAccount: wallet.kzteTokenAccountAddress,
+      buyerShareAccount: buyerShareAccount.address.toBase58(),
+      payoutMode: params.payoutMode,
+      shareAmount: params.shareAmount,
+      pricePerShareKzte: asset.pricePerShareKzte,
+      totalKzteSpent,
+      txSignature: tx,
+    });
+
     return {
       assetId: asset.assetId,
       assetPda: asset.assetPda,
