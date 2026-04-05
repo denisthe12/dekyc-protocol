@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 
 const items = [
   { href: '/permissions', label: 'Permissions' },
@@ -13,16 +14,18 @@ const items = [
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const locale = useLocale();
 
   return (
     <nav className="flex flex-col gap-2">
       {items.map((item) => {
-        const active = pathname === item.href;
+        const localizedHref = `/${locale}${item.href}`;
+        const active = pathname === localizedHref;
 
         return (
           <Link
             key={item.href}
-            href={item.href}
+            href={localizedHref}
             className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
               active
                 ? 'bg-zinc-900 text-white'

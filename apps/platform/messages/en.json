@@ -1,0 +1,77 @@
+{
+  "DemoGuidePage": {
+    "title": "Demo Guide",
+    "description": "Step-by-step walkthrough of the DeKYC user journey: profile setup, identity verification, permission creation, and service login.",
+
+    "introTitle": "What this guide is for",
+    "introPoint1": "Shows the complete user journey from onboarding to service access",
+    "introPoint2": "Helps judges follow the product flow in the correct order",
+    "introPoint3": "Connects user platform, KYC flow, permissions, and service login",
+    "introPoint4": "Works as a presentation checklist during the demo",
+
+    "progressTitle": "Demo Progress",
+    "progressDescription": "This progress reflects the current state of the user platform and readiness for service access.",
+    "loadingErrorFallback": "Failed to load overview",
+    "loadingTitle": "Loading demo progress",
+    "loadingDescription": "The platform is collecting current onboarding and permission state.",
+    "guideCompletion": "Guide completion",
+    "guideCompletionSuffix": "% of the user journey is currently completed",
+
+    "metricUserEmail": "User Email",
+    "metricActivePermissions": "Active Permissions",
+    "metricKycReady": "KYC Ready",
+    "metricServiceLoginReady": "Service Login Ready",
+
+    "yes": "Yes",
+    "no": "No",
+
+    "presentationOrderTitle": "Recommended presentation order",
+    "presentationOrderDescription": "For the strongest demo, follow the steps below in order. This keeps both technical and non-technical judges oriented.",
+    "refreshStatus": "Refresh Status",
+
+    "noStepsTitle": "No demo steps available yet",
+    "noStepsDescription": "The guide will appear after platform overview data is loaded.",
+
+    "stepDoneBody": "This part of the flow is already completed and ready to demonstrate.",
+    "stepPendingBody": "This part of the flow still needs to be completed during the demo or setup.",
+
+    "readFlowTitle": "How judges should read this flow",
+    "readFlowDescription": "This sequence shows that DeKYC is not just a technical prototype, but a complete product experience.",
+    "readFlowPoint1": "The user completes identity onboarding inside the platform",
+    "readFlowPoint2": "EDS verification produces a reusable KYC profile",
+    "readFlowPoint3": "Permissions are explicitly granted to a chosen service",
+    "readFlowPoint4": "The service receives signed KYC access through DeKYC",
+
+    "steps": {
+      "profileTitle": "Setup Profile",
+      "profileDescription": "Configure Biometric Mock and generate your Unique Login Code.",
+      "profileCta": "Open Profile",
+
+      "kycTitle": "Complete KYC",
+      "kycDescription": "Connect your digital signature and build a verified KYC profile.",
+      "kycCta": "Open KYC",
+
+      "permissionsTitle": "Grant Permission",
+      "permissionsDescription": "Choose a service and approve exactly which identity claims it may access.",
+      "permissionsCta": "Open Permissions",
+
+      "serviceLoginTitle": "Login to Service",
+      "serviceLoginDescription": "Enter the consumer service using Biometric Mock and Unique Login Code.",
+      "serviceLoginCta": "Open Service Login"
+    },
+
+    "statusCompleted": "Completed",
+    "statusPending": "Pending"
+  },
+  "PlatformSidebar": {
+    "overview": "Overview",
+    "demoGuide": "Demo Guide",
+    "profile": "Profile",
+    "kyc": "KYC",
+    "permissions": "Permissions",
+    "logout": "Logout",
+    "language": "Language",
+    "russian": "Русский",
+    "english": "English"
+  }
+}

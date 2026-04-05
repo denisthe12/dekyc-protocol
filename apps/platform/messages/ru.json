@@ -1,0 +1,77 @@
+{
+  "DemoGuidePage": {
+    "title": "Демо-гид",
+    "description": "Пошаговый обзор пользовательского пути DeKYC: настройка профиля, подтверждение личности, создание разрешения и вход в сервис.",
+
+    "introTitle": "Для чего нужен этот гид",
+    "introPoint1": "Показывает полный путь пользователя от онбординга до входа в сервис",
+    "introPoint2": "Помогает судьям проходить продуктовый flow в правильном порядке",
+    "introPoint3": "Связывает пользовательскую платформу, KYC, permissions и вход в сервис",
+    "introPoint4": "Работает как чеклист презентации во время демо",
+
+    "progressTitle": "Прогресс демо",
+    "progressDescription": "Этот прогресс отражает текущее состояние пользовательской платформы и готовность ко входу в сервис.",
+    "loadingErrorFallback": "Не удалось загрузить overview",
+    "loadingTitle": "Загрузка прогресса демо",
+    "loadingDescription": "Платформа собирает текущее состояние онбординга и разрешений.",
+    "guideCompletion": "Готовность гида",
+    "guideCompletionSuffix": "% пользовательского пути уже завершено",
+
+    "metricUserEmail": "Email пользователя",
+    "metricActivePermissions": "Активные разрешения",
+    "metricKycReady": "KYC готов",
+    "metricServiceLoginReady": "Готовность входа в сервис",
+
+    "yes": "Да",
+    "no": "Нет",
+
+    "presentationOrderTitle": "Рекомендуемый порядок презентации",
+    "presentationOrderDescription": "Для самого сильного демо проходи шаги ниже по порядку. Так и техническим, и нетехническим судьям будет проще следить за flow.",
+    "refreshStatus": "Обновить статус",
+
+    "noStepsTitle": "Шаги демо пока недоступны",
+    "noStepsDescription": "Гид появится после загрузки overview платформы.",
+
+    "stepDoneBody": "Эта часть flow уже завершена и готова к демонстрации.",
+    "stepPendingBody": "Эту часть flow ещё нужно завершить во время демо или подготовки.",
+
+    "readFlowTitle": "Как судьям читать этот flow",
+    "readFlowDescription": "Эта последовательность показывает, что DeKYC — не просто технический прототип, а полноценный продуктовый сценарий.",
+    "readFlowPoint1": "Пользователь проходит identity-onboarding внутри платформы",
+    "readFlowPoint2": "Проверка ЭЦП формирует повторно используемый KYC-профиль",
+    "readFlowPoint3": "Разрешения явно выдаются выбранному сервису",
+    "readFlowPoint4": "Сервис получает подписанный доступ к KYC через DeKYC",
+
+    "steps": {
+      "profileTitle": "Настроить профиль",
+      "profileDescription": "Настрой Biometric Mock и сгенерируй свой Unique Login Code.",
+      "profileCta": "Открыть профиль",
+
+      "kycTitle": "Пройти KYC",
+      "kycDescription": "Подключи цифровую подпись и сформируй подтверждённый KYC-профиль.",
+      "kycCta": "Открыть KYC",
+
+      "permissionsTitle": "Выдать разрешение",
+      "permissionsDescription": "Выбери сервис и подтверди, к каким identity-claims он может получить доступ.",
+      "permissionsCta": "Открыть Permissions",
+
+      "serviceLoginTitle": "Войти в сервис",
+      "serviceLoginDescription": "Войди во внешний сервис через Biometric Mock и Unique Login Code.",
+      "serviceLoginCta": "Открыть вход в сервис"
+    },
+
+    "statusCompleted": "Завершено",
+    "statusPending": "Ожидает"
+  },
+  "PlatformSidebar": {
+    "overview": "Обзор",
+    "demoGuide": "Демо-гид",
+    "profile": "Профиль",
+    "kyc": "KYC",
+    "permissions": "Разрешения",
+    "logout": "Выйти",
+    "language": "Язык",
+    "russian": "Русский",
+    "english": "English"
+  }
+}
