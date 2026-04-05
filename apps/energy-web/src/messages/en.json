@@ -95,7 +95,18 @@
     "judgeFriendly": "Judge-friendly view",
     "judgeTitle": "Verifiability for judges",
     "judgeDescription": "This page exposes hashes, document links and on-chain addresses to verify the connection between the real asset and the token.",
-    "bundleVersion": "Bundle version"
+    "bundleVersion": "Bundle version",
+    "guestPreviewWarning": "You are viewing a public preview. Log in through DeKYC to buy shares and access private documents.",
+    "restrictedPreviewWarning": "You are logged in, but full access to private docs and buying is currently restricted.",
+    "loginViaDekyc": "Log in via DeKYC",
+    "openProfile": "Open profile",
+    "fullAccessGranted": "Full asset access granted",
+    "previewOnlyGuest": "Public preview mode",
+    "previewOnlyRestricted": "Restricted preview mode",
+    "privateDocsHiddenGuest": "Private documents are hidden. Log in through DeKYC to unlock full access.",
+    "privateDocsHiddenRestricted": "Private documents are hidden. Your account is authenticated, but full access has not been activated yet.",
+    "requestAccess": "Request access",
+    "requestingAccess": "Requesting access..."
   },
   "JudgePage": {
     "eyebrow": "Judge page",

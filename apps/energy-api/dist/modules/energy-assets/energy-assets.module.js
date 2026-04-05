@@ -11,11 +11,13 @@ const common_1 = require("@nestjs/common");
 const energy_assets_service_1 = require("./energy-assets.service");
 const public_assets_controller_1 = require("./public-assets.controller");
 const private_assets_controller_1 = require("./private-assets.controller");
+const asset_access_module_1 = require("../asset-access/asset-access.module");
 let EnergyAssetsModule = class EnergyAssetsModule {
 };
 exports.EnergyAssetsModule = EnergyAssetsModule;
 exports.EnergyAssetsModule = EnergyAssetsModule = __decorate([
     (0, common_1.Module)({
+        imports: [asset_access_module_1.AssetAccessModule],
         providers: [energy_assets_service_1.EnergyAssetsService],
         controllers: [public_assets_controller_1.PublicAssetsController, private_assets_controller_1.PrivateAssetsController],
         exports: [energy_assets_service_1.EnergyAssetsService],

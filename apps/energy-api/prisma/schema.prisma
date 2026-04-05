@@ -59,6 +59,11 @@ enum EnergyAssetDocumentType {
   OTHER
 }
 
+enum EnergyAssetAccessStatus {
+  GRANTED
+  REVOKED
+}
+
 model EnergyUser {
   id                String              @id @default(cuid())
   dekycUserId       String              @unique
@@ -72,6 +77,7 @@ model EnergyUser {
   profile           EnergyUserProfile?
   wallet            EnergyUserWallet?
   sessions          EnergyUserSession[]
+  assetAccesses     EnergyAssetAccess[]
 }
 
 model EnergyUserProfile {
@@ -149,6 +155,7 @@ model EnergyAsset {
   coverImageUrl             String?           @db.VarChar(512)
   documents                 EnergyAssetDocument[]
   proofBundles              EnergyAssetProofBundle[]
+  accesses                  EnergyAssetAccess[]
 
   proofRootHash             String            @db.VarChar(128)
   metadataUriHash           String            @db.VarChar(128)
@@ -329,4 +336,21 @@ model EnergyAssetProofBundle {
 
   @@index([energyAssetId])
   @@unique([energyAssetId, bundleVersion], map: "energy_asset_bundle_version_unique")
+}
+
+model EnergyAssetAccess {
+  id            String                  @id @default(cuid())
+  energyUserId  String                  @db.VarChar(191)
+  energyAssetId String                  @db.VarChar(191)
+  status        EnergyAssetAccessStatus @default(GRANTED)
+  grantedAt     DateTime                @default(now())
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
+  user          EnergyUser              @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+  asset         EnergyAsset             @relation(fields: [energyAssetId], references: [id], onDelete: Cascade)
+
+  @@unique([energyUserId, energyAssetId], map: "energy_user_asset_access_unique")
+  @@index([energyUserId])
+  @@index([energyAssetId])
 }

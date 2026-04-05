@@ -95,7 +95,18 @@
     "judgeFriendly": "Judge-friendly view",
     "judgeTitle": "Проверяемость для судей",
     "judgeDescription": "На этой странице доступны hashes, ссылки на документы и on-chain адреса для проверки связи между реальным активом и токеном.",
-    "bundleVersion": "Версия bundle"
+    "bundleVersion": "Версия bundle",
+    "guestPreviewWarning": "Вы видите публичный preview. Для покупки и просмотра private docs войдите через DeKYC.",
+    "restrictedPreviewWarning": "Вы вошли, но полный доступ к private docs и покупке пока ограничен.",
+    "loginViaDekyc": "Войти через DeKYC",
+    "openProfile": "Открыть профиль",
+    "fullAccessGranted": "Полный доступ к активу открыт",
+    "previewOnlyGuest": "Публичный preview режим",
+    "previewOnlyRestricted": "Ограниченный preview режим",
+    "privateDocsHiddenGuest": "Private документы скрыты. Войдите через DeKYC, чтобы открыть полный доступ.",
+    "privateDocsHiddenRestricted": "Private документы скрыты. Ваш аккаунт авторизован, но полный доступ пока не активирован.",
+    "requestAccess": "Запросить доступ",
+    "requestingAccess": "Запрос доступа..."
   },
   "JudgePage": {
     "eyebrow": "Judge page",

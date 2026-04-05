@@ -1,8 +1,16 @@
+import type { Request } from 'express';
 import { EnergyAssetsService } from './energy-assets.service';
+import { AssetAccessService } from '@/modules/asset-access/asset-access.service';
+type AuthenticatedRequest = Request & {
+    user: {
+        id: string;
+    };
+};
 export declare class PrivateAssetsController {
     private readonly energyAssetsService;
-    constructor(energyAssetsService: EnergyAssetsService);
-    getPrivateAssetDetail(assetId: string): Promise<{
+    private readonly assetAccessService;
+    constructor(energyAssetsService: EnergyAssetsService, assetAccessService: AssetAccessService);
+    getPrivateAssetDetail(assetId: string, req: AuthenticatedRequest): Promise<{
         accessLevel: string;
         assetId: string;
         title: string;
@@ -51,3 +59,4 @@ export declare class PrivateAssetsController {
         } | null;
     }>;
 }
+export {};

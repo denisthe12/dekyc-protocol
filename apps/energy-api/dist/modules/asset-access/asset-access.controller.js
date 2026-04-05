@@ -12,40 +12,47 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PrivateAssetsController = void 0;
+exports.AssetAccessController = void 0;
 const common_1 = require("@nestjs/common");
-const energy_assets_service_1 = require("./energy-assets.service");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
-const asset_access_service_1 = require("../asset-access/asset-access.service");
-let PrivateAssetsController = class PrivateAssetsController {
-    constructor(energyAssetsService, assetAccessService) {
-        this.energyAssetsService = energyAssetsService;
+const asset_access_service_1 = require("./asset-access.service");
+let AssetAccessController = class AssetAccessController {
+    constructor(assetAccessService) {
         this.assetAccessService = assetAccessService;
     }
-    async getPrivateAssetDetail(assetId, req) {
-        const access = await this.assetAccessService.getAccess({
+    async getAccess(assetId, req) {
+        return this.assetAccessService.getAccess({
             energyUserId: req.user.id,
             assetId,
         });
-        if (!access.hasAccess) {
-            throw new common_1.ForbiddenException('Asset access is not granted');
-        }
-        return this.energyAssetsService.getPrivateAssetDetail(assetId);
+    }
+    async requestAccess(assetId, req) {
+        return this.assetAccessService.requestAccess({
+            energyUserId: req.user.id,
+            assetId,
+        });
     }
 };
-exports.PrivateAssetsController = PrivateAssetsController;
+exports.AssetAccessController = AssetAccessController;
 __decorate([
     (0, common_1.Get)(':assetId'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, common_1.Param)('assetId')),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], PrivateAssetsController.prototype, "getPrivateAssetDetail", null);
-exports.PrivateAssetsController = PrivateAssetsController = __decorate([
-    (0, common_1.Controller)('assets'),
-    __metadata("design:paramtypes", [energy_assets_service_1.EnergyAssetsService,
-        asset_access_service_1.AssetAccessService])
-], PrivateAssetsController);
-//# sourceMappingURL=private-assets.controller.js.map
+], AssetAccessController.prototype, "getAccess", null);
+__decorate([
+    (0, common_1.Post)(':assetId/request'),
+    __param(0, (0, common_1.Param)('assetId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], AssetAccessController.prototype, "requestAccess", null);
+exports.AssetAccessController = AssetAccessController = __decorate([
+    (0, common_1.Controller)('asset-access'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    __metadata("design:paramtypes", [asset_access_service_1.AssetAccessService])
+], AssetAccessController);
+//# sourceMappingURL=asset-access.controller.js.map

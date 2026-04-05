@@ -18,6 +18,7 @@ import { SettingsModule } from '@/modules/settings/settings.module';
 import { AssetDocumentsModule } from '@/modules/asset-documents/asset-documents.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AssetAccessModule } from '@/modules/asset-access/asset-access.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { join } from 'path';
       rootPath: join(process.cwd(), 'storage'),
       serveRoot: '/uploads',
     }),
+    AssetAccessModule,
   ],
   controllers: [AppController],
   providers: [AppService],

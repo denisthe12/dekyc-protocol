@@ -9,6 +9,8 @@ import {
 } from '@/lib/api/asset-detail';
 import { loadEnergySession } from '@/lib/session';
 
+import { fetchAssetAccess } from '@/lib/api/asset-access';
+
 type AssetDetailPageProps = {
   params: Promise<{
     assetId: string;
@@ -16,11 +18,14 @@ type AssetDetailPageProps = {
   }>;
 };
 
+type AccessUxState = 'GUEST_PREVIEW' | 'RESTRICTED_PREVIEW' | 'FULL';
+
 export default function AssetDetailPage({ params }: AssetDetailPageProps) {
   const [assetId, setAssetId] = useState<string>('');
   const [asset, setAsset] = useState<AssetDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accessUxState, setAccessUxState] = useState<AccessUxState>('GUEST_PREVIEW');
 
   async function loadAsset(nextAssetId: string): Promise<void> {
     try {
@@ -29,18 +34,33 @@ export default function AssetDetailPage({ params }: AssetDetailPageProps) {
 
       const session = loadEnergySession();
 
-      try {
-        const data = session?.accessToken
-          ? await fetchPrivateAssetDetail(nextAssetId, session.accessToken)
-          : await fetchPublicAssetDetail(nextAssetId);
-
-        setAsset(data);
-      } catch {
+      if (!session?.accessToken) {
         const preview = await fetchPublicAssetDetail(nextAssetId);
         setAsset(preview);
+        setAccessUxState('GUEST_PREVIEW');
+        return;
       }
+
+      const access = await fetchAssetAccess(nextAssetId, session.accessToken);
+
+      if (!access.hasAccess) {
+        const preview = await fetchPublicAssetDetail(nextAssetId);
+        setAsset(preview);
+        setAccessUxState('RESTRICTED_PREVIEW');
+        return;
+      }
+
+      const data = await fetchPrivateAssetDetail(nextAssetId, session.accessToken);
+      setAsset(data);
+      setAccessUxState('FULL');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load asset');
+      try {
+        const preview = await fetchPublicAssetDetail(nextAssetId);
+        setAsset(preview);
+        setAccessUxState('GUEST_PREVIEW');
+      } catch {
+        setError(err instanceof Error ? err.message : 'Failed to load asset');
+      }
     } finally {
       setLoading(false);
     }
@@ -91,6 +111,7 @@ export default function AssetDetailPage({ params }: AssetDetailPageProps) {
   return (
     <AssetDetailView
       asset={asset}
+      accessUxState={accessUxState}
       onRefresh={async () => {
         await loadAsset(asset.assetId);
       }}

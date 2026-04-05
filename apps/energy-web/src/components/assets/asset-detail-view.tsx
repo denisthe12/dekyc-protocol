@@ -8,9 +8,15 @@ import type { AssetDetailResponse } from '@/lib/api/asset-detail';
 import { ENERGY_API_BASE_URL } from '@/lib/config';
 import { formatKzte } from '@/lib/formatters';
 import { BuySharesDialog } from '@/components/energy/buy-shares-dialog';
+import { useRouter } from 'next/navigation';
+import { loadEnergySession } from '@/lib/session';
+import { requestAssetAccess } from '@/lib/api/asset-access';
+
+type AccessUxState = 'GUEST_PREVIEW' | 'RESTRICTED_PREVIEW' | 'FULL';
 
 type AssetDetailViewProps = {
   asset: AssetDetailResponse;
+  accessUxState: AccessUxState;
   onRefresh?: () => Promise<void> | void;
 };
 
@@ -19,15 +25,34 @@ function explorerTxUrl(signature: string | null): string | null {
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
 }
 
-export function AssetDetailView({ asset, onRefresh }: AssetDetailViewProps) {
+export function AssetDetailView({ asset, accessUxState, onRefresh }: AssetDetailViewProps) {
   const t = useTranslations('AssetDetailPage');
   const common = useTranslations('Common');
   const locale = useLocale();
   const [buyOpen, setBuyOpen] = useState(false);
+  const router = useRouter();
+  const [requestingAccess, setRequestingAccess] = useState(false);
 
   const supportedModes =
     (asset.metadataJson as { supportedPayoutModes?: string[] } | null)
       ?.supportedPayoutModes ?? ['KZTE'];
+  
+  async function handleRequestAccess(): Promise<void> {
+    try {
+      setRequestingAccess(true);
+
+      const session = loadEnergySession();
+      if (!session?.accessToken) {
+        router.push(`/${locale}/login`);
+        return;
+      }
+
+      await requestAssetAccess(asset.assetId, session.accessToken);
+      await onRefresh?.();
+    } finally {
+      setRequestingAccess(false);
+    }
+  }
 
   return (
     <>
@@ -78,10 +103,25 @@ export function AssetDetailView({ asset, onRefresh }: AssetDetailViewProps) {
                   <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-foreground)]">
                     {asset.description || t('noDescription')}
                   </p>
+                  <div className="mt-5">
+                    {accessUxState === 'FULL' ? (
+                      <div className="inline-flex items-center rounded-full border border-emerald-800 bg-emerald-950/30 px-4 py-2 text-sm text-emerald-300">
+                        {t('fullAccessGranted')}
+                      </div>
+                    ) : accessUxState === 'GUEST_PREVIEW' ? (
+                      <div className="inline-flex items-center rounded-full border border-amber-800 bg-amber-950/30 px-4 py-2 text-sm text-amber-300">
+                        {t('previewOnlyGuest')}
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center rounded-full border border-amber-800 bg-amber-950/30 px-4 py-2 text-sm text-amber-300">
+                        {t('previewOnlyRestricted')}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  {asset.accessLevel === 'FULL' ? (
+                  {accessUxState === 'FULL' ? (
                     <button
                       type="button"
                       onClick={() => setBuyOpen(true)}
@@ -89,10 +129,35 @@ export function AssetDetailView({ asset, onRefresh }: AssetDetailViewProps) {
                     >
                       {t('buyShares')}
                     </button>
+                  ) : accessUxState === 'GUEST_PREVIEW' ? (
+                    <>
+                      <div className="rounded-2xl border border-amber-800 bg-amber-950/30 px-4 py-3 text-sm text-amber-300">
+                        {t('guestPreviewWarning')}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/${locale}/login`)}
+                        className="rounded-2xl bg-[var(--foreground)] px-5 py-2.5 text-sm font-semibold text-[var(--background)] transition hover:opacity-90"
+                      >
+                        {t('loginViaDekyc')}
+                      </button>
+                    </>
                   ) : (
-                    <div className="rounded-2xl border border-amber-800 bg-amber-950/30 px-4 py-3 text-sm text-amber-300">
-                      {t('restrictedWarning')}
-                    </div>
+                    <>
+                      <div className="rounded-2xl border border-amber-800 bg-amber-950/30 px-4 py-3 text-sm text-amber-300">
+                        {t('restrictedPreviewWarning')}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => void handleRequestAccess()}
+                        disabled={requestingAccess}
+                        className="rounded-2xl bg-[var(--foreground)] px-5 py-2.5 text-sm font-semibold text-[var(--background)] transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {requestingAccess ? t('requestingAccess') : t('requestAccess')}
+                      </button>
+                    </>
                   )}
 
                   <Link
@@ -201,9 +266,11 @@ export function AssetDetailView({ asset, onRefresh }: AssetDetailViewProps) {
                   </div>
                 ) : (
                   <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--muted)]/30 p-4 text-sm text-[var(--muted-foreground)]">
-                    {asset.accessLevel === 'FULL'
+                    {accessUxState === 'FULL'
                       ? t('noDocuments')
-                      : t('privateDocsHidden')}
+                      : accessUxState === 'GUEST_PREVIEW'
+                        ? t('privateDocsHiddenGuest')
+                        : t('privateDocsHiddenRestricted')}
                   </div>
                 )}
               </section>
@@ -274,7 +341,7 @@ export function AssetDetailView({ asset, onRefresh }: AssetDetailViewProps) {
         </div>
       </main>
 
-      {asset.accessLevel === 'FULL' ? (
+      {accessUxState === 'FULL' ? (
         <BuySharesDialog
           open={buyOpen}
           onClose={() => setBuyOpen(false)}
