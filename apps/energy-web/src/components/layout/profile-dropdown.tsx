@@ -16,23 +16,26 @@ import { clearEnergySession } from '@/lib/session';
 export function ProfileDropdown({ email }: { email?: string }) {
   const t = useTranslations('ProfileDropdown');
   const locale = useLocale();
+  const router = useRouter();
 
   const initial = email?.[0]?.toUpperCase() ?? 'U';
-  const router = useRouter();
-  
-  function handleLogout(){
+
+  function handleLogout() {
     clearEnergySession();
-    router.push(`/${locale}/login`)
+    router.push(`/${locale}/login`);
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-2 rounded-full px-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--primary-foreground)]">
+        <Button
+          variant="outline"
+          className="gap-2 rounded-full border-[var(--border)] bg-[var(--background)]/60 px-3"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--foreground)] text-sm font-semibold text-[var(--background)]">
             {initial}
           </div>
-          <span>▾</span>
+          <span className="text-[var(--muted-foreground)]">▾</span>
         </Button>
       </DropdownMenuTrigger>
 

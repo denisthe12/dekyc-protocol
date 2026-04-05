@@ -14,7 +14,12 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button type="button" variant="outline" size="sm">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="rounded-xl border-[var(--border)] bg-[var(--background)]/60"
+      >
         •••
       </Button>
     );
@@ -28,8 +33,9 @@ export function ThemeToggle() {
       variant="outline"
       size="sm"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      className="rounded-xl border-[var(--border)] bg-[var(--background)]/60 px-3 transition hover:bg-[var(--muted)]/50"
     >
-      {isDark ? '🌙' : '☀️'}
+      <span className="text-base">{isDark ? '🌙' : '☀️'}</span>
     </Button>
   );
 }

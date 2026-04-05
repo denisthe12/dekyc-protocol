@@ -2,6 +2,8 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export function LocaleSwitcher() {
   const router = useRouter();
@@ -21,26 +23,38 @@ export function LocaleSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 px-2 py-1">
-      <button
-        type="button"
-        onClick={() => switchLocale('ru')}
-        className={`rounded-md px-2 py-1 text-sm transition ${
-          locale === 'ru' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
-        }`}
-      >
-        RU
-      </button>
+    <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--background)]/60 p-1">
+      {(['ru', 'en'] as const).map((item) => {
+        const active = locale === item;
 
-      <button
-        type="button"
-        onClick={() => switchLocale('en')}
-        className={`rounded-md px-2 py-1 text-sm transition ${
-          locale === 'en' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
-        }`}
-      >
-        EN
-      </button>
+        return (
+          <button
+            key={item}
+            type="button"
+            onClick={() => switchLocale(item)}
+            className={cn(
+              'relative rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+              active
+                ? 'text-[var(--background)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]',
+            )}
+          >
+            {active ? (
+              <motion.span
+                layoutId="locale-active-pill"
+                className="absolute inset-0 rounded-lg bg-[var(--foreground)]"
+                transition={{
+                  type: 'spring',
+                  stiffness: 380,
+                  damping: 30,
+                }}
+              />
+            ) : null}
+
+            <span className="relative z-10 uppercase">{item}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
