@@ -10,7 +10,8 @@ import path from 'path';
 function isWideRoute (pathname: string): boolean {
   return (
     pathname.includes('/assets') ||
-    pathname.includes('/judge')
+    pathname.includes('/judge') ||
+    pathname.includes('/otc')
   );
 }
 
