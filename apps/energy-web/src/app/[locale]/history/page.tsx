@@ -3,30 +3,19 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { fetchHistory, HistoryItem } from '@/lib/api/history';
 import { fetchEnergyMe } from '@/lib/api/energy';
+import { fetchHistory, type HistoryItem } from '@/lib/api/history';
 import { loadEnergySession } from '@/lib/session';
-
-function explorerTxUrl(signature: string | null): string | null {
-  if (!signature) {
-    return null;
-  }
-
-  return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
-}
+import { HistoryTabs } from '@/components/history/history-tabs';
 
 export default function HistoryPage() {
-  const locale = useLocale();
   const t = useTranslations('HistoryPage');
   const common = useTranslations('Common');
+  const locale = useLocale();
 
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void loadPage();
-  }, []);
 
   async function loadPage(): Promise<void> {
     try {
@@ -34,108 +23,106 @@ export default function HistoryPage() {
       setError(null);
 
       const session = loadEnergySession();
-      if (!session) {
-        throw new Error('Energy session not found');
+      if (!session?.accessToken) {
+        throw new Error(t('errors.sessionNotFound'));
       }
 
       const me = await fetchEnergyMe(session.accessToken);
-      const data = await fetchHistory(me.id);
+      const history = await fetchHistory(me.id);
 
-      setItems(data);
+      setItems(history);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load history');
-      setItems([]);
+      setError(err instanceof Error ? err.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
   }
 
+  useEffect(() => {
+    void loadPage();
+  }, []);
+
   return (
-    <main className="min-h-screen bg-zinc-950 px-6 py-10 text-white">
-      <div className="mx-auto flex max-w-5xl flex-col gap-6">
-        <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+    <main className="min-h-screen bg-[var(--background)] px-6 py-10 text-[var(--foreground)]">
+      <div className="mx-auto flex w-full max-w-[1880px] flex-col gap-8">
+        <section className="overflow-hidden rounded-[32px] border border-[var(--border)] bg-[var(--card)] shadow-sm">
+          <div className="grid gap-8 px-8 py-10 lg:grid-cols-[1.4fr_0.9fr] lg:px-10">
             <div>
-              <div className="text-sm uppercase tracking-[0.24em] text-zinc-500">
+              <div className="text-xs uppercase tracking-[0.28em] text-[var(--muted-foreground)]">
                 {t('eyebrow')}
               </div>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight">
+
+              <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-tight lg:text-5xl">
                 {t('title')}
               </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-400">
+
+              <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--muted-foreground)]">
                 {t('description')}
               </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href={`/${locale}/portfolio`}
+                  className="rounded-2xl bg-[var(--foreground)] px-5 py-2.5 text-sm font-semibold text-[var(--background)] transition hover:opacity-90"
+                >
+                  {t('goToPortfolio')}
+                </Link>
+
+                <Link
+                  href={`/${locale}`}
+                  className="rounded-2xl border border-[var(--border)] px-5 py-2.5 text-sm font-medium transition hover:bg-[var(--muted)]/40"
+                >
+                  {common('backHome')}
+                </Link>
+              </div>
             </div>
 
-            <Link
-              href={`/${locale}`}
-              className="rounded-2xl border border-zinc-700 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-500 hover:text-white"
-            >
-              {common('backHome')}
-            </Link>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-[var(--border)] bg-[var(--muted)]/30 p-5">
+                <div className="flex min-h-[220px] flex-col items-center justify-center text-center">
+                  <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    {t('heroMetric1Label')}
+                  </div>
+                  <div className="mt-5 text-4xl font-semibold leading-none">
+                    {items.length}
+                  </div>
+                  <p className="mt-5 max-w-[18rem] text-base leading-7 text-[var(--muted-foreground)]">
+                    {t('heroMetric1Description')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-[var(--border)] bg-[var(--muted)]/30 p-5">
+                <div className="flex min-h-[220px] flex-col items-center justify-center text-center">
+                  <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                    {t('heroMetric2Label')}
+                  </div>
+                  <div className="mt-5 text-4xl font-semibold leading-none">
+                    {items.filter((item) => item.type === 'CLAIM').length}
+                  </div>
+                  <p className="mt-5 max-w-[18rem] text-base leading-7 text-[var(--muted-foreground)]">
+                    {t('heroMetric2Description')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
         {loading ? (
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 text-zinc-400">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-10 text-[var(--muted-foreground)] shadow-sm">
             {common('loading')}
           </div>
         ) : error ? (
-          <div className="rounded-3xl border border-red-900 bg-red-950/40 p-8 text-red-300">
+          <div className="rounded-3xl border border-red-900 bg-red-950/40 p-10 text-red-300 shadow-sm">
             {error}
           </div>
         ) : items.length === 0 ? (
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 text-zinc-400">
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-10 text-center text-[var(--muted-foreground)] shadow-sm">
             {t('empty')}
           </div>
         ) : (
-          <div className="grid gap-4">
-            {items.map((item) => {
-              const txUrl = explorerTxUrl(item.txSignature);
-
-              return (
-                <article
-                  key={item.id}
-                  className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
-                      {t(`types.${item.type}`)}
-                    </div>
-
-                    <div className="text-xs text-zinc-500">
-                      {new Date(item.createdAt).toLocaleString(locale)}
-                    </div>
-                  </div>
-
-                  <h2 className="mt-3 text-xl font-semibold">{item.title}</h2>
-
-                  <p className="mt-2 text-sm leading-7 text-zinc-400">
-                    {item.description}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    {item.assetId ? (
-                      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs text-zinc-300">
-                        Asset ID: {item.assetId}
-                      </div>
-                    ) : null}
-
-                    {txUrl ? (
-                      <a
-                        href={txUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-2xl bg-white px-4 py-2 text-sm font-medium text-black transition hover:bg-zinc-200"
-                      >
-                        {t('openTx')}
-                      </a>
-                    ) : null}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <HistoryTabs items={items} />
         )}
       </div>
     </main>

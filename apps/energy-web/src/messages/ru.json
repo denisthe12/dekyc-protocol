@@ -270,18 +270,35 @@
     "logout": "Выйти"
   },
   "HistoryPage": {
-    "eyebrow": "История",
-    "title": "История операций",
-    "description": "Здесь отображаются все ключевые действия пользователя с ссылками на реальные транзакции в блокчейне.",
+    "eyebrow": "History",
+    "title": "История действий по вашим энергетическим активам",
+    "description": "Отслеживайте покупки, OTC-сделки и claim-выплаты в единой истории с tx links и понятной разбивкой по типам событий.",
+    "goToPortfolio": "Открыть портфель",
+    "heroMetric1Label": "Всего событий",
+    "heroMetric1Description": "Полная история действий по активам, claims и OTC listing’ам.",
+    "heroMetric2Label": "Claim события",
+    "heroMetric2Description": "Количество зафиксированных claim-выплат в вашей истории.",
+    "tabs": {
+      "all": "Все",
+      "primaryBuy": "Покупка активов",
+      "otc": "OTC",
+      "claims": "Claims"
+    },
+    "labels": {
+      "primaryBuy": "Primary buy",
+      "otcCreated": "OTC listing created",
+      "otcFilled": "OTC listing filled",
+      "claim": "Claim"
+    },
+    "amount": "Сумма",
+    "shares": "Доли",
+    "primaryTx": "Основной tx",
+    "secondaryTx": "Доп. tx",
     "empty": "История пока пуста.",
-    "openTx": "Открыть транзакцию",
-    "types": {
-      "INITIAL_KZTE_AIRDROP": "Начальное начисление KZTE",
-      "PRIMARY_BUY": "Покупка на primary market",
-      "REVENUE_EPOCH_CREATED": "Создание revenue epoch",
-      "PAYOUT_CLAIM": "Получение выплаты",
-      "OTC_LISTING_CREATED": "Создание OTC listing",
-      "OTC_LISTING_FILLED": "Исполнение OTC listing"
+    "emptyTab": "Для выбранной вкладки событий пока нет.",
+    "errors": {
+      "sessionNotFound": "Energy session не найдена.",
+      "loadFailed": "Не удалось загрузить историю."
     }
   },
   "SettingsPage": {

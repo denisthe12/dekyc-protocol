@@ -271,17 +271,34 @@
   },
   "HistoryPage": {
     "eyebrow": "History",
-    "title": "Activity history",
-    "description": "This page shows all key user actions with links to real blockchain transactions.",
+    "title": "History of actions for your energy assets",
+    "description": "Track purchases, OTC trades and claim payouts in a single history feed with tx links and clear grouping by event type.",
+    "goToPortfolio": "Open portfolio",
+    "heroMetric1Label": "Total events",
+    "heroMetric1Description": "Complete history of actions across assets, claims and OTC listings.",
+    "heroMetric2Label": "Claim events",
+    "heroMetric2Description": "Number of recorded claim payouts in your history.",
+    "tabs": {
+      "all": "All",
+      "primaryBuy": "Asset purchases",
+      "otc": "OTC",
+      "claims": "Claims"
+    },
+    "labels": {
+      "primaryBuy": "Primary buy",
+      "otcCreated": "OTC listing created",
+      "otcFilled": "OTC listing filled",
+      "claim": "Claim"
+    },
+    "amount": "Amount",
+    "shares": "Shares",
+    "primaryTx": "Primary tx",
+    "secondaryTx": "Secondary tx",
     "empty": "History is empty.",
-    "openTx": "Open transaction",
-    "types": {
-      "INITIAL_KZTE_AIRDROP": "Initial KZTE airdrop",
-      "PRIMARY_BUY": "Primary market purchase",
-      "REVENUE_EPOCH_CREATED": "Revenue epoch created",
-      "PAYOUT_CLAIM": "Payout claim",
-      "OTC_LISTING_CREATED": "OTC listing created",
-      "OTC_LISTING_FILLED": "OTC listing filled"
+    "emptyTab": "No events found for this tab.",
+    "errors": {
+      "sessionNotFound": "Energy session not found.",
+      "loadFailed": "Failed to load history."
     }
   },
   "SettingsPage": {

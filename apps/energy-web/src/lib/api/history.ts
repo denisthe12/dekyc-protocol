@@ -1,24 +1,26 @@
 import { ENERGY_API_BASE_URL } from '@/lib/config';
 
+export type HistoryEventType =
+  | 'PRIMARY_BUY'
+  | 'OTC_LISTING_CREATED'
+  | 'OTC_LISTING_FILLED'
+  | 'CLAIM';
+
 export type HistoryItem = {
   id: string;
-  type:
-    | 'INITIAL_KZTE_AIRDROP'
-    | 'PRIMARY_BUY'
-    | 'REVENUE_EPOCH_CREATED'
-    | 'PAYOUT_CLAIM'
-    | 'OTC_LISTING_CREATED'
-    | 'OTC_LISTING_FILLED';
+  type: HistoryEventType;
+  assetId: string;
   title: string;
-  description: string;
-  assetId: string | null;
-  txSignature: string | null;
+  payoutMode: 'KZTE' | 'ENERGY_POINTS' | null;
+  amountBaseUnits: number | null;
+  shareAmount: number | null;
+  tx: string | null;
+  secondaryTx: string | null;
   createdAt: string;
+  metadata?: Record<string, unknown> | null;
 };
 
-export async function fetchHistory(
-  energyUserId: string,
-): Promise<HistoryItem[]> {
+export async function fetchHistory(energyUserId: string): Promise<HistoryItem[]> {
   const response = await fetch(`${ENERGY_API_BASE_URL}/history/${energyUserId}`, {
     method: 'GET',
     cache: 'no-store',
