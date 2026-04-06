@@ -1,11 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
+
+export type ToastItem = {
+  id: number;
+  title?: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+};
+
+export type CreateToastInput = Omit<ToastItem, 'id'>;
 
 export function useToast() {
-  const [toasts, setToasts] = useState<any[]>([]);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  function push(toast: any) {
+  function push(toast: CreateToastInput) {
     setToasts((prev) => [...prev, { ...toast, id: Date.now() }]);
   }
 
