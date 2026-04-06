@@ -107,7 +107,7 @@ export default function EdsLabPage() {
 
       const accessToken = getAccessTokenOrThrow();
 
-      const response = await fetch('http://localhost:3001/api/eds/challenge', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/eds/challenge`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -173,7 +173,7 @@ export default function EdsLabPage() {
       setCmsSignatureBase64(signature);
       const accessToken = getAccessTokenOrThrow();
 
-      const response = await fetch('http://localhost:3001/api/eds/attest', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/eds/attest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

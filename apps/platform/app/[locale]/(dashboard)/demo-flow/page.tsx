@@ -126,7 +126,7 @@ export default function DemoFlowPage() {
       const timestamp = Date.now();
       const nonce = `demo-${timestamp}`;
 
-      const res = await fetch('http://localhost:3001/api/service-api/kyc-request', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-api/kyc-request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

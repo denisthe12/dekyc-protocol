@@ -13,7 +13,7 @@ const LOCAL_EXPLORER_BASE =
   'https://explorer.solana.com/address';
 
 const LOCAL_EXPLORER_SUFFIX =
-  '?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899';
+  '?cluster=devnet';
 
 function buildExplorerUrl(address: string) {
   return `${LOCAL_EXPLORER_BASE}/${address}${LOCAL_EXPLORER_SUFFIX}`;

@@ -73,5 +73,56 @@
     "language": "Language",
     "russian": "Русский",
     "english": "English"
+  },
+  "LandingPage": {
+    "brandTitle": "DeKYC Energy",
+    "brandSubtitle": "Identity-powered platform for tokenized energy revenue rights",
+
+    "headerUserPlatform": "Open ENERGY App",
+    "headerConsumerService": "Judge Demo",
+    "headerProtocolConsole": "Protocol Console",
+
+    "languageRussian": "RU",
+    "languageEnglish": "EN",
+
+    "eyebrow": "Hackathon 2026 • Solana • Blockchain Track",
+
+    "heroLine1": "DeKYC + Energy,",
+    "heroLine2": "walletless access to tokenized energy rights",
+
+    "heroDescription": "DeKYC Energy combines a reusable identity layer with a service for tokenized energy revenue rights. The user logs in through DeKYC, enters ENERGY without a crypto wallet, buys shares of energy projects, receives payouts and trades positions through a built-in OTC marketplace.",
+
+    "heroPrimaryCta": "Open ENERGY App",
+    "heroSecondaryCta": "Open Judge Demo",
+
+    "statWalletlessLabel": "Walletless UX",
+    "statWalletlessValue": "Face + Code",
+    "statAccessLabel": "Access Layer",
+    "statAccessValue": "DeKYC",
+    "statTrustLabel": "Energy Flow",
+    "statTrustValue": "Buy • Claim • OTC",
+
+    "architectureLabel": "Live architecture",
+    "architectureTitle": "User → DeKYC → ENERGY → Solana",
+    "architectureActive": "ACTIVE",
+
+    "layerUserTitle": "DeKYC Identity Layer",
+    "layerUserBadge": "Identity + Access",
+    "layerUserDescription": "The user's e-signature is transformed into a tokenized identity, used for authentication, signing and granting scoped access to services.",
+
+    "layerProtocolTitle": "ENERGY Service Layer",
+    "layerProtocolBadge": "Primary + OTC",
+    "layerProtocolDescription": "Asset catalog, share purchases, revenue epochs, payout claims, portfolio, history and OTC marketplace.",
+
+    "layerServiceTitle": "On-Chain Settlement",
+    "layerServiceBadge": "Token-2022",
+    "layerServiceDescription": "A dedicated share mint for each asset, claim logic, escrow OTC, payout buckets and verifiable tx links on Solana.",
+
+    "metricPermissionLabel": "Permission state",
+    "metricPermissionValue": "On-chain",
+    "metricStorageLabel": "Payout logic",
+    "metricStorageValue": "Epoch-based",
+    "metricDeliveryLabel": "Secondary market",
+    "metricDeliveryValue": "Escrow OTC"
   }
 }

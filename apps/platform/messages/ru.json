@@ -73,5 +73,56 @@
     "language": "Язык",
     "russian": "Русский",
     "english": "English"
+  },
+  "LandingPage": {
+    "brandTitle": "DeKYC Energy",
+    "brandSubtitle": "Identity-powered платформа токенизации энергетических прав на доход",
+
+    "headerUserPlatform": "Открыть ENERGY App",
+    "headerConsumerService": "Judge Demo",
+    "headerProtocolConsole": "Protocol Console",
+
+    "languageRussian": "RU",
+    "languageEnglish": "EN",
+
+    "eyebrow": "Hackathon 2026 • Solana • Blockchain Track",
+
+    "heroLine1": "DeKYC + Energy,",
+    "heroLine2": "walletless доступ к токенизированным энергоправам",
+
+    "heroDescription": "DeKYC Energy объединяет reusable identity layer и сервис токенизации энергетических прав на доход. Пользователь входит через DeKYC, получает доступ к ENERGY без криптокошелька, покупает доли энергетических проектов, получает выплаты и торгует ими через встроенный OTC-маркетплейс.",
+
+    "heroPrimaryCta": "Открыть ENERGY App",
+    "heroSecondaryCta": "Открыть Judge Demo",
+
+    "statWalletlessLabel": "Walletless UX",
+    "statWalletlessValue": "Face + Code",
+    "statAccessLabel": "Access Layer",
+    "statAccessValue": "DeKYC",
+    "statTrustLabel": "Energy Flow",
+    "statTrustValue": "Buy • Claim • OTC",
+
+    "architectureLabel": "Живая архитектура",
+    "architectureTitle": "User → DeKYC → ENERGY → Solana",
+    "architectureActive": "ACTIVE",
+
+    "layerUserTitle": "DeKYC Identity Layer",
+    "layerUserBadge": "Identity + Access",
+    "layerUserDescription": "ЭЦП пользователя преобразуется в токенизированную идентичность, которая используется для подписи, авторизации и выдачи scoped-доступа к сервисам.",
+
+    "layerProtocolTitle": "ENERGY Service Layer",
+    "layerProtocolBadge": "Primary + OTC",
+    "layerProtocolDescription": "Каталог активов, покупка долей, revenue epochs, claim payout, portfolio, history и OTC-маркетплейс.",
+
+    "layerServiceTitle": "On-Chain Settlement",
+    "layerServiceBadge": "Token-2022",
+    "layerServiceDescription": "Share mint для каждого актива, claim logic, escrow OTC, payout buckets и проверяемые tx links на Solana.",
+
+    "metricPermissionLabel": "Permission state",
+    "metricPermissionValue": "On-chain",
+    "metricStorageLabel": "Payout logic",
+    "metricStorageValue": "Epoch-based",
+    "metricDeliveryLabel": "Secondary market",
+    "metricDeliveryValue": "Escrow OTC"
   }
 }

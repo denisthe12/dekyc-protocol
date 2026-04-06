@@ -150,7 +150,7 @@ export default function ServiceLoginPage() {
       const timestamp = Date.now();
       const nonce = `service-login-${timestamp}`;
 
-      const response = await fetch('http://localhost:3001/api/service-auth/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/service-auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import {
 
 import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse, UserFacingPermissionItem, UserFacingServiceCatalogItem, UserOverviewResponse } from './types';
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 function getToken(): string {
   if (typeof window === 'undefined') {

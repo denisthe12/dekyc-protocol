@@ -35,8 +35,8 @@ export default function LoginPage() {
 
       const endpoint =
         mode === 'login'
-          ? 'http://localhost:3001/api/auth/login'
-          : 'http://localhost:3001/api/auth/signup';
+          ? `${process.env.NEXT_PUBLIC_API_URL}/auth/login`
+          : `${process.env.NEXT_PUBLIC_API_URL}/auth/signup`;
 
       const res = await fetch(endpoint, {
         method: 'POST',
