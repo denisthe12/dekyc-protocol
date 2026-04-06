@@ -126,6 +126,8 @@ let EnergyBlockchainService = class EnergyBlockchainService {
         if (!secret) {
             throw new Error('User custodial key is missing');
         }
+        const solTopUp = await this.solanaService.ensureSolBalance(wallet.custodialWalletAddress, 0.02, 0.1);
+        console.log('SOL top-up result:', solTopUp);
         const buyerKeypair = anchor.web3.Keypair.fromSecretKey(Uint8Array.from(secret));
         const buyerShareAccount = await (0, spl_token_1.getOrCreateAssociatedTokenAccount)(provider.connection, backendSigner, new web3_js_1.PublicKey(asset.shareMintAddress), buyerKeypair.publicKey, false, undefined, undefined, spl_token_1.TOKEN_2022_PROGRAM_ID);
         const tx = await program.methods

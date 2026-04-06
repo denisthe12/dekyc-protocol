@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PlatformShell } from '@/components/platform/platform-shell';
 import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
@@ -21,6 +22,8 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 import { inputClassName } from '@/components/ui/input-class';
 
 export default function PlatformPermissionsPage() {
+  const t = useTranslations('PlatformPermissionsPage');
+
   const [services, setServices] = useState<UserFacingServiceCatalogItem[]>([]);
   const [permissions, setPermissions] = useState<UserFacingPermissionItem[]>([]);
   const [selectedServiceId, setSelectedServiceId] = useState('');
@@ -72,7 +75,7 @@ export default function PlatformPermissionsPage() {
         setSelectedServiceId(catalog[0].id);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load permissions data');
+      setError(err instanceof Error ? err.message : t('loadErrorFallback'));
     } finally {
       setLoading(false);
     }
@@ -96,12 +99,12 @@ export default function PlatformPermissionsPage() {
 
   const handleGrant = async () => {
     if (!selectedService) {
-      setError('Select a service first.');
+      setError(t('selectServiceFirstError'));
       return;
     }
 
     if (activePermission) {
-      setError('Revoke the active permission before creating a new one.');
+      setError(t('revokeBeforeCreateError'));
       return;
     }
 
@@ -116,18 +119,21 @@ export default function PlatformPermissionsPage() {
 
       const allowedClaims = [...new Set([...requiredClaims, ...selectedOptionalClaims])];
 
-      const result = await grantPermission({
+      await grantPermission({
         serviceId: selectedService.id,
         allowedClaims,
       });
 
       setMessage(
-        `Permission created for ${selectedService.name}. Granted claims: ${allowedClaims.join(', ')}`,
+        t('permissionCreatedMessage', {
+          serviceName: selectedService.name,
+          claims: allowedClaims.join(', '),
+        }),
       );
 
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create permission');
+      setError(err instanceof Error ? err.message : t('createPermissionError'));
     } finally {
       setActionLoading(false);
     }
@@ -140,11 +146,11 @@ export default function PlatformPermissionsPage() {
       setMessage(null);
 
       await revokePermission(permissionId);
-      setMessage(`Permission ${permissionId} revoked.`);
+      setMessage(t('permissionRevokedMessage', { permissionId }));
 
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to revoke permission');
+      setError(err instanceof Error ? err.message : t('revokePermissionError'));
     } finally {
       setActionLoading(false);
     }
@@ -155,32 +161,32 @@ export default function PlatformPermissionsPage() {
 
   return (
     <PlatformShell
-      title="Permissions"
-      description="Choose a service and approve exactly which KYC data it may access."
+      title={t('title')}
+      description={t('description')}
     >
       <SectionCard
-        title="Create Permission"
-        description="Required claims are enforced by the service. Optional claims are your choice."
+        title={t('createPermissionTitle')}
+        description={t('createPermissionDescription')}
         actions={
           <SecondaryButton onClick={() => void loadData()}>
-            Refresh
+            {t('refresh')}
           </SecondaryButton>
-                  }
-         >
+        }
+      >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading services and permissions...</div>
+          <div className="text-sm text-zinc-500">{t('loadingServicesAndPermissions')}</div>
         ) : (
           <div className="space-y-6">
             <div>
               <label className="mb-2 block text-sm font-medium text-zinc-700">
-                Service
+                {t('serviceLabel')}
               </label>
               <select
                 value={selectedServiceId}
                 onChange={(e) => setSelectedServiceId(e.target.value)}
                 className={inputClassName}
               >
-                <option value="">Select a service</option>
+                <option value="">{t('selectService')}</option>
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
                     {service.name}
@@ -195,7 +201,7 @@ export default function PlatformPermissionsPage() {
                   {selectedService.name}
                 </div>
                 <div className="mt-1 text-sm text-zinc-600">
-                  {selectedService.description || 'No description'}
+                  {selectedService.description || t('noDescription')}
                 </div>
 
                 {selectedService.category ? (
@@ -208,19 +214,19 @@ export default function PlatformPermissionsPage() {
 
             {activePermission ? (
               <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                You already have an active permission for this service. Revoke it first if you want to create a new one.
+                {t('activePermissionWarning')}
               </div>
             ) : null}
 
             <div className="grid gap-6 lg:grid-cols-2">
               <div>
                 <div className="mb-3 text-sm font-semibold text-zinc-800">
-                  Required claims
+                  {t('requiredClaimsTitle')}
                 </div>
 
                 <div className="space-y-2">
                   {requiredClaims.length === 0 ? (
-                    <div className="text-sm text-zinc-500">No required claims.</div>
+                    <div className="text-sm text-zinc-500">{t('noRequiredClaims')}</div>
                   ) : (
                     requiredClaims.map((claim) => (
                       <label
@@ -242,25 +248,25 @@ export default function PlatformPermissionsPage() {
 
               <div>
                 <div className="mb-3 text-sm font-semibold text-zinc-800">
-                  Optional claims
+                  {t('optionalClaimsTitle')}
                 </div>
 
                 <div className="space-y-2">
                   {optionalClaims.length === 0 ? (
-                    <div className="text-sm text-zinc-500">No optional claims.</div>
+                    <div className="text-sm text-zinc-500">{t('noOptionalClaims')}</div>
                   ) : (
                     optionalClaims.map((claim) => (
                       <label
                         key={claim}
                         className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-900"
                       >
-                      <input
-                        type="checkbox"
-                        checked={getClaimChecked(claim)}
-                        onChange={() => toggleOptionalClaim(claim)}
-                        disabled={!!activePermission}
-                        className="h-4 w-4"
-                      />
+                        <input
+                          type="checkbox"
+                          checked={getClaimChecked(claim)}
+                          onChange={() => toggleOptionalClaim(claim)}
+                          disabled={!!activePermission}
+                          className="h-4 w-4"
+                        />
                         <span>{claim}</span>
                       </label>
                     ))
@@ -269,17 +275,17 @@ export default function PlatformPermissionsPage() {
               </div>
             </div>
 
-
             <div>
-            <PrimaryButton
-              onClick={() => void handleGrant()}
-              disabled={actionLoading || !!activePermission || !selectedService}
-            >
-              {actionLoading ? 'Processing...' : 'Grant Access'}
-            </PrimaryButton>
-            <div className="mt-3 text-xs text-zinc-500">
-              Required claims are enforced by the selected service. Optional claims are shared only if you approve them.
-            </div>
+              <PrimaryButton
+                onClick={() => void handleGrant()}
+                disabled={actionLoading || !!activePermission || !selectedService}
+              >
+                {actionLoading ? t('processing') : t('grantAccess')}
+              </PrimaryButton>
+
+              <div className="mt-3 text-xs text-zinc-500">
+                {t('grantAccessHint')}
+              </div>
             </div>
           </div>
         )}
@@ -298,20 +304,20 @@ export default function PlatformPermissionsPage() {
       </SectionCard>
 
       <ActionBar
-        title="Permission lifecycle"
-        description="Required claims are enforced by the service, optional claims are chosen by the user, and protocol thresholds are generated automatically."
+        title={t('permissionLifecycleTitle')}
+        description={t('permissionLifecycleDescription')}
       />
 
       <SectionCard
-        title="Your Permissions"
-        description="Here you can review and revoke the permissions you have granted."
+        title={t('yourPermissionsTitle')}
+        description={t('yourPermissionsDescription')}
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading permissions...</div>
+          <div className="text-sm text-zinc-500">{t('loadingPermissions')}</div>
         ) : permissions.length === 0 ? (
           <EmptyState
-            title="No permissions created yet"
-            description="Choose a service above and grant your first scoped permission."
+            title={t('noPermissionsTitle')}
+            description={t('noPermissionsDescription')}
           />
         ) : (
           <div className="space-y-4">
@@ -326,7 +332,7 @@ export default function PlatformPermissionsPage() {
                       {permission.service.name}
                     </div>
                     <div className="mt-1 text-sm text-zinc-600">
-                      Permission ID: {permission.id}
+                      {t('permissionIdLabel', { permissionId: permission.id })}
                     </div>
                   </div>
 
@@ -344,24 +350,24 @@ export default function PlatformPermissionsPage() {
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <MetricCard
-                    label="Granted claims"
-                    value={(permission.allowedClaims ?? []).join(', ') || '—'}
+                    label={t('metricGrantedClaims')}
+                    value={(permission.allowedClaims ?? []).join(', ') || t('emptyValue')}
                   />
-                  <MetricCard label="Created at" value={permission.createdAt} />
+                  <MetricCard label={t('metricCreatedAt')} value={permission.createdAt} />
                   <MetricCard
-                    label="Revoked at"
-                    value={permission.revokedAt ?? '—'}
+                    label={t('metricRevokedAt')}
+                    value={permission.revokedAt ?? t('emptyValue')}
                   />
                 </div>
 
                 <div className="mt-4">
-                <button
-                  onClick={() => void handleRevoke(permission.id)}
-                  disabled={actionLoading || permission.status === 'REVOKED'}
-                  className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
-                >
-                  Revoke Access
-                </button>
+                  <button
+                    onClick={() => void handleRevoke(permission.id)}
+                    disabled={actionLoading || permission.status === 'REVOKED'}
+                    className="rounded-2xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-50"
+                  >
+                    {t('revokeAccess')}
+                  </button>
                 </div>
               </div>
             ))}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PlatformShell } from '@/components/platform/platform-shell';
 import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
@@ -11,11 +12,12 @@ import {
   setupBiometric,
 } from '@/lib/api';
 import { ProfileSummaryResponse } from '@/lib/types';
-import { inputClassName } from '@/components/ui/input-class';
 import { FaceScanModal } from '@/components/biometric/face-scan-modal';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 
 export default function ProfilePage() {
+  const t = useTranslations('ProfilePage');
+
   const [data, setData] = useState<ProfileSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +36,7 @@ export default function ProfilePage() {
       setData(summary);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to load profile summary',
+        err instanceof Error ? err.message : t('loadErrorFallback'),
       );
     } finally {
       setLoading(false);
@@ -47,9 +49,10 @@ export default function ProfilePage() {
 
   const handleSetupBiometric = async () => {
     if (data?.profileStatus.biometricConfigured) {
-      setActionMessage('Biometric mock is already configured.');
+      setActionMessage(t('biometricAlreadyConfiguredMessage'));
       return;
     }
+
     try {
       setBiometricModalOpen(true);
       setBiometricScanning(true);
@@ -57,7 +60,7 @@ export default function ProfilePage() {
       setActionMessage(null);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to start biometric flow',
+        err instanceof Error ? err.message : t('biometricStartError'),
       );
     }
   };
@@ -73,11 +76,11 @@ export default function ProfilePage() {
 
       await setupBiometric({ biometricMockId: generatedMockId });
 
-      setActionMessage('Biometric mock configured successfully.');
+      setActionMessage(t('biometricConfiguredSuccess'));
       await loadProfile();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to configure biometric mock',
+        err instanceof Error ? err.message : t('biometricConfigureError'),
       );
     }
   };
@@ -90,10 +93,10 @@ export default function ProfilePage() {
 
       const result = await issueLoginCode();
       setLastIssuedLoginCode(result.loginCode);
-      setActionMessage('Login code issued successfully.');
+      setActionMessage(t('issueLoginCodeSuccess'));
       await loadProfile();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to issue login code');
+      setError(err instanceof Error ? err.message : t('issueLoginCodeError'));
     } finally {
       setActionLoading(false);
     }
@@ -107,10 +110,10 @@ export default function ProfilePage() {
 
       const result = await rotateLoginCode();
       setLastIssuedLoginCode(result.loginCode);
-      setActionMessage('Login code rotated successfully.');
+      setActionMessage(t('rotateLoginCodeSuccess'));
       await loadProfile();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to rotate login code');
+      setError(err instanceof Error ? err.message : t('rotateLoginCodeError'));
     } finally {
       setActionLoading(false);
     }
@@ -120,58 +123,58 @@ export default function ProfilePage() {
     if (!lastIssuedLoginCode) return;
 
     await navigator.clipboard.writeText(lastIssuedLoginCode);
-    setActionMessage('Login code copied to clipboard.');
+    setActionMessage(t('copyLoginCodeSuccess'));
   };
 
   return (
     <PlatformShell
-      title="Profile"
-      description="Your platform account, onboarding status, and KYC readiness."
+      title={t('title')}
+      description={t('description')}
     >
       <SectionCard
-        title="Account Summary"
-        description="This section shows your account identity and onboarding state."
+        title={t('accountSummaryTitle')}
+        description={t('accountSummaryDescription')}
         actions={
           <button
             onClick={() => void loadProfile()}
             className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
           >
-            Refresh
+            {t('refresh')}
           </button>
         }
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading profile...</div>
+          <div className="text-sm text-zinc-500">{t('loadingProfile')}</div>
         ) : error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {error}
           </div>
         ) : data ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="User ID" value={data.user.id} />
-            <MetricCard label="Email" value={data.user.email} />
+            <MetricCard label={t('metricUserId')} value={data.user.id} />
+            <MetricCard label={t('metricEmail')} value={data.user.email} />
             <MetricCard
-              label="Email verified"
-              value={String(data.user.emailVerified)}
+              label={t('metricEmailVerified')}
+              value={data.user.emailVerified ? t('trueValue') : t('falseValue')}
             />
-            <MetricCard label="Created at" value={data.user.createdAt} />
+            <MetricCard label={t('metricCreatedAt')} value={data.user.createdAt} />
           </div>
         ) : null}
       </SectionCard>
 
       <SectionCard
-        title="Onboarding Status"
-        description="You must configure biometric mock before connecting EDS."
+        title={t('onboardingStatusTitle')}
+        description={t('onboardingStatusDescription')}
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading statuses...</div>
+          <div className="text-sm text-zinc-500">{t('loadingStatuses')}</div>
         ) : data ? (
           <div className="flex flex-wrap gap-3">
             <StatusBadge
               label={
                 data.profileStatus.biometricConfigured
-                  ? 'Biometric configured'
-                  : 'Biometric not configured'
+                  ? t('biometricConfigured')
+                  : t('biometricNotConfigured')
               }
               tone={
                 data.profileStatus.biometricConfigured ? 'success' : 'warning'
@@ -180,23 +183,27 @@ export default function ProfilePage() {
             <StatusBadge
               label={
                 data.profileStatus.loginCodeConfigured
-                  ? 'Login code issued'
-                  : 'Login code not issued'
+                  ? t('loginCodeIssued')
+                  : t('loginCodeNotIssued')
               }
               tone={
                 data.profileStatus.loginCodeConfigured ? 'success' : 'warning'
               }
             />
             <StatusBadge
-              label={data.profileStatus.edsBound ? 'Digital signature connected' : 'Digital signature not connected'}
+              label={
+                data.profileStatus.edsBound
+                  ? t('digitalSignatureConnected')
+                  : t('digitalSignatureNotConnected')
+              }
               tone={data.profileStatus.edsBound ? 'success' : 'warning'}
             />
             <StatusBadge
-              label={data.profileStatus.kycReady ? 'KYC ready' : 'KYC not ready'}
+              label={data.profileStatus.kycReady ? t('kycReady') : t('kycNotReady')}
               tone={data.profileStatus.kycReady ? 'success' : 'warning'}
             />
             <StatusBadge
-              label={data.profileStatus.vaultReady ? 'Vault ready' : 'Vault not ready'}
+              label={data.profileStatus.vaultReady ? t('vaultReady') : t('vaultNotReady')}
               tone={data.profileStatus.vaultReady ? 'success' : 'warning'}
             />
           </div>
@@ -204,12 +211,12 @@ export default function ProfilePage() {
       </SectionCard>
 
       <SectionCard
-        title="Biometric Mock Setup"
-        description="Configure mock face identity before connecting EDS and using service login."
+        title={t('biometricSetupTitle')}
+        description={t('biometricSetupDescription')}
       >
         <div className="rounded-3xl border border-zinc-200 bg-zinc-50 p-5">
           <div className="text-sm leading-6 text-zinc-600">
-            Add your biometric mock profile to enable digital signature verification and service login.
+            {t('biometricSetupBody')}
           </div>
 
           <div className="mt-4">
@@ -222,61 +229,58 @@ export default function ProfilePage() {
               }
             >
               {data?.profileStatus.biometricConfigured
-                ? 'Biometric Already Added'
+                ? t('biometricAlreadyAdded')
                 : biometricScanning
-                  ? 'Scanning face...'
-                  : 'Add Biometric'}
+                  ? t('scanningFace')
+                  : t('addBiometric')}
             </PrimaryButton>
           </div>
         </div>
 
         {data?.profileStatus.biometricConfigured ? (
           <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-            Your biometric mock is already configured. Rebinding is not available in the current product flow.
+            {t('biometricAlreadyAddedWarning')}
           </div>
         ) : null}
       </SectionCard>
 
       <SectionCard
-        title="Unique Login Code"
-        description="This code is used together with mock face login on the consumer service."
+        title={t('loginCodeTitle')}
+        description={t('loginCodeDescription')}
       >
         <div className="flex flex-wrap gap-3">
           <PrimaryButton
             onClick={() => void handleIssueLoginCode()}
             disabled={actionLoading || !data?.profileStatus.biometricConfigured}
-            //className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
           >
-            Issue Login Code
+            {t('issueLoginCode')}
           </PrimaryButton>
 
           <SecondaryButton
             onClick={() => void handleRotateLoginCode()}
             disabled={actionLoading || !data?.profileStatus.biometricConfigured}
-            //className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
           >
-            Rotate Login Code
+            {t('rotateLoginCode')}
           </SecondaryButton>
 
           <SecondaryButton
             onClick={() => void handleCopyLoginCode()}
             disabled={!lastIssuedLoginCode}
-            //className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 disabled:opacity-50"
           >
-            Copy Last Issued Code
+            {t('copyLastIssuedCode')}
           </SecondaryButton>
         </div>
 
         {!data?.profileStatus.biometricConfigured ? (
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-            Configure biometric mock first to enable login code issuance.
+            {t('configureBiometricFirst')}
           </div>
         ) : null}
 
         {lastIssuedLoginCode ? (
           <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-emerald-700">
-              Last issued login code
+              {t('lastIssuedLoginCode')}
             </div>
             <div className="mt-2 break-all text-lg font-semibold text-emerald-900">
               {lastIssuedLoginCode}
@@ -286,7 +290,7 @@ export default function ProfilePage() {
 
         {data?.profileStatus.loginCodeIssuedAt ? (
           <div className="mt-4 text-sm text-zinc-600">
-            Login code issued at: {data.profileStatus.loginCodeIssuedAt}
+            {t('loginCodeIssuedAt')} {data.profileStatus.loginCodeIssuedAt}
           </div>
         ) : null}
       </SectionCard>
@@ -298,45 +302,49 @@ export default function ProfilePage() {
       ) : null}
 
       <SectionCard
-        title="Latest KYC Snapshot"
-        description="Your latest KYC profile extracted from EDS and protocol derivation."
+        title={t('latestKycSnapshotTitle')}
+        description={t('latestKycSnapshotDescription')}
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading KYC profile...</div>
+          <div className="text-sm text-zinc-500">{t('loadingKycProfile')}</div>
         ) : !data?.latestKycProfile ? (
           <div className="text-sm text-zinc-500">
-            No KYC profile yet. Configure biometric mock, then connect EDS.
+            {t('noKycProfileYet')}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <MetricCard
-              label="Full name"
-              value={data.latestKycProfile.fullName ?? '—'}
-            />
-            <MetricCard label="IIN" value={data.latestKycProfile.iin ?? '—'} />
-            <MetricCard
-              label="Birth date"
-              value={data.latestKycProfile.birthDate ?? '—'}
+              label={t('metricFullName')}
+              value={data.latestKycProfile.fullName ?? t('emptyValue')}
             />
             <MetricCard
-              label="Gender"
-              value={data.latestKycProfile.gender ?? '—'}
+              label={t('metricIin')}
+              value={data.latestKycProfile.iin ?? t('emptyValue')}
             />
             <MetricCard
-              label="Country"
-              value={data.latestKycProfile.country ?? '—'}
+              label={t('metricBirthDate')}
+              value={data.latestKycProfile.birthDate ?? t('emptyValue')}
             />
             <MetricCard
-              label="Email"
-              value={data.latestKycProfile.email ?? '—'}
+              label={t('metricGender')}
+              value={data.latestKycProfile.gender ?? t('emptyValue')}
+            />
+            <MetricCard
+              label={t('metricCountry')}
+              value={data.latestKycProfile.country ?? t('emptyValue')}
+            />
+            <MetricCard
+              label={t('metricEmail')}
+              value={data.latestKycProfile.email ?? t('emptyValue')}
             />
           </div>
         )}
       </SectionCard>
+
       <FaceScanModal
         open={biometricModalOpen}
-        title="Biometric Scan"
-        description="Please place your face inside the frame. The scan will complete automatically."
+        title={t('faceScanTitle')}
+        description={t('faceScanDescription')}
         onComplete={() => void handleBiometricScanComplete()}
         onClose={() => {
           setBiometricModalOpen(false);

@@ -219,6 +219,14 @@ export class EnergyBlockchainService {
       throw new Error('User custodial key is missing');
     }
 
+    const solTopUp = await this.solanaService.ensureSolBalance(
+      wallet.custodialWalletAddress,
+      0.02,
+      0.1,
+    );
+
+    console.log('SOL top-up result:', solTopUp);
+
     const buyerKeypair = anchor.web3.Keypair.fromSecretKey(
       Uint8Array.from(secret),
     );

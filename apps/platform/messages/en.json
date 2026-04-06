@@ -124,5 +124,271 @@
     "metricStorageValue": "Epoch-based",
     "metricDeliveryLabel": "Secondary market",
     "metricDeliveryValue": "Escrow OTC"
+  },
+  "OverviewPage": {
+    "title": "Overview",
+    "description": "Your DeKYC onboarding progress, readiness status, and quick actions.",
+
+    "onboardingTitle": "Onboarding Progress",
+    "onboardingDescription": "Complete the platform setup to use KYC-backed login on consumer services.",
+    "refresh": "Refresh",
+    "loadingOverview": "Loading overview...",
+    "loadingStatus": "Loading status...",
+    "loadingSnapshot": "Loading snapshot...",
+    "loadErrorFallback": "Failed to load overview",
+
+    "progressLabel": "Onboarding progress",
+    "progressCompleted": "% completed",
+
+    "readyForServiceLogin": "Ready for service login",
+    "setupIncomplete": "Setup incomplete",
+    "activePermissions": "Active permissions: {count}",
+
+    "serviceReadinessTitle": "Service Login Readiness",
+    "serviceReadinessReady": "Your platform account is ready for DeKYC-powered service login.",
+    "serviceReadinessPending": "Complete biometric setup, login code issuance, and KYC verification to unlock service login.",
+    "continueToService": "Continue to Service",
+
+    "accountStatusTitle": "Account Status",
+    "accountStatusDescription": "Main platform states that affect KYC and service access.",
+
+    "statusEmail": "Email",
+    "statusBiometric": "Biometric Mock",
+    "statusLoginCode": "Login Code",
+    "statusEds": "EDS",
+    "statusKyc": "KYC",
+    "statusVault": "Vault",
+
+    "verified": "Verified",
+    "notVerified": "Not verified",
+    "configured": "Configured",
+    "notConfigured": "Not configured",
+    "issued": "Issued",
+    "notIssued": "Not issued",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "ready": "Ready",
+    "notReady": "Not ready",
+    "encrypted": "Encrypted",
+
+    "quickActionsTitle": "Quick Actions",
+    "quickActionsDescription": "Fastest path to complete onboarding and create permissions.",
+
+    "openProfileTitle": "Open Profile",
+    "openProfileDescription": "Set mock biometric and issue your unique login code.",
+
+    "openKycTitle": "Open KYC",
+    "openKycDescription": "Bind EDS and review your verified KYC profile.",
+
+    "openPermissionsTitle": "Open Permissions",
+    "openPermissionsDescription": "Grant scoped access to a selected consumer service.",
+
+    "openConsumerServiceTitle": "Open Consumer Service",
+    "openConsumerServiceDescription": "Login to a service using DeKYC (biometric + login code).",
+
+    "snapshotTitle": "Latest Snapshot",
+    "snapshotDescription": "Most recent user-facing KYC and protocol readiness summary.",
+    "metricEmail": "Email",
+    "metricLatestFullName": "Latest full name",
+    "metricLatestIin": "Latest IIN",
+    "metricVaultAlgorithm": "Vault algorithm",
+    "emptyValue": "—",
+
+    "howItWorksTitle": "How it works",
+    "howItWorksDescription": "End-to-end DeKYC flow demonstrated in this platform.",
+    "howItWorks1": "1. Configure biometric + login code",
+    "howItWorks2": "2. Bind EDS and generate KYC profile",
+    "howItWorks3": "3. Grant permission to a service",
+    "howItWorks4": "4. Login to service using DeKYC",
+    "howItWorks5": "5. Service verifies signed KYC response"
+  },
+  "ProfilePage": {
+    "title": "Profile",
+    "description": "Your platform account, onboarding status, and KYC readiness.",
+
+    "accountSummaryTitle": "Account Summary",
+    "accountSummaryDescription": "This section shows your account identity and onboarding state.",
+    "refresh": "Refresh",
+    "loadingProfile": "Loading profile...",
+    "loadingStatuses": "Loading statuses...",
+    "loadingKycProfile": "Loading KYC profile...",
+    "loadErrorFallback": "Failed to load profile summary",
+
+    "metricUserId": "User ID",
+    "metricEmail": "Email",
+    "metricEmailVerified": "Email verified",
+    "metricCreatedAt": "Created at",
+    "trueValue": "true",
+    "falseValue": "false",
+
+    "onboardingStatusTitle": "Onboarding Status",
+    "onboardingStatusDescription": "You must configure biometric mock before connecting EDS.",
+
+    "biometricConfigured": "Biometric configured",
+    "biometricNotConfigured": "Biometric not configured",
+    "loginCodeIssued": "Login code issued",
+    "loginCodeNotIssued": "Login code not issued",
+    "digitalSignatureConnected": "Digital signature connected",
+    "digitalSignatureNotConnected": "Digital signature not connected",
+    "kycReady": "KYC ready",
+    "kycNotReady": "KYC not ready",
+    "vaultReady": "Vault ready",
+    "vaultNotReady": "Vault not ready",
+
+    "biometricSetupTitle": "Biometric Mock Setup",
+    "biometricSetupDescription": "Configure mock face identity before connecting EDS and using service login.",
+    "biometricSetupBody": "Add your biometric mock profile to enable digital signature verification and service login.",
+    "biometricAlreadyConfiguredMessage": "Biometric mock is already configured.",
+    "biometricConfiguredSuccess": "Biometric mock configured successfully.",
+    "biometricStartError": "Failed to start biometric flow",
+    "biometricConfigureError": "Failed to configure biometric mock",
+
+    "biometricAlreadyAdded": "Biometric Already Added",
+    "scanningFace": "Scanning face...",
+    "addBiometric": "Add Biometric",
+    "biometricAlreadyAddedWarning": "Your biometric mock is already configured. Rebinding is not available in the current product flow.",
+
+    "loginCodeTitle": "Unique Login Code",
+    "loginCodeDescription": "This code is used together with mock face login on the consumer service.",
+    "issueLoginCode": "Issue Login Code",
+    "rotateLoginCode": "Rotate Login Code",
+    "copyLastIssuedCode": "Copy Last Issued Code",
+    "issueLoginCodeSuccess": "Login code issued successfully.",
+    "rotateLoginCodeSuccess": "Login code rotated successfully.",
+    "copyLoginCodeSuccess": "Login code copied to clipboard.",
+    "issueLoginCodeError": "Failed to issue login code",
+    "rotateLoginCodeError": "Failed to rotate login code",
+    "configureBiometricFirst": "Configure biometric mock first to enable login code issuance.",
+
+    "lastIssuedLoginCode": "Last issued login code",
+    "loginCodeIssuedAt": "Login code issued at:",
+    "emptyValue": "—",
+
+    "latestKycSnapshotTitle": "Latest KYC Snapshot",
+    "latestKycSnapshotDescription": "Your latest KYC profile extracted from EDS and protocol derivation.",
+    "noKycProfileYet": "No KYC profile yet. Configure biometric mock, then connect EDS.",
+
+    "metricFullName": "Full name",
+    "metricIin": "IIN",
+    "metricBirthDate": "Birth date",
+    "metricGender": "Gender",
+    "metricCountry": "Country",
+
+    "faceScanTitle": "Biometric Scan",
+    "faceScanDescription": "Please place your face inside the frame. The scan will complete automatically."
+  },
+  "PlatformKycPage": {
+    "title": "KYC",
+    "description": "Connect your digital signature and review your verified KYC profile.",
+
+    "gatingTitle": "KYC Gating",
+    "gatingDescription": "Biometric setup must be completed before your digital signature can be connected.",
+    "refresh": "Refresh",
+    "loadingKycStatus": "Loading KYC status...",
+    "loadErrorFallback": "Failed to load KYC summary",
+
+    "biometricConfigured": "Biometric configured",
+    "biometricRequired": "Biometric required",
+    "digitalSignatureConnected": "Digital signature connected",
+    "digitalSignatureNotConnected": "Digital signature not connected",
+    "kycReady": "KYC ready",
+    "kycNotReady": "KYC not ready",
+    "vaultReady": "Vault ready",
+    "vaultNotReady": "Vault not ready",
+
+    "gatingBody": "Biometric setup is complete. You can now connect your digital signature and complete identity verification.",
+    "digitalSignatureAlreadyConnected": "Digital Signature Already Connected",
+    "connectingDigitalSignature": "Connecting Digital Signature...",
+    "connectDigitalSignature": "Connect Digital Signature",
+    "refreshKycStatus": "Refresh KYC Status",
+    "afterVerificationHint": "After successful verification, your KYC profile will be filled automatically.",
+    "rebindWarning": "Your digital signature is already connected. Rebinding is not available in the current product flow.",
+
+    "signatureAlreadyConnectedError": "Digital signature is already connected.",
+    "signatureConnectedSuccess": "Digital signature connected successfully. Your KYC profile was updated.",
+    "connectSignatureError": "Failed to connect digital signature",
+    "ncaLayerNotRunning": "NCALayer is not running. Please start NCALayer first and try again.",
+
+    "latestConnectionTitle": "Latest Digital Signature Connection",
+    "metricChallengeId": "Challenge ID",
+    "metricChallengeBase64": "Challenge Base64",
+    "metricAnalyzeResult": "Analyze Result",
+    "analyzeSaved": "Saved",
+    "analyzeProcessed": "Processed",
+
+    "verifiedProfileTitle": "Verified KYC Profile",
+    "verifiedProfileDescription": "This is the user-facing KYC snapshot extracted after EDS verification.",
+    "loadingProfile": "Loading profile...",
+    "noKycProfileTitle": "No KYC profile yet",
+    "noKycProfileDescription": "Complete biometric setup and connect your EDS first. After verification, your user-facing KYC profile will appear here.",
+
+    "metricFullName": "Full name",
+    "metricFirstName": "First name",
+    "metricLastName": "Last name",
+    "metricMiddleName": "Middle name",
+    "metricIin": "IIN",
+    "metricEmail": "Email",
+    "metricBirthDate": "Birth date",
+    "metricGender": "Gender",
+    "metricCountry": "Country",
+
+    "securityTitle": "Security Status",
+    "securityDescription": "KYC is stored off-chain in encrypted form. On-chain only permission state is recorded.",
+    "loadingSecurityStatus": "Loading security status...",
+    "metricEdsBound": "EDS bound",
+    "metricVaultEncrypted": "Vault encrypted",
+    "metricVaultAlgorithm": "Vault algorithm",
+    "yes": "Yes",
+    "no": "No",
+    "emptyValue": "—"
+  },
+  "PlatformPermissionsPage": {
+    "title": "Permissions",
+    "description": "Choose a service and approve exactly which KYC data it may access.",
+
+    "createPermissionTitle": "Create Permission",
+    "createPermissionDescription": "Required claims are enforced by the service. Optional claims are your choice.",
+    "refresh": "Refresh",
+    "loadingServicesAndPermissions": "Loading services and permissions...",
+    "loadErrorFallback": "Failed to load permissions data",
+
+    "serviceLabel": "Service",
+    "selectService": "Select a service",
+    "noDescription": "No description",
+
+    "activePermissionWarning": "You already have an active permission for this service. Revoke it first if you want to create a new one.",
+    "requiredClaimsTitle": "Required claims",
+    "optionalClaimsTitle": "Optional claims",
+    "noRequiredClaims": "No required claims.",
+    "noOptionalClaims": "No optional claims.",
+
+    "selectServiceFirstError": "Select a service first.",
+    "revokeBeforeCreateError": "Revoke the active permission before creating a new one.",
+    "createPermissionError": "Failed to create permission",
+    "revokePermissionError": "Failed to revoke permission",
+
+    "processing": "Processing...",
+    "grantAccess": "Grant Access",
+    "grantAccessHint": "Required claims are enforced by the selected service. Optional claims are shared only if you approve them.",
+
+    "permissionCreatedMessage": "Permission created for {serviceName}. Granted claims: {claims}",
+    "permissionRevokedMessage": "Permission {permissionId} revoked.",
+
+    "permissionLifecycleTitle": "Permission lifecycle",
+    "permissionLifecycleDescription": "Required claims are enforced by the service, optional claims are chosen by the user, and protocol thresholds are generated automatically.",
+
+    "yourPermissionsTitle": "Your Permissions",
+    "yourPermissionsDescription": "Here you can review and revoke the permissions you have granted.",
+    "loadingPermissions": "Loading permissions...",
+    "noPermissionsTitle": "No permissions created yet",
+    "noPermissionsDescription": "Choose a service above and grant your first scoped permission.",
+
+    "permissionIdLabel": "Permission ID: {permissionId}",
+    "metricGrantedClaims": "Granted claims",
+    "metricCreatedAt": "Created at",
+    "metricRevokedAt": "Revoked at",
+    "emptyValue": "—",
+
+    "revokeAccess": "Revoke Access"
   }
 }

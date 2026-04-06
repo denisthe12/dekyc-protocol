@@ -55,18 +55,18 @@ export declare class EnergyBlockchainService {
         tx: string;
         position: {
             id: string;
-            energyUserId: string;
-            createdAt: Date;
-            updatedAt: Date;
-            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-            energyAssetId: string;
             assetId: string;
             assetPda: string;
             shareMintAddress: string;
-            buyerWalletAddress: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            createdAt: Date;
+            updatedAt: Date;
+            energyUserId: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
+            energyAssetId: string;
+            buyerWalletAddress: string;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;

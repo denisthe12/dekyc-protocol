@@ -124,5 +124,271 @@
     "metricStorageValue": "Epoch-based",
     "metricDeliveryLabel": "Secondary market",
     "metricDeliveryValue": "Escrow OTC"
+  },
+  "OverviewPage": {
+    "title": "Обзор",
+    "description": "Ваш прогресс онбординга в DeKYC, статус готовности и быстрые действия.",
+
+    "onboardingTitle": "Прогресс онбординга",
+    "onboardingDescription": "Завершите настройку платформы, чтобы использовать вход в сервисы на основе KYC.",
+    "refresh": "Обновить",
+    "loadingOverview": "Загрузка overview...",
+    "loadingStatus": "Загрузка статуса...",
+    "loadingSnapshot": "Загрузка snapshot...",
+    "loadErrorFallback": "Не удалось загрузить overview",
+
+    "progressLabel": "Прогресс онбординга",
+    "progressCompleted": "% завершено",
+
+    "readyForServiceLogin": "Готово ко входу в сервис",
+    "setupIncomplete": "Настройка не завершена",
+    "activePermissions": "Активные разрешения: {count}",
+
+    "serviceReadinessTitle": "Готовность ко входу в сервис",
+    "serviceReadinessReady": "Ваш аккаунт платформы готов к входу в сервисы через DeKYC.",
+    "serviceReadinessPending": "Завершите настройку биометрии, выпуск login code и KYC-верификацию, чтобы открыть вход в сервис.",
+    "continueToService": "Перейти в сервис",
+
+    "accountStatusTitle": "Статус аккаунта",
+    "accountStatusDescription": "Основные состояния платформы, влияющие на KYC и доступ к сервисам.",
+
+    "statusEmail": "Email",
+    "statusBiometric": "Biometric Mock",
+    "statusLoginCode": "Login Code",
+    "statusEds": "EDS",
+    "statusKyc": "KYC",
+    "statusVault": "Vault",
+
+    "verified": "Подтвержден",
+    "notVerified": "Не подтвержден",
+    "configured": "Настроено",
+    "notConfigured": "Не настроено",
+    "issued": "Выдан",
+    "notIssued": "Не выдан",
+    "connected": "Подключено",
+    "notConnected": "Не подключено",
+    "ready": "Готово",
+    "notReady": "Не готово",
+    "encrypted": "Зашифровано",
+
+    "quickActionsTitle": "Быстрые действия",
+    "quickActionsDescription": "Самый быстрый путь завершить онбординг и создать permissions.",
+
+    "openProfileTitle": "Открыть профиль",
+    "openProfileDescription": "Настрой mock-биометрию и выпусти свой unique login code.",
+
+    "openKycTitle": "Открыть KYC",
+    "openKycDescription": "Подключи EDS и проверь свой подтверждённый KYC-профиль.",
+
+    "openPermissionsTitle": "Открыть Permissions",
+    "openPermissionsDescription": "Выдай scoped-доступ выбранному consumer service.",
+
+    "openConsumerServiceTitle": "Открыть Consumer Service",
+    "openConsumerServiceDescription": "Войди в сервис через DeKYC (биометрия + login code).",
+
+    "snapshotTitle": "Последний snapshot",
+    "snapshotDescription": "Самая свежая сводка по KYC и готовности протокола.",
+    "metricEmail": "Email",
+    "metricLatestFullName": "Последнее полное имя",
+    "metricLatestIin": "Последний ИИН",
+    "metricVaultAlgorithm": "Алгоритм vault",
+    "emptyValue": "—",
+
+    "howItWorksTitle": "Как это работает",
+    "howItWorksDescription": "Сквозной flow DeKYC, показанный в этой платформе.",
+    "howItWorks1": "1. Настроить биометрию и login code",
+    "howItWorks2": "2. Подключить EDS и создать KYC-профиль",
+    "howItWorks3": "3. Выдать разрешение сервису",
+    "howItWorks4": "4. Войти в сервис через DeKYC",
+    "howItWorks5": "5. Сервис проверяет подписанный KYC-ответ"
+  },
+  "ProfilePage": {
+    "title": "Профиль",
+    "description": "Ваш аккаунт платформы, статус онбординга и готовность KYC.",
+
+    "accountSummaryTitle": "Сводка аккаунта",
+    "accountSummaryDescription": "Этот раздел показывает идентичность аккаунта и состояние онбординга.",
+    "refresh": "Обновить",
+    "loadingProfile": "Загрузка профиля...",
+    "loadingStatuses": "Загрузка статусов...",
+    "loadingKycProfile": "Загрузка KYC-профиля...",
+    "loadErrorFallback": "Не удалось загрузить сводку профиля",
+
+    "metricUserId": "User ID",
+    "metricEmail": "Email",
+    "metricEmailVerified": "Email подтвержден",
+    "metricCreatedAt": "Создан",
+    "trueValue": "true",
+    "falseValue": "false",
+
+    "onboardingStatusTitle": "Статус онбординга",
+    "onboardingStatusDescription": "Перед подключением EDS необходимо настроить mock-биометрию.",
+
+    "biometricConfigured": "Биометрия настроена",
+    "biometricNotConfigured": "Биометрия не настроена",
+    "loginCodeIssued": "Login code выдан",
+    "loginCodeNotIssued": "Login code не выдан",
+    "digitalSignatureConnected": "Цифровая подпись подключена",
+    "digitalSignatureNotConnected": "Цифровая подпись не подключена",
+    "kycReady": "KYC готов",
+    "kycNotReady": "KYC не готов",
+    "vaultReady": "Vault готов",
+    "vaultNotReady": "Vault не готов",
+
+    "biometricSetupTitle": "Настройка Biometric Mock",
+    "biometricSetupDescription": "Настройте mock-биометрию лица перед подключением EDS и входом в сервис.",
+    "biometricSetupBody": "Добавьте mock-биометрию, чтобы включить проверку цифровой подписи и вход в сервис.",
+    "biometricAlreadyConfiguredMessage": "Mock-биометрия уже настроена.",
+    "biometricConfiguredSuccess": "Mock-биометрия успешно настроена.",
+    "biometricStartError": "Не удалось запустить biometric flow",
+    "biometricConfigureError": "Не удалось настроить mock-биометрию",
+
+    "biometricAlreadyAdded": "Биометрия уже добавлена",
+    "scanningFace": "Сканирование лица...",
+    "addBiometric": "Добавить биометрию",
+    "biometricAlreadyAddedWarning": "Ваша mock-биометрия уже настроена. Повторная привязка недоступна в текущем продуктовом flow.",
+
+    "loginCodeTitle": "Unique Login Code",
+    "loginCodeDescription": "Этот код используется вместе с mock-входом по лицу во внешнем сервисе.",
+    "issueLoginCode": "Выдать Login Code",
+    "rotateLoginCode": "Перевыпустить Login Code",
+    "copyLastIssuedCode": "Скопировать последний код",
+    "issueLoginCodeSuccess": "Login code успешно выдан.",
+    "rotateLoginCodeSuccess": "Login code успешно перевыпущен.",
+    "copyLoginCodeSuccess": "Login code скопирован в буфер обмена.",
+    "issueLoginCodeError": "Не удалось выдать login code",
+    "rotateLoginCodeError": "Не удалось перевыпустить login code",
+    "configureBiometricFirst": "Сначала настройте mock-биометрию, чтобы включить выпуск login code.",
+
+    "lastIssuedLoginCode": "Последний выданный login code",
+    "loginCodeIssuedAt": "Login code выдан:",
+    "emptyValue": "—",
+
+    "latestKycSnapshotTitle": "Последний KYC Snapshot",
+    "latestKycSnapshotDescription": "Ваш последний KYC-профиль, извлечённый из EDS и protocol derivation.",
+    "noKycProfileYet": "KYC-профиль пока отсутствует. Сначала настройте mock-биометрию, затем подключите EDS.",
+
+    "metricFullName": "Полное имя",
+    "metricIin": "ИИН",
+    "metricBirthDate": "Дата рождения",
+    "metricGender": "Пол",
+    "metricCountry": "Страна",
+
+    "faceScanTitle": "Сканирование биометрии",
+    "faceScanDescription": "Пожалуйста, поместите лицо внутрь рамки. Сканирование завершится автоматически."
+  },
+  "PlatformKycPage": {
+    "title": "KYC",
+    "description": "Подключите цифровую подпись и просмотрите подтверждённый KYC-профиль.",
+
+    "gatingTitle": "KYC Gating",
+    "gatingDescription": "Перед подключением цифровой подписи необходимо завершить настройку биометрии.",
+    "refresh": "Обновить",
+    "loadingKycStatus": "Загрузка статуса KYC...",
+    "loadErrorFallback": "Не удалось загрузить KYC summary",
+
+    "biometricConfigured": "Биометрия настроена",
+    "biometricRequired": "Требуется биометрия",
+    "digitalSignatureConnected": "Цифровая подпись подключена",
+    "digitalSignatureNotConnected": "Цифровая подпись не подключена",
+    "kycReady": "KYC готов",
+    "kycNotReady": "KYC не готов",
+    "vaultReady": "Vault готов",
+    "vaultNotReady": "Vault не готов",
+
+    "gatingBody": "Настройка биометрии завершена. Теперь вы можете подключить цифровую подпись и завершить подтверждение личности.",
+    "digitalSignatureAlreadyConnected": "Цифровая подпись уже подключена",
+    "connectingDigitalSignature": "Подключение цифровой подписи...",
+    "connectDigitalSignature": "Подключить цифровую подпись",
+    "refreshKycStatus": "Обновить статус KYC",
+    "afterVerificationHint": "После успешной проверки ваш KYC-профиль будет заполнен автоматически.",
+    "rebindWarning": "Ваша цифровая подпись уже подключена. Повторная привязка недоступна в текущем продуктовом flow.",
+
+    "signatureAlreadyConnectedError": "Цифровая подпись уже подключена.",
+    "signatureConnectedSuccess": "Цифровая подпись успешно подключена. Ваш KYC-профиль был обновлён.",
+    "connectSignatureError": "Не удалось подключить цифровую подпись",
+    "ncaLayerNotRunning": "NCALayer не запущен. Сначала запустите NCALayer и попробуйте снова.",
+
+    "latestConnectionTitle": "Последнее подключение цифровой подписи",
+    "metricChallengeId": "Challenge ID",
+    "metricChallengeBase64": "Challenge Base64",
+    "metricAnalyzeResult": "Результат анализа",
+    "analyzeSaved": "Сохранено",
+    "analyzeProcessed": "Обработано",
+
+    "verifiedProfileTitle": "Подтверждённый KYC-профиль",
+    "verifiedProfileDescription": "Это пользовательский KYC-snapshot, извлечённый после проверки EDS.",
+    "loadingProfile": "Загрузка профиля...",
+    "noKycProfileTitle": "KYC-профиль пока отсутствует",
+    "noKycProfileDescription": "Сначала завершите настройку биометрии и подключите EDS. После проверки здесь появится ваш пользовательский KYC-профиль.",
+
+    "metricFullName": "Полное имя",
+    "metricFirstName": "Имя",
+    "metricLastName": "Фамилия",
+    "metricMiddleName": "Отчество",
+    "metricIin": "ИИН",
+    "metricEmail": "Email",
+    "metricBirthDate": "Дата рождения",
+    "metricGender": "Пол",
+    "metricCountry": "Страна",
+
+    "securityTitle": "Статус безопасности",
+    "securityDescription": "KYC хранится off-chain в зашифрованном виде. On-chain записывается только состояние permission.",
+    "loadingSecurityStatus": "Загрузка статуса безопасности...",
+    "metricEdsBound": "EDS привязан",
+    "metricVaultEncrypted": "Vault зашифрован",
+    "metricVaultAlgorithm": "Алгоритм vault",
+    "yes": "Да",
+    "no": "Нет",
+    "emptyValue": "—"
+  },
+  "PlatformPermissionsPage": {
+    "title": "Permissions",
+    "description": "Выберите сервис и подтвердите, к каким KYC-данным он может получить доступ.",
+
+    "createPermissionTitle": "Создать разрешение",
+    "createPermissionDescription": "Обязательные claims задаются сервисом. Optional claims выбираете вы.",
+    "refresh": "Обновить",
+    "loadingServicesAndPermissions": "Загрузка сервисов и разрешений...",
+    "loadErrorFallback": "Не удалось загрузить данные permissions",
+
+    "serviceLabel": "Сервис",
+    "selectService": "Выберите сервис",
+    "noDescription": "Описание отсутствует",
+
+    "activePermissionWarning": "У вас уже есть активное разрешение для этого сервиса. Сначала отзовите его, если хотите создать новое.",
+    "requiredClaimsTitle": "Обязательные claims",
+    "optionalClaimsTitle": "Optional claims",
+    "noRequiredClaims": "Нет обязательных claims.",
+    "noOptionalClaims": "Нет optional claims.",
+
+    "selectServiceFirstError": "Сначала выберите сервис.",
+    "revokeBeforeCreateError": "Сначала отзовите активное разрешение перед созданием нового.",
+    "createPermissionError": "Не удалось создать разрешение",
+    "revokePermissionError": "Не удалось отозвать разрешение",
+
+    "processing": "Обработка...",
+    "grantAccess": "Выдать доступ",
+    "grantAccessHint": "Обязательные claims задаются выбранным сервисом. Optional claims будут переданы только если вы их одобрите.",
+
+    "permissionCreatedMessage": "Разрешение создано для {serviceName}. Выданные claims: {claims}",
+    "permissionRevokedMessage": "Разрешение {permissionId} отозвано.",
+
+    "permissionLifecycleTitle": "Жизненный цикл разрешения",
+    "permissionLifecycleDescription": "Обязательные claims задаются сервисом, optional claims выбираются пользователем, а protocol thresholds генерируются автоматически.",
+
+    "yourPermissionsTitle": "Ваши разрешения",
+    "yourPermissionsDescription": "Здесь вы можете просмотреть и отозвать уже выданные разрешения.",
+    "loadingPermissions": "Загрузка разрешений...",
+    "noPermissionsTitle": "Разрешения ещё не созданы",
+    "noPermissionsDescription": "Выберите сервис выше и создайте своё первое scoped-разрешение.",
+
+    "permissionIdLabel": "Permission ID: {permissionId}",
+    "metricGrantedClaims": "Выданные claims",
+    "metricCreatedAt": "Создано",
+    "metricRevokedAt": "Отозвано",
+    "emptyValue": "—",
+
+    "revokeAccess": "Отозвать доступ"
   }
 }

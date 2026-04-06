@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PlatformShell } from '@/components/platform/platform-shell';
 import { SectionCard } from '@/components/dashboard/section-card';
 import { StatusBadge } from '@/components/dashboard/status-badge';
@@ -12,6 +12,8 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 import { runPlatformEdsFlow, RunPlatformEdsFlowResult } from '@/lib/eds/eds-flow';
 
 export default function PlatformKycPage() {
+  const t = useTranslations('PlatformKycPage');
+
   const [data, setData] = useState<KycSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export default function PlatformKycPage() {
       setData(summary);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to load KYC summary',
+        err instanceof Error ? err.message : t('loadErrorFallback'),
       );
     } finally {
       setLoading(false);
@@ -46,9 +48,10 @@ export default function PlatformKycPage() {
 
   const handleConnectDigitalSignature = async () => {
     if (isDigitalSignatureAlreadyConnected) {
-      setSignatureFlowError('Digital signature is already connected.');
+      setSignatureFlowError(t('signatureAlreadyConnectedError'));
       return;
     }
+
     try {
       setConnectingSignature(true);
       setSignatureFlowError(null);
@@ -57,16 +60,14 @@ export default function PlatformKycPage() {
       const result = await runPlatformEdsFlow();
 
       setLastEdsFlowResult(result);
-      setSignatureFlowMessage(
-        'Digital signature connected successfully. Your KYC profile was updated.',
-      );
+      setSignatureFlowMessage(t('signatureConnectedSuccess'));
 
       await loadKycSummary();
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
-          : 'Failed to connect digital signature';
+          : t('connectSignatureError');
 
       setSignatureFlowError(message);
     } finally {
@@ -76,23 +77,23 @@ export default function PlatformKycPage() {
 
   return (
     <PlatformShell
-      title="KYC"
-      description="Connect your digital signature and review your verified KYC profile."
+      title={t('title')}
+      description={t('description')}
     >
       <SectionCard
-        title="KYC Gating"
-        description="Biometric setup must be completed before your digital signature can be connected."
+        title={t('gatingTitle')}
+        description={t('gatingDescription')}
         actions={
           <button
             onClick={() => void loadKycSummary()}
             className="rounded-xl border px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50"
           >
-            Refresh
+            {t('refresh')}
           </button>
         }
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading KYC status...</div>
+          <div className="text-sm text-zinc-500">{t('loadingKycStatus')}</div>
         ) : error ? (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {error}
@@ -103,30 +104,34 @@ export default function PlatformKycPage() {
               <StatusBadge
                 label={
                   data.gating.biometricConfigured
-                    ? 'Biometric configured'
-                    : 'Biometric required'
+                    ? t('biometricConfigured')
+                    : t('biometricRequired')
                 }
                 tone={
                   data.gating.biometricConfigured ? 'success' : 'warning'
                 }
               />
               <StatusBadge
-                label={data.eds.connected ? 'Digital signature connected' : 'Digital signature not connected'}
+                label={
+                  data.eds.connected
+                    ? t('digitalSignatureConnected')
+                    : t('digitalSignatureNotConnected')
+                }
                 tone={data.eds.connected ? 'success' : 'warning'}
               />
               <StatusBadge
-                label={data.kyc.ready ? 'KYC ready' : 'KYC not ready'}
+                label={data.kyc.ready ? t('kycReady') : t('kycNotReady')}
                 tone={data.kyc.ready ? 'success' : 'warning'}
               />
               <StatusBadge
-                label={data.vault.ready ? 'Vault ready' : 'Vault not ready'}
+                label={data.vault.ready ? t('vaultReady') : t('vaultNotReady')}
                 tone={data.vault.ready ? 'success' : 'warning'}
               />
             </div>
 
             <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
               <div className="text-sm text-zinc-700">
-                Biometric setup is complete. You can now connect your digital signature and complete identity verification.
+                {t('gatingBody')}
               </div>
 
               <div className="mt-4 flex flex-wrap gap-3">
@@ -135,56 +140,60 @@ export default function PlatformKycPage() {
                   disabled={connectingSignature || isDigitalSignatureAlreadyConnected}
                 >
                   {isDigitalSignatureAlreadyConnected
-                    ? 'Digital Signature Already Connected'
+                    ? t('digitalSignatureAlreadyConnected')
                     : connectingSignature
-                      ? 'Connecting Digital Signature...'
-                      : 'Connect Digital Signature'}
+                      ? t('connectingDigitalSignature')
+                      : t('connectDigitalSignature')}
                 </PrimaryButton>
 
                 <SecondaryButton onClick={() => void loadKycSummary()}>
-                  Refresh KYC Status
+                  {t('refreshKycStatus')}
                 </SecondaryButton>
               </div>
 
               <div className="mt-3 text-xs text-zinc-500">
-                After successful verification, your KYC profile will be filled automatically.
+                {t('afterVerificationHint')}
               </div>
+
               {isDigitalSignatureAlreadyConnected ? (
                 <div className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
-                  Your digital signature is already connected. Rebinding is not available in the current product flow.
+                  {t('rebindWarning')}
                 </div>
               ) : null}
             </div>
+
             {signatureFlowError ? (
               <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 {signatureFlowError.includes('NCALayer')
-                  ? 'NCALayer is not running. Please start NCALayer first and try again.'
+                  ? t('ncaLayerNotRunning')
                   : signatureFlowError}
               </div>
             ) : null}
+
             {signatureFlowMessage ? (
               <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
                 {signatureFlowMessage}
               </div>
             ) : null}
+
             {lastEdsFlowResult ? (
               <div className="mt-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
                 <div className="text-sm font-semibold text-zinc-900">
-                  Latest Digital Signature Connection
+                  {t('latestConnectionTitle')}
                 </div>
 
                 <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   <MetricCard
-                    label="Challenge ID"
+                    label={t('metricChallengeId')}
                     value={lastEdsFlowResult.challenge.challengeId}
                   />
                   <MetricCard
-                    label="Challenge Base64"
+                    label={t('metricChallengeBase64')}
                     value={lastEdsFlowResult.challenge.challengeBase64}
                   />
                   <MetricCard
-                    label="Analyze Result"
-                    value={lastEdsFlowResult.analyzeResult ? 'Saved' : 'Processed'}
+                    label={t('metricAnalyzeResult')}
+                    value={lastEdsFlowResult.analyzeResult ? t('analyzeSaved') : t('analyzeProcessed')}
                   />
                 </div>
               </div>
@@ -194,56 +203,50 @@ export default function PlatformKycPage() {
       </SectionCard>
 
       <SectionCard
-        title="Verified KYC Profile"
-        description="This is the user-facing KYC snapshot extracted after EDS verification."
+        title={t('verifiedProfileTitle')}
+        description={t('verifiedProfileDescription')}
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading profile...</div>
+          <div className="text-sm text-zinc-500">{t('loadingProfile')}</div>
         ) : !data?.kyc.profile ? (
-        <EmptyState
-          title="No KYC profile yet"
-          description="Complete biometric setup and connect your EDS first. After verification, your user-facing KYC profile will appear here."
-        />
+          <EmptyState
+            title={t('noKycProfileTitle')}
+            description={t('noKycProfileDescription')}
+          />
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            <MetricCard label="Full name" value={data.kyc.profile.fullName ?? '—'} />
-            <MetricCard label="First name" value={data.kyc.profile.firstName ?? '—'} />
-            <MetricCard label="Last name" value={data.kyc.profile.lastName ?? '—'} />
-            <MetricCard
-              label="Middle name"
-              value={data.kyc.profile.middleName ?? '—'}
-            />
-            <MetricCard label="IIN" value={data.kyc.profile.iin ?? '—'} />
-            <MetricCard label="Email" value={data.kyc.profile.email ?? '—'} />
-            <MetricCard
-              label="Birth date"
-              value={data.kyc.profile.birthDate ?? '—'}
-            />
-            <MetricCard label="Gender" value={data.kyc.profile.gender ?? '—'} />
-            <MetricCard label="Country" value={data.kyc.profile.country ?? '—'} />
+            <MetricCard label={t('metricFullName')} value={data.kyc.profile.fullName ?? t('emptyValue')} />
+            <MetricCard label={t('metricFirstName')} value={data.kyc.profile.firstName ?? t('emptyValue')} />
+            <MetricCard label={t('metricLastName')} value={data.kyc.profile.lastName ?? t('emptyValue')} />
+            <MetricCard label={t('metricMiddleName')} value={data.kyc.profile.middleName ?? t('emptyValue')} />
+            <MetricCard label={t('metricIin')} value={data.kyc.profile.iin ?? t('emptyValue')} />
+            <MetricCard label={t('metricEmail')} value={data.kyc.profile.email ?? t('emptyValue')} />
+            <MetricCard label={t('metricBirthDate')} value={data.kyc.profile.birthDate ?? t('emptyValue')} />
+            <MetricCard label={t('metricGender')} value={data.kyc.profile.gender ?? t('emptyValue')} />
+            <MetricCard label={t('metricCountry')} value={data.kyc.profile.country ?? t('emptyValue')} />
           </div>
         )}
       </SectionCard>
 
       <SectionCard
-        title="Security Status"
-        description="KYC is stored off-chain in encrypted form. On-chain only permission state is recorded."
+        title={t('securityTitle')}
+        description={t('securityDescription')}
       >
         {loading ? (
-          <div className="text-sm text-zinc-500">Loading security status...</div>
+          <div className="text-sm text-zinc-500">{t('loadingSecurityStatus')}</div>
         ) : data ? (
           <div className="grid gap-4 md:grid-cols-3">
             <MetricCard
-              label="EDS bound"
-              value={data.eds.connected ? 'Yes' : 'No'}
+              label={t('metricEdsBound')}
+              value={data.eds.connected ? t('yes') : t('no')}
             />
             <MetricCard
-              label="Vault encrypted"
-              value={data.vault.ready ? 'Yes' : 'No'}
+              label={t('metricVaultEncrypted')}
+              value={data.vault.ready ? t('yes') : t('no')}
             />
             <MetricCard
-              label="Vault algorithm"
-              value={data.vault.entry?.algorithm ?? '—'}
+              label={t('metricVaultAlgorithm')}
+              value={data.vault.entry?.algorithm ?? t('emptyValue')}
             />
           </div>
         ) : null}
