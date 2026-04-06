@@ -16,5 +16,8 @@
     "lint:energy-api": "pnpm --filter energy-api lint",
     "typecheck:energy-web": "pnpm --filter energy-web typecheck",
     "typecheck:energy-api": "pnpm --filter energy-api typecheck"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0"
   }
 }

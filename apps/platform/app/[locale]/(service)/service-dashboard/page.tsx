@@ -20,12 +20,17 @@ export default function ServiceDashboardPage() {
 
 function ServiceDashboardContent({ session }: { session: ServiceSession }) {
   const router = useRouter();
+  const [nowTs, setNowTs] = useState<number>(0);
   const [verification, setVerification] = useState<{
     ok: boolean;
     computedSignature: string | null;
     canonical: string;
     reason: string;
   } | null>(null);
+
+  useEffect (() => {
+    setNowTs(Date.now());
+  }, [])
 
   useEffect(() => {
     const envelope = session.signedEnvelope as {
@@ -82,7 +87,7 @@ function ServiceDashboardContent({ session }: { session: ServiceSession }) {
             <Metric
               label="Status"
               value={
-                new Date(session.expiresAt).getTime() > Date.now()
+                new Date(session.expiresAt).getTime() > nowTs
                   ? 'Active'
                   : 'Expired'
               }

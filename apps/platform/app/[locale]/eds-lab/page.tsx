@@ -31,7 +31,7 @@ type AttestResponse = {
     subjectCountry: string | null;
     probableIin: string | null;
   };
-  certificateLab: any;
+  certificateLab: unknown;
   savedUserCertId: string;
   cmsDebug: {
     normalizedFormat: string;

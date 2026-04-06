@@ -253,7 +253,7 @@ export default function ProtocolPage() {
             ))}
             <div className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
               Each scope is materialized as a Token-2022 mint. Access is granted only if
-              the service verifies that the user's token account balance meets the required threshold.
+              the service verifies that the user&apos;s token account balance meets the required threshold.
             </div>
           </div>
         )}
