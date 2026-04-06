@@ -50,9 +50,9 @@ export declare class PrivateAssetsController {
         }[];
         latestProofBundle: {
             id: string;
-            proofRootHash: string;
             createdAt: Date;
             energyAssetId: string;
+            proofRootHash: string;
             bundleVersion: number;
             manifestJson: import("prisma/generated/client/runtime/library").JsonValue;
             createdByEnergyUserId: string | null;

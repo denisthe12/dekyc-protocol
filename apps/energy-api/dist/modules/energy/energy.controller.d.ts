@@ -17,9 +17,13 @@ export declare class EnergyController {
         onchain: import("./energy-blockchain.service").CreatedEnergyAssetResult;
         db: {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
             assetId: string;
             assetPda: string;
             shareMintAddress: string;
+            payoutMode: string;
             treasuryShareAccount: string;
             treasuryKzteAccount: string;
             issuerEnergyUserId: string | null;
@@ -31,8 +35,6 @@ export declare class EnergyController {
             pricePerShareKzte: number;
             investorBps: number;
             operatorBps: number;
-            payoutMode: string;
-            status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
             registryPda: string;
             coverImageUrl: string | null;
             proofRootHash: string;
@@ -41,8 +43,6 @@ export declare class EnergyController {
             metadataCanonicalJson: string;
             createAssetTx: string | null;
             issueSharesTx: string | null;
-            createdAt: Date;
-            updatedAt: Date;
         };
     }>;
     buyDemoShares(dto: BuyDemoSharesDto): Promise<{
@@ -56,18 +56,18 @@ export declare class EnergyController {
         tx: string;
         position: {
             id: string;
+            energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            energyAssetId: string;
             assetId: string;
             assetPda: string;
             shareMintAddress: string;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
-            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-            createdAt: Date;
-            updatedAt: Date;
-            energyUserId: string;
+            buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
-            energyAssetId: string;
-            buyerWalletAddress: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
@@ -82,18 +82,18 @@ export declare class EnergyController {
         recalculatedTotalSpent: number;
         updated: {
             id: string;
+            energyUserId: string;
+            createdAt: Date;
+            updatedAt: Date;
+            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+            energyAssetId: string;
             assetId: string;
             assetPda: string;
             shareMintAddress: string;
-            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
-            status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-            createdAt: Date;
-            updatedAt: Date;
-            energyUserId: string;
+            buyerWalletAddress: string;
             buyerKzteAccount: string | null;
             buyerShareAccount: string;
-            energyAssetId: string;
-            buyerWalletAddress: string;
+            payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
             totalSharesPurchased: number;
             totalKzteSpent: number;
             averagePricePerShare: number;
@@ -102,9 +102,13 @@ export declare class EnergyController {
     }>;
     listAssets(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
+        payoutMode: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -116,8 +120,6 @@ export declare class EnergyController {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         registryPda: string;
         coverImageUrl: string | null;
         proofRootHash: string;
@@ -126,23 +128,21 @@ export declare class EnergyController {
         metadataCanonicalJson: string;
         createAssetTx: string | null;
         issueSharesTx: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }[]>;
     getPortfolio(energyUserId: string): Promise<{
         id: string;
+        energyUserId: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
+        energyAssetId: string;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
-        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
-        status: import("prisma/generated/client").$Enums.EnergyPositionStatus;
-        createdAt: Date;
-        updatedAt: Date;
-        energyUserId: string;
+        buyerWalletAddress: string;
         buyerKzteAccount: string | null;
         buyerShareAccount: string;
-        energyAssetId: string;
-        buyerWalletAddress: string;
+        payoutMode: import("prisma/generated/client").$Enums.EnergyPositionPayoutMode;
         totalSharesPurchased: number;
         totalKzteSpent: number;
         averagePricePerShare: number;

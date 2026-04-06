@@ -5,9 +5,13 @@ export declare class EnergyAssetsService {
     constructor(prisma: PrismaService);
     createDemoAsset(onchain: CreatedEnergyAssetResult): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
+        payoutMode: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -19,8 +23,6 @@ export declare class EnergyAssetsService {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         registryPda: string;
         coverImageUrl: string | null;
         proofRootHash: string;
@@ -29,14 +31,16 @@ export declare class EnergyAssetsService {
         metadataCanonicalJson: string;
         createAssetTx: string | null;
         issueSharesTx: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     listAssets(): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         assetId: string;
         assetPda: string;
         shareMintAddress: string;
+        payoutMode: string;
         treasuryShareAccount: string;
         treasuryKzteAccount: string;
         issuerEnergyUserId: string | null;
@@ -48,8 +52,6 @@ export declare class EnergyAssetsService {
         pricePerShareKzte: number;
         investorBps: number;
         operatorBps: number;
-        payoutMode: string;
-        status: import("prisma/generated/client").$Enums.EnergyAssetStatus;
         registryPda: string;
         coverImageUrl: string | null;
         proofRootHash: string;
@@ -58,8 +60,6 @@ export declare class EnergyAssetsService {
         metadataCanonicalJson: string;
         createAssetTx: string | null;
         issueSharesTx: string | null;
-        createdAt: Date;
-        updatedAt: Date;
     }[]>;
     listPublicAssets(): Promise<{
         assetId: string;
@@ -105,9 +105,9 @@ export declare class EnergyAssetsService {
         metadataJson: import("prisma/generated/client/runtime/library").JsonValue;
         latestProofBundle: {
             id: string;
-            proofRootHash: string;
             createdAt: Date;
             energyAssetId: string;
+            proofRootHash: string;
             bundleVersion: number;
             manifestJson: import("prisma/generated/client/runtime/library").JsonValue;
             createdByEnergyUserId: string | null;
@@ -153,9 +153,9 @@ export declare class EnergyAssetsService {
         }[];
         latestProofBundle: {
             id: string;
-            proofRootHash: string;
             createdAt: Date;
             energyAssetId: string;
+            proofRootHash: string;
             bundleVersion: number;
             manifestJson: import("prisma/generated/client/runtime/library").JsonValue;
             createdByEnergyUserId: string | null;
