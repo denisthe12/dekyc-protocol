@@ -1,0 +1,66 @@
+name: CI Solana
+
+on:
+  push:
+    branches: [main, master, develop]
+    paths:
+      - 'programs/**'
+      - '.github/workflows/ci-solana.yml'
+  pull_request:
+    branches: [main, master, develop]
+    paths:
+      - 'programs/**'
+      - '.github/workflows/ci-solana.yml'
+
+jobs:
+  solana:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: programs/permission_protocol
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        run: |
+          rustup default stable
+          rustup component add rustfmt clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            programs/permission_protocol/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('programs/permission_protocol/**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install Anchor CLI
+        run: cargo install --git https://github.com/coral-xyz/anchor avm --locked || true
+
+      - name: Install Anchor version
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          avm install 0.32.1
+          avm use 0.32.1
+          anchor --version
+
+      - name: Rust fmt check
+        run: cargo fmt --all --check
+
+      - name: Rust clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Anchor build
+        run: |
+          export PATH="$HOME/.cargo/bin:$HOME/.local/share/solana/install/active_release/bin:$PATH"
+          anchor build
