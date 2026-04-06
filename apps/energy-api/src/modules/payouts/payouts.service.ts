@@ -5,7 +5,6 @@ import { EnergyPointsService } from '@/modules/solana/energy-points.service';
 import {
   getOrCreateAssociatedTokenAccount,
   TOKEN_2022_PROGRAM_ID,
-  getAccount,
 } from '@solana/spl-token';
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { AnchorService } from '@/modules/solana/anchor.service';

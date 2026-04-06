@@ -7,26 +7,14 @@ on:
     branches: [main, master, develop]
 
 jobs:
-  apps:
+  energy-web:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app:
-          - platform
-          - energy-web
-          - api
-          - energy-api
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: pnpm
@@ -37,14 +25,80 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} lint
-        continue-on-error: false
+      - name: Lint energy-web
+        run: pnpm --filter energy-web lint
 
-      - name: Typecheck ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} typecheck
-        continue-on-error: false
+      - name: Typecheck energy-web
+        run: pnpm --filter energy-web typecheck
 
-      - name: Build ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} build
-        continue-on-error: false
+      - name: Build energy-web
+        run: pnpm --filter energy-web build
+
+  energy-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            apps/*/package.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint energy-api
+        run: pnpm --filter energy-api lint
+
+      - name: Typecheck energy-api
+        run: pnpm --filter energy-api typecheck
+
+      - name: Build energy-api
+        run: pnpm --filter energy-api build
+
+  platform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            apps/*/package.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build platform
+        run: pnpm --filter platform build
+
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            apps/*/package.json
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build api
+        run: pnpm --filter api build

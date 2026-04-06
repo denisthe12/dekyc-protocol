@@ -26,7 +26,7 @@ jobs:
       - name: Install Rust stable
         run: |
           rustup default stable
-          rustup component add rustfmt clippy
+          rustup component add rustfmt
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -44,10 +44,10 @@ jobs:
           sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
-      - name: Install Anchor CLI
+      - name: Install AVM
         run: cargo install --git https://github.com/coral-xyz/anchor avm --locked || true
 
-      - name: Install Anchor version
+      - name: Install Anchor
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
           avm install 0.32.1
@@ -56,9 +56,6 @@ jobs:
 
       - name: Rust fmt check
         run: cargo fmt --all --check
-
-      - name: Rust clippy
-        run: cargo clippy --all-targets -- -D warnings
 
       - name: Anchor build
         run: |

@@ -93,12 +93,6 @@ export class PositionsService {
       },
     });
 
-    const wallet = await this.prisma.energyUserWallet.findUniqueOrThrow({
-      where: {
-        energyUserId: params.energyUserId,
-      },
-    });
-
     const position = await this.prisma.energyInvestorPosition.findUnique({
       where: {
         energyUserId_energyAssetId_payoutMode: {
