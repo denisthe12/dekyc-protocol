@@ -231,57 +231,57 @@ Solana здесь — это слой состояния, правил, settleme
 
 ### 1. Landing page
 
-*MD*
+```md
 ![Landing](assets/screenshots/landing.png)
-*md*
+```
 
 ### 2. Marketplace
 
-*MD*
+```md
 ![Marketplace](assets/screenshots/marketplace.png)
-*md*
+```
 
 ### 3. Asset detail
 
-*MD*
+```md
 ![Asset Detail](assets/screenshots/asset-detail.png)
-*md*
+```
 
 ### 4. Portfolio
 
-*MD*
+```md
 ![Portfolio](assets/screenshots/portfolio.png)
-*md*
+```
 
 ### 5. OTC
 
-*MD*
+```md
 ![OTC](assets/screenshots/otc.png)
-*md*
+```
 
 ### 6. History
 
-*MD*
+```md
 ![History](assets/screenshots/history.png)
-*md*
+```
 
 ### 7. Judge page
 
-*MD*
+```md
 ![Judge Page](assets/screenshots/judge.png)
-*md*
+```
 
 ### 8. Demo GIF
 
-*MD*
+```md
 ![Demo GIF](assets/gif/demo-flow.gif)
-*md*
+```
 
 ---
 
 ## Архитектура
 
-*TEXT*
+```text
 ┌──────────────────────────────┐
 │        DeKYC Platform        │
 │  ЭЦП identity + permissions  │
@@ -305,7 +305,7 @@ Solana здесь — это слой состояния, правил, settleme
 │ assets • claims • listings   │
 │ epochs • escrow              │
 └──────────────────────────────┘
-*text*
+```
 
 ### Основные компоненты
 
@@ -320,7 +320,7 @@ Solana здесь — это слой состояния, правил, settleme
 
 ## Структура репозитория
 
-*TEXT*
+```text
 .
 ├── README.md
 ├── LICENSE
@@ -347,7 +347,7 @@ Solana здесь — это слой состояния, правил, settleme
 │           ├── permission_protocol/
 │           └── tokenization_case/
 └── packages/
-*text*
+```
 
 ---
 
@@ -376,11 +376,11 @@ Solana здесь — это слой состояния, правил, settleme
 
 ### 1. Клонировать репозиторий
 
-*BASH*
+```Bash
 git clone https://github.com/denisthe12/dekyc-protocol.git
 cd dekyc-protocol
 pnpm install
-*bash*
+```
 
 ### 2. Подготовить environment variables
 
@@ -395,27 +395,27 @@ pnpm install
 
 ### 3. Сгенерировать Prisma clients
 
-*BASH*
+```Bash
 pnpm --filter api prisma:generate
 pnpm --filter energy-api prisma:generate
-*bash*
+```
 
 ### 4. Собрать Solana программы
 
-*BASH*
+```Bash
 cd programs/permission_protocol
 anchor build
 cd ../../
-*bash*
+```
 
 ### 5. Запустить приложения
 
-*BASH*
+```Bash
 pnpm dev:platform
 pnpm dev:api
 pnpm dev:energy-web
 pnpm dev:energy-api
-*bash*
+```
 
 ### 6. Открыть приложения
 
