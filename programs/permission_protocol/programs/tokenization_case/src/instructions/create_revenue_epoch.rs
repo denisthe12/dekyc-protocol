@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::{Mint, TokenAccount, TokenInterface, TransferChecked, transfer_checked};
+use anchor_spl::token_interface::{
+    transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked,
+};
 
 use crate::constants::{ENERGY_ASSET_SEED, REVENUE_EPOCH_SEED};
 use crate::errors::TokenizationError;
@@ -53,7 +55,10 @@ pub fn handler(
 ) -> Result<()> {
     let asset = &ctx.accounts.energy_asset;
 
-    require!(asset.issued_shares > 0, TokenizationError::InvalidTotalShares);
+    require!(
+        asset.issued_shares > 0,
+        TokenizationError::InvalidTotalShares
+    );
 
     let amount_per_share_kzte = total_amount_kzte
         .checked_div(asset.issued_shares)

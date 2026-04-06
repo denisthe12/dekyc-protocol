@@ -1,5 +1,5 @@
-use anchor_lang::prelude::*;
 use super::{AssetStatus, PayoutMode};
+use anchor_lang::prelude::*;
 
 #[account]
 pub struct EnergyAsset {
@@ -44,5 +44,5 @@ impl EnergyAsset {
         + 1                    // status
         + 32                   // proof_root_hash
         + 32                   // metadata_uri_hash
-        + 1;                   // bump
+        + 1; // bump
 }

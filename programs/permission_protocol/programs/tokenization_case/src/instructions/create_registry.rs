@@ -1,7 +1,7 @@
-use anchor_lang::prelude::*;
 use crate::constants::REGISTRY_SEED;
 use crate::events::RegistryCreated;
 use crate::state::Registry;
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 pub struct CreateRegistry<'info> {

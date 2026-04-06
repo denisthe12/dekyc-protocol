@@ -61,11 +61,7 @@ pub struct BuyShares<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(
-    ctx: Context<BuyShares>,
-    share_amount: u64,
-    payout_mode: PayoutMode,
-) -> Result<()> {
+pub fn handler(ctx: Context<BuyShares>, share_amount: u64, payout_mode: PayoutMode) -> Result<()> {
     require!(share_amount > 0, TokenizationError::InvalidShareAmount);
 
     let price_per_share_kzte = ctx.accounts.energy_asset.price_per_share_kzte;
@@ -95,11 +91,7 @@ pub fn handler(
     )?;
 
     let asset_id_bytes = asset_id.to_le_bytes();
-    let signer_seeds: &[&[u8]] = &[
-        ENERGY_ASSET_SEED,
-        &asset_id_bytes,
-        &[asset_bump],
-    ];
+    let signer_seeds: &[&[u8]] = &[ENERGY_ASSET_SEED, &asset_id_bytes, &[asset_bump]];
     let signer_binding = [signer_seeds];
 
     let treasury_to_buyer_accounts = TransferChecked {

@@ -77,12 +77,7 @@ pub mod tokenization_case {
         share_amount: u64,
         price_per_share_kzte: u64,
     ) -> Result<()> {
-        instructions::create_listing::handler(
-            ctx,
-            listing_id,
-            share_amount,
-            price_per_share_kzte,
-        )
+        instructions::create_listing::handler(ctx, listing_id, share_amount, price_per_share_kzte)
     }
 
     pub fn fill_listing(ctx: Context<FillListing>) -> Result<()> {

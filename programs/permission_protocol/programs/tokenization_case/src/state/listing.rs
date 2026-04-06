@@ -40,5 +40,5 @@ impl Listing {
         + 8                    // price_per_share_kzte
         + 8                    // total_price_kzte
         + 1                    // status
-        + 1;                   // bump
+        + 1; // bump
 }

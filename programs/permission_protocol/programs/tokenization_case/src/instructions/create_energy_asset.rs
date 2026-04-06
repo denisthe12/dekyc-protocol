@@ -1,8 +1,8 @@
-use anchor_lang::prelude::*;
 use crate::constants::ENERGY_ASSET_SEED;
 use crate::errors::TokenizationError;
 use crate::events::EnergyAssetCreated;
 use crate::state::{AssetStatus, EnergyAsset, PayoutMode, Registry};
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 #[instruction(asset_id: u64)]
@@ -49,7 +49,10 @@ pub fn handler(
     proof_root_hash: [u8; 32],
     metadata_uri_hash: [u8; 32],
 ) -> Result<()> {
-    require!(!ctx.accounts.registry.paused, TokenizationError::RegistryPaused);
+    require!(
+        !ctx.accounts.registry.paused,
+        TokenizationError::RegistryPaused
+    );
     require!(total_shares > 0, TokenizationError::InvalidTotalShares);
     require!(
         investor_bps as u32 + operator_bps as u32 == 10_000,

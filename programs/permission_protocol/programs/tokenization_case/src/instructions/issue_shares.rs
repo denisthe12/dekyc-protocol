@@ -1,11 +1,9 @@
-use anchor_lang::prelude::*;
-use anchor_spl::token_interface::{
-    mint_to, Mint, MintTo, TokenAccount, TokenInterface,
-};
 use crate::constants::ENERGY_ASSET_SEED;
 use crate::errors::TokenizationError;
 use crate::events::SharesIssued;
 use crate::state::{AssetStatus, EnergyAsset};
+use anchor_lang::prelude::*;
+use anchor_spl::token_interface::{mint_to, Mint, MintTo, TokenAccount, TokenInterface};
 
 #[derive(Accounts)]
 pub struct IssueShares<'info> {
@@ -32,14 +30,13 @@ pub struct IssueShares<'info> {
 pub fn handler(ctx: Context<IssueShares>) -> Result<()> {
     let asset = &mut ctx.accounts.energy_asset;
 
-    require!(asset.issued_shares == 0, TokenizationError::SharesAlreadyIssued);
+    require!(
+        asset.issued_shares == 0,
+        TokenizationError::SharesAlreadyIssued
+    );
 
     let asset_id_bytes = asset.asset_id.to_le_bytes();
-    let signer_seeds: &[&[u8]] = &[
-        ENERGY_ASSET_SEED,
-        &asset_id_bytes,
-        &[asset.bump],
-    ];
+    let signer_seeds: &[&[u8]] = &[ENERGY_ASSET_SEED, &asset_id_bytes, &[asset.bump]];
     let signer_binding = [signer_seeds];
 
     let cpi_accounts = MintTo {

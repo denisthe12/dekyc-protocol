@@ -76,11 +76,7 @@ pub fn handler(
         transfer_accounts,
     );
 
-    transfer_checked(
-        transfer_ctx,
-        share_amount,
-        ctx.accounts.share_mint.decimals,
-    )?;
+    transfer_checked(transfer_ctx, share_amount, ctx.accounts.share_mint.decimals)?;
 
     let listing = &mut ctx.accounts.listing;
     listing.listing_id = listing_id;
