@@ -7,20 +7,39 @@ on:
     branches: [main, master, develop]
 
 jobs:
-  energy-web:
+  platform:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            apps/*/package.json
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint platform
+        run: pnpm --filter platform lint
+
+      - name: Typecheck platform
+        run: pnpm --filter platform typecheck
+
+      - name: Build platform
+        run: pnpm --filter platform build
+
+  energy-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -38,19 +57,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            apps/*/package.json
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client for energy-api
+        run: pnpm --filter energy-api prisma:generate
 
       - name: Lint energy-api
         run: pnpm --filter energy-api lint
@@ -61,44 +79,22 @@ jobs:
       - name: Build energy-api
         run: pnpm --filter energy-api build
 
-  platform:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            apps/*/package.json
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build platform
-        run: pnpm --filter platform build
-
   api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            apps/*/package.json
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client for api
+        run: pnpm --filter api prisma:generate
 
       - name: Build api
         run: pnpm --filter api build

@@ -8,6 +8,7 @@
     "build": "nest build",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
     "backfill:energy-points-wallets": "ts-node -r tsconfig-paths/register test-scripts/backfill-energy-points-wallets.ts"
   },
   "dependencies": {
