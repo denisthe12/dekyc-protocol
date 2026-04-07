@@ -20,10 +20,10 @@ const fadeUp: Variants = {
 
 const localePrefixRegex = /^\/(ru|en)(?=\/|$)/;
 
-// Если ENERGY app у тебя расположен на отдельном домене/порту,
-// просто замени эти функции на абсолютные URL.
+const ENERGY_BASE_URL = process.env.NEXT_PUBLIC_ENERGY_URL || 'http://localhost:3200'
+
 function energyAppHref(locale: string) {
-  return `/${locale}/login`;
+  return `${ENERGY_BASE_URL}/${locale}`;
 }
 
 function energyJudgeHref(locale: string) {
@@ -101,7 +101,7 @@ export default function HomePage() {
                 </Link>
 
                 <Link
-                  href={energyJudgeHref(locale)}
+                  href={`/${locale}/login`}
                   className="rounded-2xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
                 >
                   {t('headerConsumerService')}
