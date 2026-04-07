@@ -23,7 +23,7 @@
 
 ---
 
-![Логотип проекта — placeholder](assets/logo/README-logo-placeholder.png)
+<img src="assets/screenshots/landing.png" alt="Landing" width="700">
 
 ---
 
@@ -183,11 +183,6 @@ Solana + Anchor + Token-2022
 ### 6. Judge Page
 
 ![Judge Page](assets/screenshots/judge.png)
-
-
-### 7. Demo GIF
-
-![Demo GIF](assets/gif/demo-flow.gif)
 
 ---
 
