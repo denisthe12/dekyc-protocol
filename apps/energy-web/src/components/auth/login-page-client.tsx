@@ -90,7 +90,7 @@ export function LoginPageClient() {
               {t('connectedService')}
             </div>
             <div className="mt-2 text-base font-medium text-[var(--foreground)]">
-              Auto Marketplace
+              DeKYC Energy
             </div>
             <div className="mt-2 break-all text-xs text-[var(--muted-foreground)]">
               serviceId: {DEKYC_SERVICE_ID || t('notSet')}
