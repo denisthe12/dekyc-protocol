@@ -213,6 +213,17 @@ pnpm install
 
 > Для них нужно использовать `.env.example` (находится в каждой папке) и при необходимости вручную поправить значения.
 
+Перед запуском скопируйте example-файлы:
+
+```Bash
+cp apps/api/.env.example apps/api/.env
+cp apps/energy-api/.env.example apps/energy-api/.env
+cp apps/platform/.env.local.example apps/platform/.env.local
+cp apps/energy-web/.env.local.example apps/energy-web/.env.local
+```
+
+После этого замените значения, помеченные как REPLACE_WITH_...
+
 ### Prisma
 
 ```Bash

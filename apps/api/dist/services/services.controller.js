@@ -34,7 +34,6 @@ let ServicesController = class ServicesController {
 };
 exports.ServicesController = ServicesController;
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

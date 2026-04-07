@@ -21,23 +21,23 @@ export declare class ServicesController {
     }>;
     getAll(): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         name: string;
-        status: string;
         clientId: string;
         description: string | null;
         category: string | null;
         requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
         optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        status: string;
+        createdAt: Date;
+        updatedAt: Date;
     }[]>;
     getCatalog(): Promise<{
         id: string;
         name: string;
-        status: string;
         description: string | null;
         category: string | null;
         requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
         optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        status: string;
     }[]>;
 }
