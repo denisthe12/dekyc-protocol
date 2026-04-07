@@ -12,7 +12,14 @@
 
 > **DeKYC Energy** — это продукт, где пользователь входит через **DeKYC**, получает доступ **без криптокошелька** и инвестирует в **токенизированные права на доход от энергетических проектов**.
 
-[🚀 Демо](#) · [🎥 Видео-демо](#) · [🖥 Live App](#) · [🖼 Скриншоты](#скриншоты) · [📑 Презентация](#) · [📚 Docs](docs/) · [🛡 DeKYC](docs/DeKYC.md) · [⚡ ENERGY](docs/ENERGY.md)
+[🚀 Pitch](https://drive.google.com/file/d/1oClcI4LiEJJVwXUGpS_nMy3RnbLAT6q1/view?usp=drive_link) ·
+[🎥 Видео-демо](https://drive.google.com/file/d/1nIkRuN5ldQDLz1fBbjWfGUx_rZdPWLcH/view?usp=drive_link) ·
+[🖥 Live App](https://dekyc-protocol-platform.vercel.app) ·
+[🖼 Скриншоты](#скриншоты) ·
+[📑 Презентация](https://docs.google.com/presentation/d/1P_jO0h7JyzIrQUPMACuS093DTZxP-DcS/edit?usp=drive_link&ouid=113841808140956424271&rtpof=true&sd=true) ·
+[📚 Docs](docs/) ·
+[🛡 DeKYC](docs/DeKYC.md) ·
+[⚡ ENERGY](docs/ENERGY.md)
 
 ---
 
