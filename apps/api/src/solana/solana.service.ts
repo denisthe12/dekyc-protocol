@@ -44,12 +44,23 @@ export class SolanaService {
 
   constructor() {
     const rpcUrl = getRequiredEnv('SOLANA_RPC_URL');
-    const keypairPath = getRequiredEnv('SOLANA_KEYPAIR_PATH');
+    const keypairPath = process.env.SOLANA_KEYPAIR_PATH?.trim() ?? '';
     const programId = getRequiredEnv('SOLANA_PERMISSION_PROGRAM_ID');
+    const privateKeyFromEnv=process.env.SOLANA_PRIVATE_KEY?.trim() ?? '';
 
     this.connection = new Connection(rpcUrl, 'confirmed');
+    let secret: number[];
 
-    const secret = JSON.parse(readFileSync(keypairPath, 'utf8')) as number[];
+    if (privateKeyFromEnv) {
+      secret = JSON.parse(privateKeyFromEnv) as number[];
+    } else if (keypairPath) {
+      secret = JSON.parse(readFileSync(keypairPath, 'utf8')) as number[];
+    } else {
+      throw new Error(
+        'Missing Solana signer config: set SOLANA_PRIVATE_KEY or SOLANA_KEYPAIR_PATH'
+      );
+    }
+
     this.walletKeypair = Keypair.fromSecretKey(Uint8Array.from(secret));
 
     const wallet = new Wallet(this.walletKeypair);
