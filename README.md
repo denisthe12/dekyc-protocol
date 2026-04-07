@@ -10,7 +10,7 @@
 [![Token--2022](https://img.shields.io/badge/Token--2022-enabled-14F195)](#)
 [![Hackathon](https://img.shields.io/badge/National%20Solana%20Hackathon-2026-14F195)](#)
 
-> **DeKYC Energy** — это продукт, где пользователь входит через **DeKYC**, получает доступ **без криптокошелька** и инвестирует в **токенизированные права на доход от энергетических проектов**.
+> **DeKYC Energy** — это продукт, где пользователь входит через **DeKYC** (Токенизированный ЭЦП ключ), получает доступ **без криптокошелька** и инвестирует в **токенизированные права на доход от энергетических проектов**.
 
 [🚀 Pitch](https://drive.google.com/file/d/1oClcI4LiEJJVwXUGpS_nMy3RnbLAT6q1/view?usp=drive_link) ·
 [🎥 Видео-демо](https://drive.google.com/file/d/1nIkRuN5ldQDLz1fBbjWfGUx_rZdPWLcH/view?usp=drive_link) ·
