@@ -26,10 +26,20 @@ let SolanaService = class SolanaService {
     program;
     constructor() {
         const rpcUrl = (0, env_1.getRequiredEnv)('SOLANA_RPC_URL');
-        const keypairPath = (0, env_1.getRequiredEnv)('SOLANA_KEYPAIR_PATH');
+        const keypairPath = process.env.SOLANA_KEYPAIR_PATH?.trim() ?? '';
         const programId = (0, env_1.getRequiredEnv)('SOLANA_PERMISSION_PROGRAM_ID');
+        const privateKeyFromEnv = process.env.SOLANA_PRIVATE_KEY?.trim() ?? '';
         this.connection = new web3_js_1.Connection(rpcUrl, 'confirmed');
-        const secret = JSON.parse((0, fs_1.readFileSync)(keypairPath, 'utf8'));
+        let secret;
+        if (privateKeyFromEnv) {
+            secret = JSON.parse(privateKeyFromEnv);
+        }
+        else if (keypairPath) {
+            secret = JSON.parse((0, fs_1.readFileSync)(keypairPath, 'utf8'));
+        }
+        else {
+            throw new Error('Missing Solana signer config: set SOLANA_PRIVATE_KEY or SOLANA_KEYPAIR_PATH');
+        }
         this.walletKeypair = web3_js_1.Keypair.fromSecretKey(Uint8Array.from(secret));
         const wallet = new anchor_1.Wallet(this.walletKeypair);
         this.provider = new anchor_1.AnchorProvider(this.connection, wallet, {
