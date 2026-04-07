@@ -23,6 +23,8 @@
 
 ---
 
+Тестовый юзер - л0гин denissnims@gmail.com и пар0ль Den12345
+
 <p align="center">
   <img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="600">
 </p>
