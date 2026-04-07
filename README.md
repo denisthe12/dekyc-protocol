@@ -23,7 +23,7 @@
 
 ---
 
-<img src="assets/screenshots/landing.png" alt="Landing" width="700">
+<img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="700">
 
 ---
 
