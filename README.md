@@ -23,7 +23,9 @@
 
 ---
 
-<img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="700">
+<p align="center">
+  <img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="600">
+</p>
 
 ---
 
@@ -157,32 +159,39 @@ Solana + Anchor + Token-2022
 
 ### 1. Landing
 
-![Landing](assets/screenshots/landing.png)
-
+<p align="center">
+  <img src="assets/screenshots/landing.png" alt="Landing" width="600">
+</p>
 
 ### 2. Marketplace
 
-![Marketplace](assets/screenshots/marketplace.png)
-
+<p align="center">
+  <img src="assets/screenshots/marketplace.png" alt="Marketplace" width="600">
+</p>
 
 ### 3. Asset Detail
 
-![Asset Detail](assets/screenshots/asset-detail.png)
-
+<p align="center">
+  <img src="assets/screenshots/asset-detail.png" alt="Asset Detail" width="600">
+</p>
 
 ### 4. Portfolio
 
-![Portfolio](assets/screenshots/portfolio.png)
-
+<p align="center">
+  <img src="assets/screenshots/portfolio.png" alt="Portfolio" width="600">
+</p>
 
 ### 5. OTC
 
-![OTC](assets/screenshots/otc.png)
-
+<p align="center">
+  <img src="assets/screenshots/otc.png" alt="OTC" width="600">
+</p>
 
 ### 6. Judge Page
 
-![Judge Page](assets/screenshots/judge.png)
+<p align="center">
+  <img src="assets/screenshots/judge.png" alt="Judge Page" width="600">
+</p>
 
 ---
 
