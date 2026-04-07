@@ -18,6 +18,12 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const ENERGY_BASE_URL = process.env.NEXT_PUBLIC_ENERGY_URL || 'http://localhost:3200'
+
+  function energyAppHref(locale: string) {
+    return `${ENERGY_BASE_URL}/${locale}`;
+  }
+
   const loadOverview = async () => {
     try {
       setLoading(true);
@@ -120,7 +126,7 @@ export default function OverviewPage() {
               {data.onboarding.readyForServiceLogin ? (
                 <div className="mt-4">
                   <Link
-                    href={`/${locale}/service-login`}
+                    href={energyAppHref(locale)}
                     className="inline-flex rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"
                   >
                     {t('continueToService')}
@@ -201,7 +207,7 @@ export default function OverviewPage() {
             description={t('openPermissionsDescription')}
           />
           <QuickAction
-            href={`/${locale}/service-login`}
+            href={energyAppHref(locale)}
             title={t('openConsumerServiceTitle')}
             description={t('openConsumerServiceDescription')}
           />

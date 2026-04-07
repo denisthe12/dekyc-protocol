@@ -201,6 +201,11 @@ function buildSteps(
   }
 
   const s = overview.status;
+  const ENERGY_BASE_URL = process.env.NEXT_PUBLIC_ENERGY_URL || 'http://localhost:3200'
+
+  function energyAppHref(locale: string) {
+    return `${ENERGY_BASE_URL}/${locale}`;
+  }
 
   return [
     {
@@ -233,7 +238,7 @@ function buildSteps(
       title: t('steps.serviceLoginTitle'),
       description: t('steps.serviceLoginDescription'),
       status: overview.onboarding.readyForServiceLogin ? 'done' : 'pending',
-      href: '/service-login',
+      href: energyAppHref(''),
       cta: t('steps.serviceLoginCta'),
     },
   ];

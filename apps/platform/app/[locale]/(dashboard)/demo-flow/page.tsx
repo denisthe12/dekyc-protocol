@@ -101,6 +101,13 @@ export default function DemoFlowPage() {
   useEffect(() => {
     if (selectedService) {
       setClientId(selectedService.clientId);
+      if (selectedService.name == 'DeKYC Energy'){
+        setClientSecret('sk_9b868b87d4035d409a46e65469a4e44992309ec54434eeeb')
+        setUserId('cmmtfpjsh0000bg51a04bt0t0')
+      } else {
+        setClientSecret('');
+        setUserId('');
+      }
     }
   }, [selectedService]);
 
