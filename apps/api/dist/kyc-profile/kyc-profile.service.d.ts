@@ -19,7 +19,7 @@ export declare class KycProfileService {
         country: string | null;
         status: string;
         source: string;
-        profileJson: import("prisma/generated/client/runtime/library").JsonValue;
+        profileJson: import("../../prisma/generated/client/runtime/library").JsonValue;
     }>;
     getLatestUserKycProfile(userId: string): Promise<{
         gender: string | null;
@@ -37,6 +37,6 @@ export declare class KycProfileService {
         country: string | null;
         status: string;
         source: string;
-        profileJson: import("prisma/generated/client/runtime/library").JsonValue;
+        profileJson: import("../../prisma/generated/client/runtime/library").JsonValue;
     } | null>;
 }

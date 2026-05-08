@@ -16,6 +16,11 @@ import { SolanaModule } from './solana/solana.module';
 import { PermissionScopeGrantsModule } from './permission-scope-grants/permission-scope-grants.module';
 import { ProtocolMonitorModule } from './protocol-monitor/protocol-monitor.module';
 import { ServiceAuthModule } from './service-auth/service-auth.module';
+import { SubjectsModule } from './subjects/subjects.module';
+import { ConsentReceiptsModule } from './consent-receipts/consent-receipts.module';
+import { IdentityAssertionsModule } from './identity-assertions/identity-assertions.module';
+import { IssuerMetadataModule } from './issuer-metadata/issuer-metadata.module';
+import { ConnectModule } from './connect/connect.module';
 
 @Module({
   imports: [
@@ -33,6 +38,11 @@ import { ServiceAuthModule } from './service-auth/service-auth.module';
     PermissionScopeGrantsModule,
     ProtocolMonitorModule,
     ServiceAuthModule,
+    SubjectsModule,
+    ConsentReceiptsModule,
+    IdentityAssertionsModule,
+    IssuerMetadataModule,
+    ConnectModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],
