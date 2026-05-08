@@ -52,4 +52,11 @@ export interface ConnectAuthorizationDecisionResponse {
   redirectUriWithError?: string;
   consentId?: string;
   serviceSubjectId?: string;
+  permission?: {
+    id: string;
+    status: string;
+    created: boolean;
+    onchainPermissionPda: string | null;
+    grantTx: string | null;
+  };
 }

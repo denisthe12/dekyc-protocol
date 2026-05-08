@@ -26,6 +26,7 @@ import type {
 } from './types/connect-authorization-session-response.type';
 import type { ApproveAuthorizationSessionDto } from './dto/approve-authorization-session.dto';
 import type { RejectAuthorizationSessionDto } from './dto/reject-authorization-session.dto';
+import { PermissionsService } from '../permissions/permissions.service';
 
 interface ServiceAuthContext {
   serviceId: string;
@@ -39,6 +40,7 @@ export class ConnectService {
     private readonly servicesService: ServicesService,
     private readonly consentReceiptsService: ConsentReceiptsService,
     private readonly identityAssertionsService: IdentityAssertionsService,
+    private readonly permissionsService: PermissionsService,
   ) {}
 
   async createAuthorizationSession(
@@ -191,6 +193,12 @@ export class ConnectService {
       approvedClaims,
     });
 
+    const permission = await this.ensureActivePermissionForConnect({
+      userId: input.userId,
+      serviceId: session.serviceId,
+      approvedClaims,
+    });
+
     const consentReceipt =
       await this.consentReceiptsService.createConsentReceipt({
         userId: input.userId,
@@ -250,6 +258,7 @@ export class ConnectService {
       redirectUriWithCode,
       consentId: consentReceipt.consentId,
       serviceSubjectId: consentReceipt.serviceSubjectId,
+      permission,
     };
   }
 
@@ -789,5 +798,69 @@ export class ConnectService {
     return value
       .map((item) => String(item).trim())
       .filter(Boolean);
+  }
+
+  private async ensureActivePermissionForConnect(input: {
+    userId: string;
+    serviceId: string;
+    approvedClaims: DeKycClaimKey[];
+  }): Promise<{
+    id: string;
+    status: string;
+    created: boolean;
+    onchainPermissionPda: string | null;
+    grantTx: string | null;
+  }> {
+    const existingPermission = await this.prisma.permission.findUnique({
+      where: {
+        userId_serviceId: {
+          userId: input.userId,
+          serviceId: input.serviceId,
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        allowedClaims: true,
+        onchainPermissionPda: true,
+      },
+    });
+
+    if (existingPermission?.status === 'ACTIVE') {
+      const existingAllowedClaims = this.readStringArray(
+        existingPermission.allowedClaims,
+      );
+
+      const hasAllApprovedClaims = input.approvedClaims.every((claim) =>
+        existingAllowedClaims.includes(claim),
+      );
+
+      if (!hasAllApprovedClaims) {
+        throw new BadRequestException(
+          'active_permission_does_not_cover_approved_claims',
+        );
+      }
+
+      return {
+        id: existingPermission.id,
+        status: existingPermission.status,
+        created: false,
+        onchainPermissionPda: existingPermission.onchainPermissionPda,
+        grantTx: null,
+      };
+    }
+
+    const grantResult = await this.permissionsService.grantPermission(input.userId, {
+      serviceId: input.serviceId,
+      allowedClaims: input.approvedClaims,
+    });
+
+    return {
+      id: grantResult.permission.id,
+      status: grantResult.permission.status,
+      created: true,
+      onchainPermissionPda: grantResult.permission.onchainPermissionPda,
+      grantTx: grantResult.onChain.grantTx,
+    };
   }
 }

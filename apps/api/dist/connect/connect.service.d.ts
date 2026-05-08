@@ -10,6 +10,7 @@ import type { CompleteAuthorizationResult } from './types/complete-authorization
 import type { ConnectAuthorizationDecisionResponse, ConnectAuthorizationSessionDetailResponse, ConnectAuthorizationSessionResponse } from './types/connect-authorization-session-response.type';
 import type { ApproveAuthorizationSessionDto } from './dto/approve-authorization-session.dto';
 import type { RejectAuthorizationSessionDto } from './dto/reject-authorization-session.dto';
+import { PermissionsService } from '../permissions/permissions.service';
 interface ServiceAuthContext {
     serviceId: string;
     clientId: string;
@@ -19,7 +20,8 @@ export declare class ConnectService {
     private readonly servicesService;
     private readonly consentReceiptsService;
     private readonly identityAssertionsService;
-    constructor(prisma: PrismaService, servicesService: ServicesService, consentReceiptsService: ConsentReceiptsService, identityAssertionsService: IdentityAssertionsService);
+    private readonly permissionsService;
+    constructor(prisma: PrismaService, servicesService: ServicesService, consentReceiptsService: ConsentReceiptsService, identityAssertionsService: IdentityAssertionsService, permissionsService: PermissionsService);
     createAuthorizationSession(query: AuthorizeQueryDto): Promise<ConnectAuthorizationSessionResponse>;
     getAuthorizationSessionForUser(input: {
         sessionId: string;
@@ -65,5 +67,6 @@ export declare class ConnectService {
     private assertApprovedClaimsSubset;
     private buildRedirectUriWithError;
     private readStringArray;
+    private ensureActivePermissionForConnect;
 }
 export {};

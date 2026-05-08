@@ -7,6 +7,7 @@ import { ServiceRequestNonceService } from '../service-api/service-request-nonce
 import { ServicesModule } from '../services/services.module';
 import { ConnectController } from './connect.controller';
 import { ConnectService } from './connect.service';
+import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConnectService } from './connect.service';
     ServicesModule,
     ConsentReceiptsModule,
     IdentityAssertionsModule,
+    PermissionsModule,
   ],
   controllers: [ConnectController],
   providers: [ConnectService, ServiceCredentialsGuard, ServiceRequestNonceService],

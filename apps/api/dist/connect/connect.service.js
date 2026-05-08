@@ -16,16 +16,19 @@ const consent_receipts_service_1 = require("../consent-receipts/consent-receipts
 const identity_assertions_service_1 = require("../identity-assertions/identity-assertions.service");
 const prisma_service_1 = require("../prisma/prisma.service");
 const services_service_1 = require("../services/services.service");
+const permissions_service_1 = require("../permissions/permissions.service");
 let ConnectService = class ConnectService {
     prisma;
     servicesService;
     consentReceiptsService;
     identityAssertionsService;
-    constructor(prisma, servicesService, consentReceiptsService, identityAssertionsService) {
+    permissionsService;
+    constructor(prisma, servicesService, consentReceiptsService, identityAssertionsService, permissionsService) {
         this.prisma = prisma;
         this.servicesService = servicesService;
         this.consentReceiptsService = consentReceiptsService;
         this.identityAssertionsService = identityAssertionsService;
+        this.permissionsService = permissionsService;
     }
     async createAuthorizationSession(query) {
         const clientId = this.getClientIdFromAuthorizeQuery(query);
@@ -144,6 +147,11 @@ let ConnectService = class ConnectService {
             requestedClaims,
             approvedClaims,
         });
+        const permission = await this.ensureActivePermissionForConnect({
+            userId: input.userId,
+            serviceId: session.serviceId,
+            approvedClaims,
+        });
         const consentReceipt = await this.consentReceiptsService.createConsentReceipt({
             userId: input.userId,
             serviceId: session.serviceId,
@@ -194,6 +202,7 @@ let ConnectService = class ConnectService {
             redirectUriWithCode,
             consentId: consentReceipt.consentId,
             serviceSubjectId: consentReceipt.serviceSubjectId,
+            permission,
         };
     }
     async rejectAuthorizationSession(input) {
@@ -568,6 +577,47 @@ let ConnectService = class ConnectService {
             .map((item) => String(item).trim())
             .filter(Boolean);
     }
+    async ensureActivePermissionForConnect(input) {
+        const existingPermission = await this.prisma.permission.findUnique({
+            where: {
+                userId_serviceId: {
+                    userId: input.userId,
+                    serviceId: input.serviceId,
+                },
+            },
+            select: {
+                id: true,
+                status: true,
+                allowedClaims: true,
+                onchainPermissionPda: true,
+            },
+        });
+        if (existingPermission?.status === 'ACTIVE') {
+            const existingAllowedClaims = this.readStringArray(existingPermission.allowedClaims);
+            const hasAllApprovedClaims = input.approvedClaims.every((claim) => existingAllowedClaims.includes(claim));
+            if (!hasAllApprovedClaims) {
+                throw new common_1.BadRequestException('active_permission_does_not_cover_approved_claims');
+            }
+            return {
+                id: existingPermission.id,
+                status: existingPermission.status,
+                created: false,
+                onchainPermissionPda: existingPermission.onchainPermissionPda,
+                grantTx: null,
+            };
+        }
+        const grantResult = await this.permissionsService.grantPermission(input.userId, {
+            serviceId: input.serviceId,
+            allowedClaims: input.approvedClaims,
+        });
+        return {
+            id: grantResult.permission.id,
+            status: grantResult.permission.status,
+            created: true,
+            onchainPermissionPda: grantResult.permission.onchainPermissionPda,
+            grantTx: grantResult.onChain.grantTx,
+        };
+    }
 };
 exports.ConnectService = ConnectService;
 exports.ConnectService = ConnectService = __decorate([
@@ -575,6 +625,7 @@ exports.ConnectService = ConnectService = __decorate([
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         services_service_1.ServicesService,
         consent_receipts_service_1.ConsentReceiptsService,
-        identity_assertions_service_1.IdentityAssertionsService])
+        identity_assertions_service_1.IdentityAssertionsService,
+        permissions_service_1.PermissionsService])
 ], ConnectService);
 //# sourceMappingURL=connect.service.js.map

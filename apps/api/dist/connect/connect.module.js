@@ -16,6 +16,7 @@ const service_request_nonce_service_1 = require("../service-api/service-request-
 const services_module_1 = require("../services/services.module");
 const connect_controller_1 = require("./connect.controller");
 const connect_service_1 = require("./connect.service");
+const permissions_module_1 = require("../permissions/permissions.module");
 let ConnectModule = class ConnectModule {
 };
 exports.ConnectModule = ConnectModule;
@@ -26,6 +27,7 @@ exports.ConnectModule = ConnectModule = __decorate([
             services_module_1.ServicesModule,
             consent_receipts_module_1.ConsentReceiptsModule,
             identity_assertions_module_1.IdentityAssertionsModule,
+            permissions_module_1.PermissionsModule,
         ],
         controllers: [connect_controller_1.ConnectController],
         providers: [connect_service_1.ConnectService, service_credentials_guard_1.ServiceCredentialsGuard, service_request_nonce_service_1.ServiceRequestNonceService],
