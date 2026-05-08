@@ -1,10 +1,17 @@
-import {
+import type {
+  ConnectAuthorizationDecision,
+  ConnectAuthorizationSessionDetail,
+  DeKycConnectClaimKey,
   GrantPermissionResponse,
+  KycSummaryResponse,
   PermissionItem,
+  ProfileSummaryResponse,
+  ProtocolSnapshot,
   ServiceItem,
+  UserFacingPermissionItem,
+  UserFacingServiceCatalogItem,
+  UserOverviewResponse,
 } from './types';
-
-import { ProtocolSnapshot, ProfileSummaryResponse, KycSummaryResponse, UserFacingPermissionItem, UserFacingServiceCatalogItem, UserOverviewResponse } from './types';
 
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}`;
 
@@ -16,7 +23,7 @@ function getToken(): string {
   const token = window.localStorage.getItem('dekyc_access_token');
 
   if (!token) {
-    throw new Error('Access token not found. Please login in EDS Lab first.');
+    throw new Error('Access token not found. Please login to DeKYC Platform first.');
   }
 
   return token;
@@ -142,4 +149,46 @@ export async function fetchUserOverview(): Promise<UserOverviewResponse> {
   return apiFetch<UserOverviewResponse>('/auth/user-overview', {
     method: 'GET',
   });
+}
+
+export async function fetchConnectAuthorizationSession(
+  sessionId: string,
+): Promise<ConnectAuthorizationSessionDetail> {
+  return apiFetch<ConnectAuthorizationSessionDetail>(
+    `/connect/authorization-sessions/${encodeURIComponent(sessionId)}`,
+    {
+      method: 'GET',
+    },
+  );
+}
+
+export async function approveConnectAuthorizationSession(input: {
+  sessionId: string;
+  approvedClaims: DeKycConnectClaimKey[];
+}): Promise<ConnectAuthorizationDecision> {
+  return apiFetch<ConnectAuthorizationDecision>(
+    `/connect/authorization-sessions/${encodeURIComponent(input.sessionId)}/approve`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        approvedClaims: input.approvedClaims,
+        consentTextVersion: 'dekyc-connect-consent-v1',
+      }),
+    },
+  );
+}
+
+export async function rejectConnectAuthorizationSession(input: {
+  sessionId: string;
+  reason?: string;
+}): Promise<ConnectAuthorizationDecision> {
+  return apiFetch<ConnectAuthorizationDecision>(
+    `/connect/authorization-sessions/${encodeURIComponent(input.sessionId)}/reject`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        reason: input.reason ?? 'User rejected consent',
+      }),
+    },
+  );
 }

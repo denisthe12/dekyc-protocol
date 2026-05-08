@@ -246,3 +246,43 @@ export type UserOverviewResponse = {
     createdAt: string;
   } | null;
 };
+
+export type DeKycConnectClaimKey =
+  | 'fullName'
+  | 'iin'
+  | 'birthDate'
+  | 'email'
+  | 'verified'
+  | 'age18Plus';
+
+export interface ConnectAuthorizationSessionDetail {
+  sessionId: string;
+  status: string;
+  service: {
+    id: string;
+    name: string;
+    clientId: string;
+    description: string | null;
+    category: string | null;
+  };
+  requestedClaims: DeKycConnectClaimKey[];
+  redirectUri: string;
+  state: string | null;
+  nonce: string | null;
+  expiresAt: string;
+  existingPermission: {
+    id: string;
+    status: string;
+    allowedClaims: string[];
+  } | null;
+}
+
+export interface ConnectAuthorizationDecision {
+  sessionId: string;
+  status: 'approved' | 'rejected';
+  redirectUri: string;
+  redirectUriWithCode?: string;
+  redirectUriWithError?: string;
+  consentId?: string;
+  serviceSubjectId?: string;
+}

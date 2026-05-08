@@ -390,5 +390,60 @@
     "emptyValue": "—",
 
     "revokeAccess": "Отозвать доступ"
+  },
+  "ConnectConsentPage": {
+    "title": "Подтверждение доступа",
+    "description": "Проверьте, какой сервис запрашивает доступ к вашей DeKYC-идентичности.",
+    "cardTitle": "DeKYC Connect",
+    "cardDescription": "Сервис запрашивает подтверждение личности и ограниченный набор KYC-атрибутов.",
+    "loading": "Загрузка запроса доступа...",
+    "missingSessionId": "Не найден идентификатор authorization session.",
+    "loadError": "Не удалось загрузить запрос доступа.",
+    "approveError": "Не удалось подтвердить доступ.",
+    "rejectError": "Не удалось отклонить доступ.",
+    "requestFrom": "Запрос от сервиса",
+    "noDescription": "Описание сервиса не указано.",
+    "clientId": "Client ID",
+    "expiresAt": "Истекает",
+    "redirectUri": "Redirect URI",
+    "state": "State",
+    "emptyValue": "—",
+    "activePermissionHint": "У вас уже есть активное разрешение для этого сервиса. Сейчас будет создан одноразовый authorization code для входа.",
+    "noActivePermissionHint": "У вас пока нет активного разрешения для этого сервиса. Подтверждение создаст consent receipt для текущего запроса.",
+    "requestedClaimsTitle": "Запрашиваемые данные",
+    "requestedClaimsDescription": "Вы можете подтвердить только те данные, которые запрошены сервисом. Нельзя добавить новые claims поверх запроса.",
+    "selectAtLeastOneClaim": "Выберите хотя бы один claim для подтверждения.",
+    "missingRedirectUriWithCode": "Backend не вернул redirect URI с authorization code.",
+    "consentTextTitle": "Текст согласия",
+    "consentTextDescription": "Я разрешаю сервису {serviceName} получить через DeKYC следующие данные: {claims}. Согласие будет зафиксировано как signed consent receipt.",
+    "approveAndContinue": "Подтвердить и продолжить",
+    "reject": "Отклонить",
+    "processing": "Обработка...",
+    "claims": {
+      "fullName": {
+        "label": "ФИО",
+        "description": "Полное имя из подтвержденного KYC-профиля."
+      },
+      "iin": {
+        "label": "ИИН",
+        "description": "Идентификатор из подтвержденного профиля."
+      },
+      "birthDate": {
+        "label": "Дата рождения",
+        "description": "Дата рождения для проверки возраста и профиля."
+      },
+      "email": {
+        "label": "Email",
+        "description": "Email, связанный с аккаунтом DeKYC."
+      },
+      "verified": {
+        "label": "Статус проверки",
+        "description": "Флаг, что пользователь прошел DeKYC-проверку."
+      },
+      "age18Plus": {
+        "label": "18+",
+        "description": "Подтверждение, что пользователь старше 18 лет."
+      }
+    }
   }
 }

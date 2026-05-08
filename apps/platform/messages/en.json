@@ -390,5 +390,60 @@
     "emptyValue": "—",
 
     "revokeAccess": "Revoke Access"
+  },
+  "ConnectConsentPage": {
+    "title": "Access confirmation",
+    "description": "Review which service is requesting access to your DeKYC identity.",
+    "cardTitle": "DeKYC Connect",
+    "cardDescription": "The service is requesting identity confirmation and a limited set of KYC attributes.",
+    "loading": "Loading access request...",
+    "missingSessionId": "Authorization session id was not found.",
+    "loadError": "Failed to load access request.",
+    "approveError": "Failed to approve access.",
+    "rejectError": "Failed to reject access.",
+    "requestFrom": "Request from service",
+    "noDescription": "No service description provided.",
+    "clientId": "Client ID",
+    "expiresAt": "Expires at",
+    "redirectUri": "Redirect URI",
+    "state": "State",
+    "emptyValue": "—",
+    "activePermissionHint": "You already have an active permission for this service. DeKYC will now create a one-time authorization code.",
+    "noActivePermissionHint": "You do not have an active permission for this service yet. Approval will create a consent receipt for this request.",
+    "requestedClaimsTitle": "Requested data",
+    "requestedClaimsDescription": "You can approve only the claims requested by the service. You cannot add new claims on top of the request.",
+    "selectAtLeastOneClaim": "Select at least one claim to approve.",
+    "missingRedirectUriWithCode": "Backend did not return a redirect URI with authorization code.",
+    "consentTextTitle": "Consent text",
+    "consentTextDescription": "I allow {serviceName} to receive the following data through DeKYC: {claims}. This consent will be recorded as a signed consent receipt.",
+    "approveAndContinue": "Approve and continue",
+    "reject": "Reject",
+    "processing": "Processing...",
+    "claims": {
+      "fullName": {
+        "label": "Full name",
+        "description": "Full name from the verified KYC profile."
+      },
+      "iin": {
+        "label": "IIN",
+        "description": "Identifier from the verified profile."
+      },
+      "birthDate": {
+        "label": "Birth date",
+        "description": "Birth date for age and profile checks."
+      },
+      "email": {
+        "label": "Email",
+        "description": "Email linked to the DeKYC account."
+      },
+      "verified": {
+        "label": "Verification status",
+        "description": "Flag showing that the user passed DeKYC verification."
+      },
+      "age18Plus": {
+        "label": "18+",
+        "description": "Confirmation that the user is older than 18."
+      }
+    }
   }
 }
