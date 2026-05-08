@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { createHash, randomBytes } from 'crypto';
 import type {
@@ -18,6 +19,13 @@ import type { AuthorizeQueryDto } from './dto/authorize-query.dto';
 import type { CompleteAuthorizationDto } from './dto/complete-authorization.dto';
 import type { TokenRequestDto } from './dto/token-request.dto';
 import type { CompleteAuthorizationResult } from './types/complete-authorization-result.type';
+import type {
+  ConnectAuthorizationDecisionResponse,
+  ConnectAuthorizationSessionDetailResponse,
+  ConnectAuthorizationSessionResponse,
+} from './types/connect-authorization-session-response.type';
+import type { ApproveAuthorizationSessionDto } from './dto/approve-authorization-session.dto';
+import type { RejectAuthorizationSessionDto } from './dto/reject-authorization-session.dto';
 
 interface ServiceAuthContext {
   serviceId: string;
@@ -33,7 +41,9 @@ export class ConnectService {
     private readonly identityAssertionsService: IdentityAssertionsService,
   ) {}
 
-  async previewAuthorizeRequest(query: AuthorizeQueryDto) {
+  async createAuthorizationSession(
+    query: AuthorizeQueryDto,
+  ): Promise<ConnectAuthorizationSessionResponse> {
     const clientId = this.getClientIdFromAuthorizeQuery(query);
     const redirectUri = this.normalizeRedirectUri(
       query.redirect_uri ?? query.redirectUri,
@@ -53,14 +63,38 @@ export class ConnectService {
     }
 
     const claimsScope = this.parseClaimsScope(query.scope);
+    const sessionId = this.generateAuthorizationSessionId();
+    const expiresAt = this.buildAuthorizationSessionExpiresAt();
+
+    await this.prisma.deKycConnectAuthorizationSession.create({
+      data: {
+        sessionId,
+        serviceId: service.id,
+        clientId: service.clientId,
+        redirectUri,
+        state: query.state?.trim() || null,
+        nonce: query.nonce?.trim() || null,
+        claimsScope: this.toJsonArray(claimsScope),
+        status: 'pending',
+        userId: null,
+        consentId: null,
+        codeHash: null,
+        expiresAt,
+        approvedAt: null,
+        rejectedAt: null,
+        completedAt: null,
+      },
+    });
 
     return {
-      status: 'authorization_request_ready',
-      nextAction: 'hosted_consent_ui_required',
+      sessionId,
+      status: 'pending',
       service: {
         id: service.id,
         name: service.name,
         clientId: service.clientId,
+        description: service.description,
+        category: service.category,
       },
       authorizationRequest: {
         responseType: 'code',
@@ -70,7 +104,192 @@ export class ConnectService {
         state: query.state ?? null,
         nonce: query.nonce ?? null,
       },
-      note: 'MVP preview endpoint. Use POST /api/connect/dev/authorize/complete to simulate hosted consent until UI is connected.',
+      platformConsentUrl: this.buildPlatformConsentUrl(sessionId),
+      expiresAt: expiresAt.toISOString(),
+    };
+  }
+
+  async getAuthorizationSessionForUser(input: {
+    sessionId: string;
+    userId: string;
+  }): Promise<ConnectAuthorizationSessionDetailResponse> {
+    const session = await this.getAuthorizationSessionOrThrow(input.sessionId);
+
+    if (session.expiresAt.getTime() <= Date.now()) {
+      throw new BadRequestException('authorization_session_expired');
+    }
+
+    const service = await this.servicesService.getServiceByClientIdWithSecrets(
+      session.clientId,
+    );
+
+    if (!service) {
+      throw new BadRequestException('service_not_found');
+    }
+
+    const permission = await this.prisma.permission.findUnique({
+      where: {
+        userId_serviceId: {
+          userId: input.userId,
+          serviceId: session.serviceId,
+        },
+      },
+      select: {
+        id: true,
+        status: true,
+        allowedClaims: true,
+      },
+    });
+
+    return {
+      sessionId: session.sessionId,
+      status: session.status,
+      service: {
+        id: service.id,
+        name: service.name,
+        clientId: service.clientId,
+        description: service.description,
+        category: service.category,
+      },
+      requestedClaims: this.readClaimsScope(session.claimsScope),
+      redirectUri: session.redirectUri,
+      state: session.state,
+      nonce: session.nonce,
+      expiresAt: session.expiresAt.toISOString(),
+      existingPermission: permission
+        ? {
+            id: permission.id,
+            status: permission.status,
+            allowedClaims: this.readStringArray(permission.allowedClaims),
+          }
+        : null,
+    };
+  }
+
+  async approveAuthorizationSession(input: {
+    sessionId: string;
+    userId: string;
+    body: ApproveAuthorizationSessionDto;
+  }): Promise<ConnectAuthorizationDecisionResponse> {
+    const session = await this.getAuthorizationSessionOrThrow(input.sessionId);
+
+    if (session.status !== 'pending') {
+      throw new BadRequestException('authorization_session_not_pending');
+    }
+
+    if (session.expiresAt.getTime() <= Date.now()) {
+      throw new BadRequestException('authorization_session_expired');
+    }
+
+    const requestedClaims = this.readClaimsScope(session.claimsScope);
+    const approvedClaims = input.body.approvedClaims
+      ? this.parseClaimsScope(input.body.approvedClaims)
+      : requestedClaims;
+
+    this.assertApprovedClaimsSubset({
+      requestedClaims,
+      approvedClaims,
+    });
+
+    const consentReceipt =
+      await this.consentReceiptsService.createConsentReceipt({
+        userId: input.userId,
+        serviceId: session.serviceId,
+        grantedClaims: approvedClaims,
+        consentTextVersion:
+          input.body.consentTextVersion?.trim() ||
+          'dekyc-connect-consent-v1',
+        expiresAt: this.buildConsentExpiresAt(
+          input.body.consentExpiresInSeconds,
+        ),
+      });
+
+    const code = this.generateAuthorizationCode();
+    const codeHash = this.hashAuthorizationCode(code);
+    const codeExpiresAt = this.buildCodeExpiresAt();
+
+    await this.prisma.deKycAuthorizationCode.create({
+      data: {
+        codeHash,
+        userId: input.userId,
+        serviceId: session.serviceId,
+        redirectUri: session.redirectUri,
+        state: session.state,
+        nonce: session.nonce,
+        claimsScope: this.toJsonArray(approvedClaims),
+        consentId: consentReceipt.consentId,
+        expiresAt: codeExpiresAt,
+        consumedAt: null,
+      },
+    });
+
+    await this.prisma.deKycConnectAuthorizationSession.update({
+      where: {
+        sessionId: session.sessionId,
+      },
+      data: {
+        status: 'approved',
+        userId: input.userId,
+        consentId: consentReceipt.consentId,
+        codeHash,
+        approvedAt: new Date(),
+        completedAt: new Date(),
+      },
+    });
+
+    const redirectUriWithCode = this.buildRedirectUriWithCode({
+      redirectUri: session.redirectUri,
+      code,
+      state: session.state ?? undefined,
+    });
+
+    return {
+      sessionId: session.sessionId,
+      status: 'approved',
+      redirectUri: session.redirectUri,
+      redirectUriWithCode,
+      consentId: consentReceipt.consentId,
+      serviceSubjectId: consentReceipt.serviceSubjectId,
+    };
+  }
+
+  async rejectAuthorizationSession(input: {
+    sessionId: string;
+    userId: string;
+    body: RejectAuthorizationSessionDto;
+  }): Promise<ConnectAuthorizationDecisionResponse> {
+    const session = await this.getAuthorizationSessionOrThrow(input.sessionId);
+
+    if (session.status !== 'pending') {
+      throw new BadRequestException('authorization_session_not_pending');
+    }
+
+    if (session.expiresAt.getTime() <= Date.now()) {
+      throw new BadRequestException('authorization_session_expired');
+    }
+
+    await this.prisma.deKycConnectAuthorizationSession.update({
+      where: {
+        sessionId: session.sessionId,
+      },
+      data: {
+        status: 'rejected',
+        userId: input.userId,
+        rejectedAt: new Date(),
+        completedAt: new Date(),
+      },
+    });
+
+    return {
+      sessionId: session.sessionId,
+      status: 'rejected',
+      redirectUri: session.redirectUri,
+      redirectUriWithError: this.buildRedirectUriWithError({
+        redirectUri: session.redirectUri,
+        error: 'access_denied',
+        errorDescription: input.body.reason?.trim() || 'User rejected consent',
+        state: session.state ?? undefined,
+      }),
     };
   }
 
@@ -480,5 +699,95 @@ export class ConnectService {
 
   private toJsonArray(values: DeKycClaimKey[]): Prisma.InputJsonArray {
     return [...values];
+  }
+
+  private async getAuthorizationSessionOrThrow(sessionId: string) {
+    const session =
+      await this.prisma.deKycConnectAuthorizationSession.findUnique({
+        where: {
+          sessionId,
+        },
+      });
+
+    if (!session) {
+      throw new NotFoundException('authorization_session_not_found');
+    }
+
+    return session;
+  }
+
+  private generateAuthorizationSessionId(): string {
+    return `authz_${randomBytes(18).toString('hex')}`;
+  }
+
+  private buildAuthorizationSessionExpiresAt(): Date {
+    return new Date(
+      Date.now() + this.getAuthorizationSessionTtlSeconds() * 1000,
+    );
+  }
+
+  private getAuthorizationSessionTtlSeconds(): number {
+    const rawValue = process.env.DEKYC_CONNECT_AUTH_SESSION_TTL_SECONDS;
+    const parsed = rawValue ? Number(rawValue) : 600;
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return 600;
+    }
+
+    return Math.floor(parsed);
+  }
+
+  private buildPlatformConsentUrl(sessionId: string): string {
+    const baseUrl =
+      process.env.DEKYC_PLATFORM_CONNECT_CONSENT_URL ??
+      'http://localhost:3000/ru/connect/consent';
+
+    const url = new URL(baseUrl);
+    url.searchParams.set('session_id', sessionId);
+
+    return url.toString();
+  }
+
+  private assertApprovedClaimsSubset(input: {
+    requestedClaims: DeKycClaimKey[];
+    approvedClaims: DeKycClaimKey[];
+  }): void {
+    const requested = new Set(input.requestedClaims);
+
+    const hasOnlyRequestedClaims = input.approvedClaims.every((claim) =>
+      requested.has(claim),
+    );
+
+    if (!hasOnlyRequestedClaims) {
+      throw new BadRequestException('approved_claims_exceed_requested_scope');
+    }
+  }
+
+  private buildRedirectUriWithError(input: {
+    redirectUri: string;
+    error: string;
+    errorDescription: string;
+    state?: string;
+  }): string {
+    const url = new URL(input.redirectUri);
+
+    url.searchParams.set('error', input.error);
+    url.searchParams.set('error_description', input.errorDescription);
+
+    if (input.state?.trim()) {
+      url.searchParams.set('state', input.state.trim());
+    }
+
+    return url.toString();
+  }
+
+  private readStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => String(item).trim())
+      .filter(Boolean);
   }
 }

@@ -19,13 +19,16 @@ const connect_service_1 = require("./connect.service");
 const authorize_query_dto_1 = require("./dto/authorize-query.dto");
 const complete_authorization_dto_1 = require("./dto/complete-authorization.dto");
 const token_request_dto_1 = require("./dto/token-request.dto");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const approve_authorization_session_dto_1 = require("./dto/approve-authorization-session.dto");
+const reject_authorization_session_dto_1 = require("./dto/reject-authorization-session.dto");
 let ConnectController = class ConnectController {
     connectService;
     constructor(connectService) {
         this.connectService = connectService;
     }
     authorize(query) {
-        return this.connectService.previewAuthorizeRequest(query);
+        return this.connectService.createAuthorizationSession(query);
     }
     completeAuthorizationForDev(body, masterSecret) {
         return this.connectService.completeAuthorizationForDev(body, masterSecret);
@@ -39,6 +42,26 @@ let ConnectController = class ConnectController {
             },
         });
     }
+    getAuthorizationSession(sessionId, req) {
+        return this.connectService.getAuthorizationSessionForUser({
+            sessionId,
+            userId: req.user.sub,
+        });
+    }
+    approveAuthorizationSession(sessionId, body, req) {
+        return this.connectService.approveAuthorizationSession({
+            sessionId,
+            userId: req.user.sub,
+            body,
+        });
+    }
+    rejectAuthorizationSession(sessionId, body, req) {
+        return this.connectService.rejectAuthorizationSession({
+            sessionId,
+            userId: req.user.sub,
+            body,
+        });
+    }
 };
 exports.ConnectController = ConnectController;
 __decorate([
@@ -46,7 +69,7 @@ __decorate([
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [authorize_query_dto_1.AuthorizeQueryDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], ConnectController.prototype, "authorize", null);
 __decorate([
     (0, common_1.Post)('dev/authorize/complete'),
@@ -65,6 +88,35 @@ __decorate([
     __metadata("design:paramtypes", [token_request_dto_1.TokenRequestDto, Object]),
     __metadata("design:returntype", void 0)
 ], ConnectController.prototype, "exchangeToken", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('authorization-sessions/:sessionId'),
+    __param(0, (0, common_1.Param)('sessionId')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ConnectController.prototype, "getAuthorizationSession", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('authorization-sessions/:sessionId/approve'),
+    __param(0, (0, common_1.Param)('sessionId')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, approve_authorization_session_dto_1.ApproveAuthorizationSessionDto, Object]),
+    __metadata("design:returntype", Promise)
+], ConnectController.prototype, "approveAuthorizationSession", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Post)('authorization-sessions/:sessionId/reject'),
+    __param(0, (0, common_1.Param)('sessionId')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, reject_authorization_session_dto_1.RejectAuthorizationSessionDto, Object]),
+    __metadata("design:returntype", Promise)
+], ConnectController.prototype, "rejectAuthorizationSession", null);
 exports.ConnectController = ConnectController = __decorate([
     (0, common_1.Controller)('connect'),
     __metadata("design:paramtypes", [connect_service_1.ConnectService])

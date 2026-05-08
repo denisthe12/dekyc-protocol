@@ -1,4 +1,4 @@
-import type { DeKycClaimKey, DeKycTokenResponseDto } from '@energy/shared';
+import type { DeKycTokenResponseDto } from '@energy/shared';
 import { ConsentReceiptsService } from '../consent-receipts/consent-receipts.service';
 import { IdentityAssertionsService } from '../identity-assertions/identity-assertions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -7,6 +7,9 @@ import type { AuthorizeQueryDto } from './dto/authorize-query.dto';
 import type { CompleteAuthorizationDto } from './dto/complete-authorization.dto';
 import type { TokenRequestDto } from './dto/token-request.dto';
 import type { CompleteAuthorizationResult } from './types/complete-authorization-result.type';
+import type { ConnectAuthorizationDecisionResponse, ConnectAuthorizationSessionDetailResponse, ConnectAuthorizationSessionResponse } from './types/connect-authorization-session-response.type';
+import type { ApproveAuthorizationSessionDto } from './dto/approve-authorization-session.dto';
+import type { RejectAuthorizationSessionDto } from './dto/reject-authorization-session.dto';
 interface ServiceAuthContext {
     serviceId: string;
     clientId: string;
@@ -17,24 +20,21 @@ export declare class ConnectService {
     private readonly consentReceiptsService;
     private readonly identityAssertionsService;
     constructor(prisma: PrismaService, servicesService: ServicesService, consentReceiptsService: ConsentReceiptsService, identityAssertionsService: IdentityAssertionsService);
-    previewAuthorizeRequest(query: AuthorizeQueryDto): Promise<{
-        status: string;
-        nextAction: string;
-        service: {
-            id: string;
-            name: string;
-            clientId: string;
-        };
-        authorizationRequest: {
-            responseType: string;
-            clientId: string;
-            redirectUri: string;
-            scope: DeKycClaimKey[];
-            state: string | null;
-            nonce: string | null;
-        };
-        note: string;
-    }>;
+    createAuthorizationSession(query: AuthorizeQueryDto): Promise<ConnectAuthorizationSessionResponse>;
+    getAuthorizationSessionForUser(input: {
+        sessionId: string;
+        userId: string;
+    }): Promise<ConnectAuthorizationSessionDetailResponse>;
+    approveAuthorizationSession(input: {
+        sessionId: string;
+        userId: string;
+        body: ApproveAuthorizationSessionDto;
+    }): Promise<ConnectAuthorizationDecisionResponse>;
+    rejectAuthorizationSession(input: {
+        sessionId: string;
+        userId: string;
+        body: RejectAuthorizationSessionDto;
+    }): Promise<ConnectAuthorizationDecisionResponse>;
     completeAuthorizationForDev(input: CompleteAuthorizationDto, masterSecret: string | undefined): Promise<CompleteAuthorizationResult>;
     exchangeAuthorizationCode(input: {
         body: TokenRequestDto;
@@ -57,5 +57,13 @@ export declare class ConnectService {
     private buildRedirectUriWithCode;
     private assertDevCompleteAllowed;
     private toJsonArray;
+    private getAuthorizationSessionOrThrow;
+    private generateAuthorizationSessionId;
+    private buildAuthorizationSessionExpiresAt;
+    private getAuthorizationSessionTtlSeconds;
+    private buildPlatformConsentUrl;
+    private assertApprovedClaimsSubset;
+    private buildRedirectUriWithError;
+    private readStringArray;
 }
 export {};
