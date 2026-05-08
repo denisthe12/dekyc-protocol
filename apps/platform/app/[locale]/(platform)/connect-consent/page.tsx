@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { PlatformShell } from '@/components/platform/platform-shell';
@@ -18,6 +18,24 @@ import type {
 } from '@/lib/types';
 
 export default function ConnectConsentPage() {
+  const t = useTranslations('ConnectConsentPage');
+
+  return (
+    <Suspense
+      fallback={
+        <PlatformShell title={t('title')} description={t('description')}>
+          <SectionCard title={t('cardTitle')} description={t('cardDescription')}>
+            <div className="text-sm text-zinc-500">{t('loading')}</div>
+          </SectionCard>
+        </PlatformShell>
+      }
+    >
+      <ConnectConsentContent />
+    </Suspense>
+  );
+}
+
+function ConnectConsentContent() {
   const t = useTranslations('ConnectConsentPage');
   const locale = useLocale();
   const router = useRouter();
@@ -37,7 +55,7 @@ export default function ConnectConsentPage() {
       return '—';
     }
 
-    return new Date(session.expiresAt).toLocaleString(locale);
+    return new Date(session.expiresAt).toLocaleString(locale === 'ru' ? 'ru-RU' : 'en-US');
   }, [locale, session?.expiresAt]);
 
   useEffect(() => {
