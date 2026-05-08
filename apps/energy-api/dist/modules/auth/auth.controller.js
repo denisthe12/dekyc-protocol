@@ -20,6 +20,7 @@ const dekyc_login_dto_1 = require("./dto/dekyc-login.dto");
 const jwt_auth_guard_1 = require("../../common/guards/jwt-auth.guard");
 const current_user_decorator_1 = require("../../common/decorators/current-user.decorator");
 const users_service_1 = require("../users/users.service");
+const dekyc_connect_exchange_dto_1 = require("./dto/dekyc-connect-exchange.dto");
 let AuthController = class AuthController {
     constructor(authService, usersService) {
         this.authService = authService;
@@ -30,6 +31,9 @@ let AuthController = class AuthController {
     }
     loginViaDekycCallback(dto) {
         return this.authService.loginViaDekycCallback(dto);
+    }
+    loginViaDekycConnect(dto) {
+        return this.authService.loginViaDekycConnect(dto);
     }
     async getMe(user) {
         const me = await this.usersService.getMeView(user.id);
@@ -54,6 +58,13 @@ __decorate([
     __metadata("design:paramtypes", [dekyc_login_callback_dto_1.DekycLoginCallbackDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "loginViaDekycCallback", null);
+__decorate([
+    (0, common_1.Post)('dekyc-connect/exchange'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [dekyc_connect_exchange_dto_1.DekycConnectExchangeDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "loginViaDekycConnect", null);
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('me'),

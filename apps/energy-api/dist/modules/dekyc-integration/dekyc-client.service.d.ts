@@ -1,3 +1,4 @@
+import type { DekycConnectTokenResponse } from '@/modules/auth/types/dekyc-connect-token-response.type';
 type DekycSignedEnvelope = {
     payload: {
         allowed: boolean;
@@ -46,5 +47,9 @@ export declare class DekycClientService {
         loginCode: string;
         requestedClaims?: string[];
     }): Promise<DekycSignedEnvelope>;
+    exchangeConnectCode(params: {
+        code: string;
+        redirectUri: string;
+    }): Promise<DekycConnectTokenResponse>;
 }
 export {};

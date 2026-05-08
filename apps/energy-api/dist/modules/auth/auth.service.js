@@ -56,6 +56,52 @@ let AuthService = class AuthService {
             },
         };
     }
+    async loginViaDekycConnect(dto) {
+        const tokenResponse = await this.dekycClientService.exchangeConnectCode({
+            code: dto.code,
+            redirectUri: dto.redirectUri,
+        });
+        if (tokenResponse.tokenType !== 'dekyc_identity_assertion') {
+            throw new common_1.UnauthorizedException('Unexpected DeKYC Connect token type');
+        }
+        if (tokenResponse.identityAssertion.payload.revocationStatus !== 'active') {
+            throw new common_1.UnauthorizedException('DeKYC Connect consent is not active');
+        }
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        if (tokenResponse.identityAssertion.payload.exp <= nowSeconds) {
+            throw new common_1.UnauthorizedException('DeKYC Connect assertion expired');
+        }
+        const claims = tokenResponse.minimalClaims ?? {};
+        const user = await this.usersService.findOrCreateFromDekycEnvelope({
+            dekycUserId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+            claims,
+        });
+        const accessToken = this.jwtService.sign({
+            sub: user.id,
+            dekycConnect: {
+                assertionId: tokenResponse.identityAssertion.payload.assertionId,
+                consentId: tokenResponse.consentReceipt.consentId,
+                serviceSubjectId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+            },
+        });
+        return {
+            accessToken,
+            user: {
+                id: user.id,
+                dekycUserId: user.dekycUserId,
+                email: user.email,
+                fullName: user.fullName,
+                role: user.role,
+            },
+            dekycConnect: {
+                assertionId: tokenResponse.identityAssertion.payload.assertionId,
+                consentId: tokenResponse.consentReceipt.consentId,
+                serviceSubjectId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+                consentReceiptHash: tokenResponse.consentReceipt.receiptHash,
+                assertionExpiresAt: new Date(tokenResponse.identityAssertion.payload.exp * 1000).toISOString(),
+            },
+        };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

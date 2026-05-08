@@ -4,6 +4,7 @@ import { DekycLoginCallbackDto } from './dto/dekyc-login-callback.dto';
 import { DekycLoginDto } from './dto/dekyc-login.dto';
 import { UsersService } from '@/modules/users/users.service';
 import { DekycClientService } from '@/modules/dekyc-integration/dekyc-client.service';
+import { DekycConnectExchangeDto } from './dto/dekyc-connect-exchange.dto';
 
 @Injectable()
 export class AuthService {
@@ -64,6 +65,63 @@ export class AuthService {
         email: user.email,
         fullName: user.fullName,
         role: user.role,
+      },
+    };
+  }
+
+  public async loginViaDekycConnect(dto: DekycConnectExchangeDto) {
+    const tokenResponse = await this.dekycClientService.exchangeConnectCode({
+      code: dto.code,
+      redirectUri: dto.redirectUri,
+    });
+
+    if (tokenResponse.tokenType !== 'dekyc_identity_assertion') {
+      throw new UnauthorizedException('Unexpected DeKYC Connect token type');
+    }
+
+    if (tokenResponse.identityAssertion.payload.revocationStatus !== 'active') {
+      throw new UnauthorizedException('DeKYC Connect consent is not active');
+    }
+
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    if (tokenResponse.identityAssertion.payload.exp <= nowSeconds) {
+      throw new UnauthorizedException('DeKYC Connect assertion expired');
+    }
+
+    const claims = tokenResponse.minimalClaims ?? {};
+
+    const user = await this.usersService.findOrCreateFromDekycEnvelope({
+      dekycUserId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+      claims,
+    });
+
+    const accessToken = this.jwtService.sign({
+      sub: user.id,
+      dekycConnect: {
+        assertionId: tokenResponse.identityAssertion.payload.assertionId,
+        consentId: tokenResponse.consentReceipt.consentId,
+        serviceSubjectId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+      },
+    });
+
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        dekycUserId: user.dekycUserId,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+      },
+      dekycConnect: {
+        assertionId: tokenResponse.identityAssertion.payload.assertionId,
+        consentId: tokenResponse.consentReceipt.consentId,
+        serviceSubjectId: tokenResponse.identityAssertion.payload.serviceSubjectId,
+        consentReceiptHash: tokenResponse.consentReceipt.receiptHash,
+        assertionExpiresAt: new Date(
+          tokenResponse.identityAssertion.payload.exp * 1000,
+        ).toISOString(),
       },
     };
   }
