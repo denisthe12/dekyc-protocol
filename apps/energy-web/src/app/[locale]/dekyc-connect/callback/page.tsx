@@ -1,11 +1,16 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createEnergySessionViaDekycConnect } from '@/lib/api/energy';
 import { saveEnergySession } from '@/lib/session';
+import {
+  clearPendingDekycConnectSession,
+  isPendingDekycConnectSessionFresh,
+  loadPendingDekycConnectSession,
+} from '@/lib/dekyc-connect-session';
 
 export default function DekycConnectCallbackPage() {
   const t = useTranslations('DekycConnectCallbackPage');
@@ -37,6 +42,7 @@ function DekycConnectCallbackContent() {
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
+  const exchangeStartedRef = useRef(false);
 
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState<string | null>(null);
@@ -50,7 +56,12 @@ function DekycConnectCallbackContent() {
   }, [locale]);
 
   useEffect(() => {
+    if (exchangeStartedRef.current) {
+      return;
+    }
+
     if (errorParam) {
+      clearPendingDekycConnectSession();
       setStatus('error');
       setMessage(errorDescription || errorParam);
       return;
@@ -66,11 +77,42 @@ function DekycConnectCallbackContent() {
       return;
     }
 
+    const pendingSession = loadPendingDekycConnectSession();
+
+    if (!pendingSession) {
+      setStatus('error');
+      setMessage(t('missingPendingSession'));
+      return;
+    }
+
+    if (!isPendingDekycConnectSessionFresh(pendingSession)) {
+      clearPendingDekycConnectSession();
+      setStatus('error');
+      setMessage(t('pendingSessionExpired'));
+      return;
+    }
+
+    if (!state || pendingSession.state !== state) {
+      clearPendingDekycConnectSession();
+      setStatus('error');
+      setMessage(t('stateMismatch'));
+      return;
+    }
+
+    if (pendingSession.redirectUri !== redirectUri) {
+      clearPendingDekycConnectSession();
+      setStatus('error');
+      setMessage(t('redirectUriMismatch'));
+      return;
+    }
+
+    exchangeStartedRef.current = true;
+
     void exchangeCode({
       code,
-      redirectUri,
+      redirectUri: pendingSession.redirectUri,
     });
-  }, [code, errorParam, errorDescription, redirectUri]);
+  }, [code, errorParam, errorDescription, redirectUri, state, t]);
 
   async function exchangeCode(input: {
     code: string;
@@ -83,12 +125,14 @@ function DekycConnectCallbackContent() {
       const session = await createEnergySessionViaDekycConnect(input);
 
       saveEnergySession(session);
+      clearPendingDekycConnectSession();
 
       setStatus('success');
       setMessage(t('success'));
 
       router.replace(`/${locale}`);
     } catch (err) {
+      exchangeStartedRef.current = false;
       setStatus('error');
       setMessage(err instanceof Error ? err.message : t('exchangeError'));
     }

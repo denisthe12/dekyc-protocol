@@ -55,6 +55,14 @@ export async function createEnergySessionViaDekyc(params: {
   return JSON.parse(rawText) as EnergySession;
 }
 
+export function buildDekycConnectRedirectUri(locale: string): string {
+  if (typeof window === 'undefined') {
+    throw new Error('Redirect URI can be built only in browser');
+  }
+
+  return `${window.location.origin}/${locale}/dekyc-connect/callback`;
+}
+
 export async function startDekycConnectAuthorization(params: {
   locale: string;
   state?: string;
@@ -68,7 +76,7 @@ export async function startDekycConnectAuthorization(params: {
     throw new Error('DeKYC Connect authorization can be started only in browser');
   }
 
-  const redirectUri = `${window.location.origin}/${params.locale}/dekyc-connect/callback`;
+  const redirectUri = buildDekycConnectRedirectUri(params.locale);
   const url = new URL(`${DEKYC_API_BASE_URL}/connect/authorize`);
 
   url.searchParams.set('client_id', DEKYC_CLIENT_ID);

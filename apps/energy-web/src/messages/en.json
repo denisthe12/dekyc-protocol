@@ -499,6 +499,10 @@
     "statusLoading": "Verifying code",
     "statusSuccess": "Done",
     "statusError": "Error",
+    "missingPendingSession": "Pending DeKYC Connect session was not found. Start login again from the ENERGY home page.",
+    "pendingSessionExpired": "Pending DeKYC Connect session has expired. Start login again.",
+    "stateMismatch": "Callback state does not match the expected value. Login was stopped to protect against request forgery.",
+    "redirectUriMismatch": "Redirect URI does not match the expected value. Login was stopped.",
     "backHome": "Back home",
     "openAssets": "Open assets"
   }

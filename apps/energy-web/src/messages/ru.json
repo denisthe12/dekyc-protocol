@@ -499,6 +499,10 @@
     "statusLoading": "Проверяем code",
     "statusSuccess": "Готово",
     "statusError": "Ошибка",
+    "missingPendingSession": "Не найдена pending DeKYC Connect session. Начните вход заново с главной страницы ENERGY.",
+    "pendingSessionExpired": "Pending DeKYC Connect session истекла. Начните вход заново.",
+    "stateMismatch": "State из callback URL не совпадает с ожидаемым значением. Вход остановлен для защиты от подмены запроса.",
+    "redirectUriMismatch": "Redirect URI не совпадает с ожидаемым значением. Вход остановлен.",
     "backHome": "На главную",
     "openAssets": "Открыть активы"
   }

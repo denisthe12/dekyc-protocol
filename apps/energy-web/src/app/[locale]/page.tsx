@@ -5,8 +5,13 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { loadEnergySession, clearEnergySession } from '@/lib/session';
-import { fetchEnergyMe, startDekycConnectAuthorization } from '@/lib/api/energy';
+import {
+  buildDekycConnectRedirectUri,
+  fetchEnergyMe,
+  startDekycConnectAuthorization,
+} from '@/lib/api/energy';
 import { FaceScanModal } from '@/components/auth/face-scan-modal';
+import { savePendingDekycConnectSession } from '@/lib/dekyc-connect-session';
 
 type MeState = Awaited<ReturnType<typeof fetchEnergyMe>> | null;
 
@@ -59,6 +64,14 @@ export default function HomePage() {
 
       const state = `energy-${crypto.randomUUID()}`;
       const nonce = `energy-nonce-${crypto.randomUUID()}`;
+      const redirectUri = buildDekycConnectRedirectUri(locale);
+
+      savePendingDekycConnectSession({
+        state,
+        nonce,
+        redirectUri,
+        createdAt: Date.now(),
+      });
 
       const authorizationSession = await startDekycConnectAuthorization({
         locale,
