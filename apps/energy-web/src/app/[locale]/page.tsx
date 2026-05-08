@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { loadEnergySession, clearEnergySession } from '@/lib/session';
-import { fetchEnergyMe } from '@/lib/api/energy';
+import { fetchEnergyMe, startDekycConnectAuthorization } from '@/lib/api/energy';
 import { FaceScanModal } from '@/components/auth/face-scan-modal';
 
 type MeState = Awaited<ReturnType<typeof fetchEnergyMe>> | null;
@@ -20,6 +20,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [scanOpen, setScanOpen] = useState(false);
+  const [connectLoading, setConnectLoading] = useState(false);
 
   useEffect(() => {
     void loadProfile();
@@ -49,6 +50,28 @@ export default function HomePage() {
   function handleLogout(): void {
     clearEnergySession();
     router.push(`/${locale}/login`);
+  }
+
+  async function handleDekycConnectLogin(): Promise<void> {
+    try {
+      setConnectLoading(true);
+      setError(null);
+
+      const state = `energy-${crypto.randomUUID()}`;
+      const nonce = `energy-nonce-${crypto.randomUUID()}`;
+
+      const authorizationSession = await startDekycConnectAuthorization({
+        locale,
+        state,
+        nonce,
+      });
+
+      window.location.href = authorizationSession.platformConsentUrl;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.connectLogin'));
+    } finally {
+      setConnectLoading(false);
+    }
   }
 
   if (loading) {
@@ -84,10 +107,19 @@ export default function HomePage() {
                   <div className="mt-8 flex flex-wrap gap-4">
                     <button
                       type="button"
-                      onClick={() => setScanOpen(true)}
-                      className="rounded-2xl bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition hover:opacity-90"
+                      onClick={() => void handleDekycConnectLogin()}
+                      disabled={connectLoading}
+                      className="rounded-2xl bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition hover:opacity-90 disabled:opacity-60"
                     >
-                      {t('loginViaDekyc')}
+                      {connectLoading ? t('startingDekycConnect') : t('loginViaDekycConnect')}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setScanOpen(true)}
+                      className="rounded-2xl border border-[var(--border)] px-5 py-3 text-sm font-medium transition hover:bg-[var(--muted)]/40"
+                    >
+                      {t('loginViaDekycLegacy')}
                     </button>
 
                     <Link

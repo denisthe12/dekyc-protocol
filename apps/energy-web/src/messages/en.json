@@ -439,19 +439,23 @@
     "logout": "Log out",
     "user": "User",
     "nameMissing": "Name not provided",
+    "loginViaDekycConnect": "Login with DeKYC Connect",
+    "loginViaDekycLegacy": "Legacy Face + Code login",
     "email": "Email",
     "notProvided": "not provided",
     "verification": "Verification",
     "role": "Role",
     "custodialAddress": "Custodial address",
     "kzteAccount": "KZTE token account",
+    "startingDekycConnect": "Opening DeKYC Connect...",
     "notCreated": "not created",
     "walletStatus": "Wallet status",
     "initialAirdrop": "Initial KZTE airdrop",
     "airdropTx": "Airdrop tx",
     "notYet": "not yet",
     "errors": {
-      "loadProfile": "Failed to load profile"
+      "loadProfile": "Failed to load profile",
+      "connectLogin": "Failed to start DeKYC Connect login"
     }
   },
   "FaceScan": {
@@ -482,5 +486,20 @@
       "codeRequired": "Enter the login code",
       "loginFailed": "Login failed"
     }
+  },
+  "DekycConnectCallbackPage": {
+    "eyebrow": "DeKYC Connect",
+    "title": "Completing login",
+    "description": "ENERGY verifies the authorization code through the backend and creates your local product session.",
+    "loading": "Completing DeKYC Connect login...",
+    "missingCode": "Authorization code is missing from the callback URL.",
+    "exchangeError": "Failed to exchange authorization code.",
+    "success": "Login completed. Redirecting to ENERGY.",
+    "statusLabel": "Status",
+    "statusLoading": "Verifying code",
+    "statusSuccess": "Done",
+    "statusError": "Error",
+    "backHome": "Back home",
+    "openAssets": "Open assets"
   }
 }

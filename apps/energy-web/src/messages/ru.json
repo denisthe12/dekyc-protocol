@@ -447,11 +447,15 @@
     "kzteAccount": "KZTE token account",
     "notCreated": "не создан",
     "walletStatus": "Статус кошелька",
+    "loginViaDekycConnect": "Войти через DeKYC Connect",
+    "loginViaDekycLegacy": "Legacy вход Face + Code", 
     "initialAirdrop": "Стартовый KZTE airdrop",
+    "startingDekycConnect": "Открываем DeKYC Connect...",
     "airdropTx": "Tx начисления",
     "notYet": "ещё нет",
     "errors": {
-      "loadProfile": "Ошибка загрузки профиля"
+      "loadProfile": "Ошибка загрузки профиля",
+      "connectLogin": "Не удалось начать вход через DeKYC Connect"
     }
   },
   "FaceScan": {
@@ -482,5 +486,20 @@
       "codeRequired": "Введите код входа",
       "loginFailed": "Ошибка входа"
     }
+  },
+  "DekycConnectCallbackPage": {
+    "eyebrow": "DeKYC Connect",
+    "title": "Завершение входа",
+    "description": "ENERGY проверяет authorization code через backend и создаёт вашу локальную product-сессию.",
+    "loading": "Завершение входа через DeKYC Connect...",
+    "missingCode": "Authorization code отсутствует в callback URL.",
+    "exchangeError": "Не удалось обменять authorization code.",
+    "success": "Вход успешно завершён. Перенаправляем в ENERGY.",
+    "statusLabel": "Статус",
+    "statusLoading": "Проверяем code",
+    "statusSuccess": "Готово",
+    "statusError": "Ошибка",
+    "backHome": "На главную",
+    "openAssets": "Открыть активы"
   }
 }
