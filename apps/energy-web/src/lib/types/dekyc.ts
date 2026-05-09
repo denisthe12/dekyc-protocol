@@ -37,6 +37,7 @@ export type EnergySession = {
     role: string;
   };
   dekycConnect?: {
+    loginRecordId: string;
     assertionId: string;
     consentId: string;
     serviceSubjectId: string;

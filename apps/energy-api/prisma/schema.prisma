@@ -78,6 +78,7 @@ model EnergyUser {
   wallet            EnergyUserWallet?
   sessions          EnergyUserSession[]
   assetAccesses     EnergyAssetAccess[]
+  dekycConnectLogins EnergyDekycConnectLogin[]
 }
 
 model EnergyUserProfile {
@@ -375,4 +376,40 @@ model EnergyAssetAccess {
   @@unique([energyUserId, energyAssetId], map: "energy_user_asset_access_unique")
   @@index([energyUserId])
   @@index([energyAssetId])
+}
+
+model EnergyDekycConnectLogin {
+  id                    String   @id @default(cuid())
+  energyUserId          String   @db.VarChar(191)
+
+  dekycServiceId         String   @db.VarChar(191)
+  subjectId              String   @db.VarChar(128)
+  serviceSubjectId       String   @db.VarChar(128)
+
+  consentId              String   @db.VarChar(128)
+  assertionId            String   @unique @db.VarChar(128)
+  consentReceiptHash     String   @db.VarChar(128)
+
+  assertionAlgorithm     String   @db.VarChar(32)
+  assertionJws           String   @db.Text
+  assertionPayloadJson   Json
+  consentReceiptJson     Json
+  minimalClaimsJson      Json?
+
+  revocationStatus       String   @db.VarChar(32)
+  assertionIssuedAt      DateTime
+  assertionExpiresAt     DateTime
+
+  createdAt              DateTime @default(now())
+
+  user                   EnergyUser @relation(fields: [energyUserId], references: [id], onDelete: Cascade)
+
+  @@index([energyUserId])
+  @@index([dekycServiceId])
+  @@index([serviceSubjectId])
+  @@index([consentId])
+  @@index([assertionId])
+  @@index([consentReceiptHash])
+  @@index([assertionExpiresAt])
+  @@index([createdAt])
 }

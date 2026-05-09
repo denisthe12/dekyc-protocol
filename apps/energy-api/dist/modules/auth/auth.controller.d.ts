@@ -38,6 +38,7 @@ export declare class AuthController {
             role: import("prisma/generated/client").$Enums.EnergyUserRole;
         };
         dekycConnect: {
+            loginRecordId: string;
             assertionId: string;
             consentId: string;
             serviceSubjectId: string;

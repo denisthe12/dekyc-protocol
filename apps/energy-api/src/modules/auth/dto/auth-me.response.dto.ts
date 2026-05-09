@@ -20,4 +20,13 @@ export class AuthMeResponseDto {
     initialKzteAirdropped: boolean;
     initialKzteAirdropTx: string | null;
   } | null;
+  latestDekycConnectLogin!: {
+    id: string;
+    assertionId: string;
+    consentId: string;
+    serviceSubjectId: string;
+    consentReceiptHash: string;
+    assertionExpiresAt: string;
+    createdAt: string;
+  } | null;
 }
