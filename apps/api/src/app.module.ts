@@ -21,6 +21,7 @@ import { ConsentReceiptsModule } from './consent-receipts/consent-receipts.modul
 import { IdentityAssertionsModule } from './identity-assertions/identity-assertions.module';
 import { IssuerMetadataModule } from './issuer-metadata/issuer-metadata.module';
 import { ConnectModule } from './connect/connect.module';
+import { ConnectVerificationModule } from './connect-verification/connect-verification.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ConnectModule } from './connect/connect.module';
     IdentityAssertionsModule,
     IssuerMetadataModule,
     ConnectModule,
+    ConnectVerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],

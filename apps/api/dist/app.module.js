@@ -30,6 +30,7 @@ const consent_receipts_module_1 = require("./consent-receipts/consent-receipts.m
 const identity_assertions_module_1 = require("./identity-assertions/identity-assertions.module");
 const issuer_metadata_module_1 = require("./issuer-metadata/issuer-metadata.module");
 const connect_module_1 = require("./connect/connect.module");
+const connect_verification_module_1 = require("./connect-verification/connect-verification.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -55,6 +56,7 @@ exports.AppModule = AppModule = __decorate([
             identity_assertions_module_1.IdentityAssertionsModule,
             issuer_metadata_module_1.IssuerMetadataModule,
             connect_module_1.ConnectModule,
+            connect_verification_module_1.ConnectVerificationModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, dev_bootstrap_service_1.DevBootstrapService],

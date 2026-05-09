@@ -11,6 +11,8 @@ import type {
   UserFacingPermissionItem,
   UserFacingServiceCatalogItem,
   UserOverviewResponse,
+  ConnectVerificationSnapshot,
+  VerifyAssertionResponse,
 } from './types';
 
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}`;
@@ -191,4 +193,21 @@ export async function rejectConnectAuthorizationSession(input: {
       }),
     },
   );
+}
+
+export async function fetchConnectVerificationSnapshot(): Promise<ConnectVerificationSnapshot> {
+  return apiFetch<ConnectVerificationSnapshot>('/connect-verification/snapshot', {
+    method: 'GET',
+  });
+}
+
+export async function verifyConnectAssertion(
+  assertionJws: string,
+): Promise<VerifyAssertionResponse> {
+  return apiFetch<VerifyAssertionResponse>('/connect/assertions/verify', {
+    method: 'POST',
+    body: JSON.stringify({
+      assertionJws,
+    }),
+  });
 }
