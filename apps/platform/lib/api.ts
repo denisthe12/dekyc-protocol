@@ -15,38 +15,78 @@ import type {
   VerifyAssertionResponse,
 } from './types';
 
+import {
+  clearPlatformSession,
+  getPlatformAccessToken,
+} from './platform-session';
+
 const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}`;
 
-function getToken(): string {
+function getCurrentLocaleFromPath(): 'ru' | 'en' {
+  if (typeof window === 'undefined') {
+    return 'ru';
+  }
+
+  return window.location.pathname.startsWith('/en') ? 'en' : 'ru';
+}
+
+function redirectToLogin(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const locale = getCurrentLocaleFromPath();
+  window.location.replace(`/${locale}/login`);
+}
+
+function getTokenOrRedirect(): string {
   if (typeof window === 'undefined') {
     throw new Error('Token is not available on the server');
   }
 
-  const token = window.localStorage.getItem('dekyc_access_token');
+  const token = getPlatformAccessToken();
 
   if (!token) {
-    throw new Error('Access token not found. Please login to DeKYC Platform first.');
+    clearPlatformSession();
+    redirectToLogin();
+
+    throw new Error('Session expired. Please login to DeKYC Platform again.');
   }
 
   return token;
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const token = getToken();
+  const token = getTokenOrRedirect();
+
+  const headers = new Headers(init?.headers);
+
+  if (!headers.has('Content-Type') && init?.body) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  headers.set('Authorization', `Bearer ${token}`);
 
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...(init?.headers ?? {}),
-    },
+    headers,
   });
 
   const rawText = await response.text();
 
+  if (response.status === 401) {
+    clearPlatformSession();
+    redirectToLogin();
+
+    throw new Error('Session expired. Please login to DeKYC Platform again.');
+  }
+
   if (!response.ok) {
     throw new Error(`${response.status}: ${rawText}`);
+  }
+
+  if (!rawText) {
+    return undefined as T;
   }
 
   return JSON.parse(rawText) as T;

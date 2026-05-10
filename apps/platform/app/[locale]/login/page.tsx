@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { hasPlatformSession } from '@/lib/platform-session';
+import {
+  hasPlatformSession,
+  setPlatformSession,
+} from '@/lib/platform-session';
 import { inputClassName, inputClassNamePageLogin } from '@/components/ui/input-class';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/buttons';
 
@@ -59,7 +62,7 @@ export default function LoginPage() {
         accessToken: string;
       };
 
-      window.localStorage.setItem('dekyc_access_token', data.accessToken);
+      setPlatformSession(data.accessToken);
       router.push('/overview');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Authentication failed');

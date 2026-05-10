@@ -23,7 +23,7 @@
 
 ---
 
-Test user - login denissnims@gmail.com and password Den12345
+Test user - l0gin denissnims@gmail.com and p@ssw0rd Den12345
 
 <p align="center">
   <img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="600">
