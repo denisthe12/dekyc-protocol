@@ -174,7 +174,8 @@
     "errors": {
       "assetRequired": "Выберите актив.",
       "invalidEpochAmount": "Введите корректную сумму эпохи.",
-      "createEpochFailed": "Не удалось создать эпоху."
+      "createEpochFailed": "Не удалось создать эпоху.",
+      "claimFailed": "Не удалось получить выплату."
     },
     "bucket": "Тип выплаты",
     "shares": "Доли",
@@ -205,6 +206,7 @@
     "listingPda": "Listing PDA",
     "escrowShareAccount": "Escrow share account",
     "sellerWallet": "Seller wallet",
+    "claimConfirm": "Получить выплату для пользователя {userId}, asset {assetId}, epoch #{epochIndex}?",
     "sellerShareAccount": "Seller share account",
     "sellerKzteAccount": "Seller KZTE account",
     "shareMint": "Share mint",
@@ -213,7 +215,18 @@
     "createEpochTx": "Create epoch tx",
     "createListingTx": "Create listing tx",
     "fillListingTx": "Fill listing tx",
-    "claimUser": "Claim · User"
+    "claimUser": "Claim · User",
+    "claimAvailableTitle": "Доступное получение выплаты",
+    "claimOnlyCurrentUserHint": "На judge page показывается claim только для текущего пользователя, под которым выполнен вход.",
+    "claimUserId": "Energy User ID",
+    "claimPayoutButton": "Получить выплату",
+    "claimingPayout": "Получаем выплату...",
+    "claimAlreadyClaimed": "Уже получено",
+    "claimDialogEyebrow": "Claim payout",
+    "claimDialogTitle": "Подтвердить получение выплаты",
+    "claimDialogDescription": "Сейчас будет выполнена on-chain операция claim. После успеха появится claim transaction и ClaimReceiptPDA.",
+    "claimDialogCalculation": "Расчёт выплаты",
+    "claimDialogConfirm": "Подтвердить claim"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",

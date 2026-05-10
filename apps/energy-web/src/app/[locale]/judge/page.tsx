@@ -3,6 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import { fetchJudgeSummary } from '@/lib/api/judge';
 import { formatKzte } from '@/lib/formatters';
 import { JudgeEpochControls } from '@/components/judge/judge-epoch-controls';
+import { JudgeClaimButton } from '@/components/judge/judge-claim-button';
+import { JudgeEpochClaimActions } from '@/components/judge/judge-epoch-claim-actions';
 
 type JudgePageProps = {
   params: Promise<{ locale: string }>;
@@ -35,6 +37,7 @@ export default async function JudgePage({ params }: JudgePageProps) {
   const programUrl = explorerAddressUrl(summary.solana.tokenizationProgramId);
   const signerUrl = explorerAddressUrl(summary.solana.signerAddress);
   const mintUrl = explorerAddressUrl(summary.kzte.mintAddress);
+  const assetsByDbId = new Map(summary.assets.map((asset) => [asset.id, asset]));
 
   return (
     <main className="min-h-screen bg-[var(--background)] px-6 py-10 text-[var(--foreground)]">
@@ -583,11 +586,26 @@ export default async function JudgePage({ params }: JudgePageProps) {
             <div className="mt-6 text-[var(--muted-foreground)]">{t('empty')}</div>
           ) : (
             <div className="mt-6 grid gap-4">
-              {summary.epochs.map((epoch) => (
-                <article
-                  key={epoch.id}
-                  className="rounded-2xl border border-[var(--border)] bg-[var(--muted)]/30 p-6"
-                >
+              {summary.epochs.map((epoch) => {
+                const epochAsset = assetsByDbId.get(epoch.energyAssetId) ?? null;
+
+                const claimablePositions = Array.from(
+                  new Map(
+                    summary.positions
+                      .filter(
+                        (position) =>
+                          position.energyAssetId === epoch.energyAssetId &&
+                          position.status === 'ACTIVE',
+                      )
+                      .map((position) => [position.energyUserId, position]),
+                  ).values(),
+                );
+
+                return (
+                  <article
+                    key={epoch.id}
+                    className="rounded-2xl border border-[var(--border)] bg-[var(--muted)]/30 p-6"
+                  >
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <div>
                       <div className="text-xs text-[var(--muted-foreground)]">
@@ -638,8 +656,16 @@ export default async function JudgePage({ params }: JudgePageProps) {
                       </a>
                     </div>
                   ) : null}
+
+                  <JudgeEpochClaimActions
+                    epoch={epoch}
+                    asset={assetsByDbId.get(epoch.energyAssetId) ?? null}
+                    positions={summary.positions}
+                    claims={summary.claims}
+                  />
                 </article>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

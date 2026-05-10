@@ -174,7 +174,8 @@
     "errors": {
       "assetRequired": "Select an asset.",
       "invalidEpochAmount": "Enter a valid epoch amount.",
-      "createEpochFailed": "Failed to create revenue epoch."
+      "createEpochFailed": "Failed to create revenue epoch.",
+      "claimFailed": "Failed to claim payout."
     },
     "bucket": "Payout",
     "shares": "Shares",
@@ -207,13 +208,25 @@
     "sellerWallet": "Seller wallet",
     "sellerShareAccount": "Seller share account",
     "sellerKzteAccount": "Seller KZTE account",
+    "claimConfirm": "Claim payout for user {userId}, asset {assetId}, epoch #{epochIndex}?",
     "shareMint": "Share mint",
     "createAssetTx": "Create asset tx",
     "issueSharesTx": "Issue shares tx",
     "createEpochTx": "Create epoch tx",
     "createListingTx": "Create listing tx",
     "fillListingTx": "Fill listing tx",
-    "claimUser": "Claim · User"
+    "claimUser": "Claim · User",
+    "claimAvailableTitle": "Available payout claim",
+    "claimOnlyCurrentUserHint": "The judge page shows claim actions only for the currently logged-in user.",
+    "claimUserId": "Energy User ID",
+    "claimPayoutButton": "Claim payout",
+    "claimingPayout": "Claiming payout...",
+    "claimAlreadyClaimed": "Already claimed",
+    "claimDialogEyebrow": "Claim payout",
+    "claimDialogTitle": "Confirm payout claim",
+    "claimDialogDescription": "This will execute the on-chain claim operation. After success, claim transaction and ClaimReceiptPDA will appear.",
+    "claimDialogCalculation": "Payout calculation",
+    "claimDialogConfirm": "Confirm claim"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",
