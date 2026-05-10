@@ -17,6 +17,7 @@ import { SubjectsService } from '../subjects/subjects.service';
 import { ConsentReceiptsSigner } from './consent-receipts.signer';
 import type { CreateConsentReceiptInput } from './types/create-consent-receipt-input.type';
 import type { ConsentReceiptSignablePayload } from './types/consent-receipt-signable-payload.type';
+import { WebhookDeliveryService } from '../webhooks/webhook-delivery.service';
 
 const ACTIVE_CONSENT_STATUS = 'active' satisfies DeKycConsentStatus;
 const REVOKED_CONSENT_STATUS = 'revoked' satisfies DeKycConsentStatus;
@@ -27,6 +28,7 @@ export class ConsentReceiptsService {
     private readonly prisma: PrismaService,
     private readonly subjectsService: SubjectsService,
     private readonly signer: ConsentReceiptsSigner,
+    private readonly webhookDeliveryService: WebhookDeliveryService,
   ) {}
 
   async createConsentReceipt(
@@ -74,6 +76,19 @@ export class ConsentReceiptsService {
         status: ACTIVE_CONSENT_STATUS,
       },
     });
+
+    void this.webhookDeliveryService
+    .emitConsentGranted({
+      serviceId: receipt.serviceId,
+      consentId: receipt.consentId,
+      subjectId: receipt.subjectId,
+      serviceSubjectId: receipt.serviceSubjectId,
+      grantedClaims: this.readGrantedClaims(receipt.grantedClaims),
+      grantedAt: receipt.grantedAt.toISOString(),
+      expiresAt: receipt.expiresAt ? receipt.expiresAt.toISOString() : null,
+      receiptHash: receipt.receiptHash,
+    })
+    .catch(() => undefined);
 
     return this.toReceiptDto(receipt);
   }
@@ -133,6 +148,16 @@ export class ConsentReceiptsService {
         revokedAt,
       },
     });
+
+    void this.webhookDeliveryService
+    .emitConsentRevoked({
+      serviceId: updatedReceipt.serviceId,
+      consentId: updatedReceipt.consentId,
+      subjectId: updatedReceipt.subjectId,
+      serviceSubjectId: updatedReceipt.serviceSubjectId,
+      revokedAt: revokedAt.toISOString(),
+    })
+    .catch(() => undefined);
 
     return {
       consentId: updatedReceipt.consentId,

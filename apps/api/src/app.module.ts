@@ -22,6 +22,7 @@ import { IdentityAssertionsModule } from './identity-assertions/identity-asserti
 import { IssuerMetadataModule } from './issuer-metadata/issuer-metadata.module';
 import { ConnectModule } from './connect/connect.module';
 import { ConnectVerificationModule } from './connect-verification/connect-verification.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ConnectVerificationModule } from './connect-verification/connect-verifi
     IssuerMetadataModule,
     ConnectModule,
     ConnectVerificationModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],

@@ -3,11 +3,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SubjectsService } from '../subjects/subjects.service';
 import { ConsentReceiptsSigner } from './consent-receipts.signer';
 import type { CreateConsentReceiptInput } from './types/create-consent-receipt-input.type';
+import { WebhookDeliveryService } from '../webhooks/webhook-delivery.service';
 export declare class ConsentReceiptsService {
     private readonly prisma;
     private readonly subjectsService;
     private readonly signer;
-    constructor(prisma: PrismaService, subjectsService: SubjectsService, signer: ConsentReceiptsSigner);
+    private readonly webhookDeliveryService;
+    constructor(prisma: PrismaService, subjectsService: SubjectsService, signer: ConsentReceiptsSigner, webhookDeliveryService: WebhookDeliveryService);
     createConsentReceipt(input: CreateConsentReceiptInput): Promise<DeKycConsentReceiptDto>;
     getConsentStatus(input: {
         consentId: string;

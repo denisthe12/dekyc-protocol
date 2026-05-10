@@ -6,31 +6,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConsentReceiptsModule = void 0;
+exports.WebhooksModule = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_module_1 = require("../prisma/prisma.module");
 const service_credentials_guard_1 = require("../service-api/service-credentials.guard");
 const service_request_nonce_service_1 = require("../service-api/service-request-nonce.service");
 const services_module_1 = require("../services/services.module");
-const subjects_module_1 = require("../subjects/subjects.module");
-const consent_receipts_controller_1 = require("./consent-receipts.controller");
-const consent_receipts_service_1 = require("./consent-receipts.service");
-const consent_receipts_signer_1 = require("./consent-receipts.signer");
-const webhooks_module_1 = require("../webhooks/webhooks.module");
-let ConsentReceiptsModule = class ConsentReceiptsModule {
+const webhook_delivery_service_1 = require("./webhook-delivery.service");
+const webhook_signer_service_1 = require("./webhook-signer.service");
+const webhooks_controller_1 = require("./webhooks.controller");
+const webhooks_service_1 = require("./webhooks.service");
+let WebhooksModule = class WebhooksModule {
 };
-exports.ConsentReceiptsModule = ConsentReceiptsModule;
-exports.ConsentReceiptsModule = ConsentReceiptsModule = __decorate([
+exports.WebhooksModule = WebhooksModule;
+exports.WebhooksModule = WebhooksModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, subjects_module_1.SubjectsModule, services_module_1.ServicesModule, webhooks_module_1.WebhooksModule],
-        controllers: [consent_receipts_controller_1.ConsentReceiptsController],
+        imports: [prisma_module_1.PrismaModule, services_module_1.ServicesModule],
+        controllers: [webhooks_controller_1.WebhooksController],
         providers: [
-            consent_receipts_service_1.ConsentReceiptsService,
-            consent_receipts_signer_1.ConsentReceiptsSigner,
+            webhooks_service_1.WebhooksService,
+            webhook_delivery_service_1.WebhookDeliveryService,
+            webhook_signer_service_1.WebhookSignerService,
             service_credentials_guard_1.ServiceCredentialsGuard,
             service_request_nonce_service_1.ServiceRequestNonceService,
         ],
-        exports: [consent_receipts_service_1.ConsentReceiptsService, consent_receipts_signer_1.ConsentReceiptsSigner],
+        exports: [webhooks_service_1.WebhooksService, webhook_delivery_service_1.WebhookDeliveryService, webhook_signer_service_1.WebhookSignerService],
     })
-], ConsentReceiptsModule);
-//# sourceMappingURL=consent-receipts.module.js.map
+], WebhooksModule);
+//# sourceMappingURL=webhooks.module.js.map

@@ -7,9 +7,10 @@ import { SubjectsModule } from '../subjects/subjects.module';
 import { ConsentReceiptsController } from './consent-receipts.controller';
 import { ConsentReceiptsService } from './consent-receipts.service';
 import { ConsentReceiptsSigner } from './consent-receipts.signer';
+import { WebhooksModule } from '../webhooks/webhooks.module';
 
 @Module({
-  imports: [PrismaModule, SubjectsModule, ServicesModule],
+  imports: [PrismaModule, SubjectsModule, ServicesModule, WebhooksModule],
   controllers: [ConsentReceiptsController],
   providers: [
     ConsentReceiptsService,

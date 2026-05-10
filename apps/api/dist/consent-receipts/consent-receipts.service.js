@@ -15,16 +15,19 @@ const crypto_1 = require("crypto");
 const prisma_service_1 = require("../prisma/prisma.service");
 const subjects_service_1 = require("../subjects/subjects.service");
 const consent_receipts_signer_1 = require("./consent-receipts.signer");
+const webhook_delivery_service_1 = require("../webhooks/webhook-delivery.service");
 const ACTIVE_CONSENT_STATUS = 'active';
 const REVOKED_CONSENT_STATUS = 'revoked';
 let ConsentReceiptsService = class ConsentReceiptsService {
     prisma;
     subjectsService;
     signer;
-    constructor(prisma, subjectsService, signer) {
+    webhookDeliveryService;
+    constructor(prisma, subjectsService, signer, webhookDeliveryService) {
         this.prisma = prisma;
         this.subjectsService = subjectsService;
         this.signer = signer;
+        this.webhookDeliveryService = webhookDeliveryService;
     }
     async createConsentReceipt(input) {
         const serviceSubject = await this.subjectsService.ensureServiceSubject({
@@ -65,6 +68,18 @@ let ConsentReceiptsService = class ConsentReceiptsService {
                 status: ACTIVE_CONSENT_STATUS,
             },
         });
+        void this.webhookDeliveryService
+            .emitConsentGranted({
+            serviceId: receipt.serviceId,
+            consentId: receipt.consentId,
+            subjectId: receipt.subjectId,
+            serviceSubjectId: receipt.serviceSubjectId,
+            grantedClaims: this.readGrantedClaims(receipt.grantedClaims),
+            grantedAt: receipt.grantedAt.toISOString(),
+            expiresAt: receipt.expiresAt ? receipt.expiresAt.toISOString() : null,
+            receiptHash: receipt.receiptHash,
+        })
+            .catch(() => undefined);
         return this.toReceiptDto(receipt);
     }
     async getConsentStatus(input) {
@@ -105,6 +120,15 @@ let ConsentReceiptsService = class ConsentReceiptsService {
                 revokedAt,
             },
         });
+        void this.webhookDeliveryService
+            .emitConsentRevoked({
+            serviceId: updatedReceipt.serviceId,
+            consentId: updatedReceipt.consentId,
+            subjectId: updatedReceipt.subjectId,
+            serviceSubjectId: updatedReceipt.serviceSubjectId,
+            revokedAt: revokedAt.toISOString(),
+        })
+            .catch(() => undefined);
         return {
             consentId: updatedReceipt.consentId,
             status: REVOKED_CONSENT_STATUS,
@@ -191,6 +215,7 @@ exports.ConsentReceiptsService = ConsentReceiptsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         subjects_service_1.SubjectsService,
-        consent_receipts_signer_1.ConsentReceiptsSigner])
+        consent_receipts_signer_1.ConsentReceiptsSigner,
+        webhook_delivery_service_1.WebhookDeliveryService])
 ], ConsentReceiptsService);
 //# sourceMappingURL=consent-receipts.service.js.map
