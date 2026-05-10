@@ -41,7 +41,19 @@ let ConnectService = class ConnectService {
         if (!service || service.status !== 'active') {
             throw new common_1.UnauthorizedException('invalid_client');
         }
+        this.assertStateAndNoncePresent({
+            state: query.state,
+            nonce: query.nonce,
+        });
         const claimsScope = this.parseClaimsScope(query.scope);
+        this.assertRedirectUriAllowed({
+            redirectUri,
+            allowedRedirectUris: this.readStringArray(service.allowedRedirectUris),
+        });
+        this.assertScopesAllowed({
+            requestedClaims: claimsScope,
+            allowedScopes: this.readStringArray(service.allowedScopes),
+        });
         const sessionId = this.generateAuthorizationSessionId();
         const expiresAt = this.buildAuthorizationSessionExpiresAt();
         await this.prisma.deKycConnectAuthorizationSession.create({
@@ -152,11 +164,16 @@ let ConnectService = class ConnectService {
             serviceId: session.serviceId,
             approvedClaims,
         });
+        const service = await this.servicesService.getServiceByClientIdWithSecrets(session.clientId);
+        if (!service) {
+            throw new common_1.BadRequestException('service_not_found');
+        }
         const consentReceipt = await this.consentReceiptsService.createConsentReceipt({
             userId: input.userId,
             serviceId: session.serviceId,
             grantedClaims: approvedClaims,
             consentTextVersion: input.body.consentTextVersion?.trim() ||
+                service.consentTextVersion ||
                 'dekyc-connect-consent-v1',
             expiresAt: this.buildConsentExpiresAt(input.body.consentExpiresInSeconds),
         });
@@ -246,6 +263,14 @@ let ConnectService = class ConnectService {
         }
         const userId = await this.resolveUserIdForDev(input);
         const claimsScope = this.parseClaimsScope(input.scope);
+        this.assertRedirectUriAllowed({
+            redirectUri,
+            allowedRedirectUris: this.readStringArray(service.allowedRedirectUris),
+        });
+        this.assertScopesAllowed({
+            requestedClaims: claimsScope,
+            allowedScopes: this.readStringArray(service.allowedScopes),
+        });
         const code = this.generateAuthorizationCode();
         const codeHash = this.hashAuthorizationCode(code);
         const expiresAt = this.buildCodeExpiresAt();
@@ -617,6 +642,33 @@ let ConnectService = class ConnectService {
             onchainPermissionPda: grantResult.permission.onchainPermissionPda,
             grantTx: grantResult.onChain.grantTx,
         };
+    }
+    assertStateAndNoncePresent(input) {
+        if (!input.state?.trim()) {
+            throw new common_1.BadRequestException('state_required');
+        }
+        if (!input.nonce?.trim()) {
+            throw new common_1.BadRequestException('nonce_required');
+        }
+    }
+    assertRedirectUriAllowed(input) {
+        if (input.allowedRedirectUris.length === 0) {
+            throw new common_1.BadRequestException('service_redirect_uris_not_configured');
+        }
+        const allowed = new Set(input.allowedRedirectUris);
+        if (!allowed.has(input.redirectUri)) {
+            throw new common_1.BadRequestException('redirect_uri_not_allowed');
+        }
+    }
+    assertScopesAllowed(input) {
+        if (input.allowedScopes.length === 0) {
+            throw new common_1.BadRequestException('service_allowed_scopes_not_configured');
+        }
+        const allowed = new Set(input.allowedScopes);
+        const hasOnlyAllowedScopes = input.requestedClaims.every((claim) => allowed.has(claim));
+        if (!hasOnlyAllowedScopes) {
+            throw new common_1.BadRequestException('scope_not_allowed');
+        }
     }
 };
 exports.ConnectService = ConnectService;

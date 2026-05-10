@@ -68,5 +68,8 @@ export declare class ConnectService {
     private buildRedirectUriWithError;
     private readStringArray;
     private ensureActivePermissionForConnect;
+    private assertStateAndNoncePresent;
+    private assertRedirectUriAllowed;
+    private assertScopesAllowed;
 }
 export {};

@@ -106,6 +106,14 @@ model Service {
   category             String?
   requiredClaims       Json?
   optionalClaims       Json?
+
+  allowedRedirectUris Json?
+  allowedScopes       Json?
+  assertionAudience   String?
+  webhookSigningMode  String       @default("shared_secret")
+  consentTextVersion  String       @default("dekyc-connect-consent-v1")
+  environment         String       @default("sandbox")
+
   status             String       @default("active")
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt

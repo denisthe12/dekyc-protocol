@@ -23,6 +23,7 @@ import { IssuerMetadataModule } from './issuer-metadata/issuer-metadata.module';
 import { ConnectModule } from './connect/connect.module';
 import { ConnectVerificationModule } from './connect-verification/connect-verification.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
+import { ConnectServiceConfigModule } from './connect-service-config/connect-service-config.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { WebhooksModule } from './webhooks/webhooks.module';
     ConnectModule,
     ConnectVerificationModule,
     WebhooksModule,
+    ConnectServiceConfigModule,
   ],
   controllers: [AppController],
   providers: [AppService, DevBootstrapService],

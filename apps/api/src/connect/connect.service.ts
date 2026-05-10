@@ -64,7 +64,23 @@ export class ConnectService {
       throw new UnauthorizedException('invalid_client');
     }
 
+    this.assertStateAndNoncePresent({
+      state: query.state,
+      nonce: query.nonce,
+    });
+
     const claimsScope = this.parseClaimsScope(query.scope);
+
+    this.assertRedirectUriAllowed({
+      redirectUri,
+      allowedRedirectUris: this.readStringArray(service.allowedRedirectUris),
+    });
+
+    this.assertScopesAllowed({
+      requestedClaims: claimsScope,
+      allowedScopes: this.readStringArray(service.allowedScopes),
+    });
+
     const sessionId = this.generateAuthorizationSessionId();
     const expiresAt = this.buildAuthorizationSessionExpiresAt();
 
@@ -199,6 +215,14 @@ export class ConnectService {
       approvedClaims,
     });
 
+    const service = await this.servicesService.getServiceByClientIdWithSecrets(
+      session.clientId,
+    );
+
+    if (!service) {
+      throw new BadRequestException('service_not_found');
+    }
+
     const consentReceipt =
       await this.consentReceiptsService.createConsentReceipt({
         userId: input.userId,
@@ -206,6 +230,7 @@ export class ConnectService {
         grantedClaims: approvedClaims,
         consentTextVersion:
           input.body.consentTextVersion?.trim() ||
+          service.consentTextVersion ||
           'dekyc-connect-consent-v1',
         expiresAt: this.buildConsentExpiresAt(
           input.body.consentExpiresInSeconds,
@@ -321,6 +346,16 @@ export class ConnectService {
 
     const userId = await this.resolveUserIdForDev(input);
     const claimsScope = this.parseClaimsScope(input.scope);
+
+    this.assertRedirectUriAllowed({
+      redirectUri,
+      allowedRedirectUris: this.readStringArray(service.allowedRedirectUris),
+    });
+
+    this.assertScopesAllowed({
+      requestedClaims: claimsScope,
+      allowedScopes: this.readStringArray(service.allowedScopes),
+    });
     const code = this.generateAuthorizationCode();
     const codeHash = this.hashAuthorizationCode(code);
     const expiresAt = this.buildCodeExpiresAt();
@@ -862,5 +897,52 @@ export class ConnectService {
       onchainPermissionPda: grantResult.permission.onchainPermissionPda,
       grantTx: grantResult.onChain.grantTx,
     };
+  }
+
+  private assertStateAndNoncePresent(input: {
+    state?: string;
+    nonce?: string;
+  }): void {
+    if (!input.state?.trim()) {
+      throw new BadRequestException('state_required');
+    }
+
+    if (!input.nonce?.trim()) {
+      throw new BadRequestException('nonce_required');
+    }
+  }
+
+  private assertRedirectUriAllowed(input: {
+    redirectUri: string;
+    allowedRedirectUris: string[];
+  }): void {
+    if (input.allowedRedirectUris.length === 0) {
+      throw new BadRequestException('service_redirect_uris_not_configured');
+    }
+
+    const allowed = new Set(input.allowedRedirectUris);
+
+    if (!allowed.has(input.redirectUri)) {
+      throw new BadRequestException('redirect_uri_not_allowed');
+    }
+  }
+
+  private assertScopesAllowed(input: {
+    requestedClaims: DeKycClaimKey[];
+    allowedScopes: string[];
+  }): void {
+    if (input.allowedScopes.length === 0) {
+      throw new BadRequestException('service_allowed_scopes_not_configured');
+    }
+
+    const allowed = new Set(input.allowedScopes);
+
+    const hasOnlyAllowedScopes = input.requestedClaims.every((claim) =>
+      allowed.has(claim),
+    );
+
+    if (!hasOnlyAllowedScopes) {
+      throw new BadRequestException('scope_not_allowed');
+    }
   }
 }

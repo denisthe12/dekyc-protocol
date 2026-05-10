@@ -56,6 +56,12 @@ export declare class ServicesService {
         category: string | null;
         requiredClaims: import("../../prisma/generated/client/runtime/library").JsonValue | null;
         optionalClaims: import("../../prisma/generated/client/runtime/library").JsonValue | null;
+        allowedRedirectUris: import("../../prisma/generated/client/runtime/library").JsonValue | null;
+        allowedScopes: import("../../prisma/generated/client/runtime/library").JsonValue | null;
+        assertionAudience: string | null;
+        webhookSigningMode: string;
+        consentTextVersion: string;
+        environment: string;
     } | null>;
     validateServiceCredentials(clientId: string, clientSecret: string): Promise<{
         id: string;
