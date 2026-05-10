@@ -1,73 +1,77 @@
 # ===== docs/api.md =====
 
-# DeKYC Energy — Обзор API
+# DeKYC Energy — API Overview
 
-## Зачем нужен этот документ
+## Why this document is needed
 
-Этот документ дает практическое описание API-слоя проекта.
+This document provides a practical description of the project’s API layer.
 
-Это не полный OpenAPI dump и не попытка расписать все DTO до последнего поля.  
-Цель документа — помочь понять:
+This is not a full OpenAPI dump and not an attempt to describe every DTO down to the last field.  
+The purpose of this document is to help understand:
 
-- какой backend за что отвечает,
-- как взаимодействуют DeKYC и ENERGY,
-- где живут identity, access и blockchain orchestration,
-- как выглядит логика продукта с точки зрения API.
+- which backend is responsible for what,
+- how DeKYC and ENERGY interact,
+- where identity, access, and blockchain orchestration live,
+- what the product logic looks like from the API perspective.
 
 ---
 
-## API-слои системы
+## API layers of the system
 
-В проекте два backend-слоя:
+The project has two backend layers:
 
 ## 1. DeKYC API
-Путь в репозитории:
+
+Path in the repository:
 
 ```text
 apps/api
 ```
 
-Отвечает за:
+Responsible for:
 
-- identity и access logic
+- identity and access logic
 - service-auth
 - service-facing signed access logic
-- backend-логику платформы DeKYC
+- backend logic of the DeKYC platform
 
 ## 2. ENERGY API
-Путь в репозитории:
+
+Path in the repository:
 
 ```text
 apps/energy-api
 ```
 
-Отвечает за:
+Responsible for:
 
 - custodial wallet orchestration
-- управление энергетическими активами
+- management of energy assets
 - on-chain transaction orchestration
 - portfolio / payouts / OTC
 - proof bundle metadata
 - judge summary
-- пользовательские действия внутри ENERGY
+- user actions inside ENERGY
 
 ---
 
-## Обзор DeKYC API
+## DeKYC API overview
 
-## Основная роль
-DeKYC backend — это authority для identity и permission logic.
+## Main role
 
-Это backend, который отвечает на вопросы:
+The DeKYC backend is the authority for identity and permission logic.
 
-- кто этот пользователь,
-- какой сервис запрашивает доступ,
-- что именно разрешено,
-- какие claims можно вернуть,
-- какой signed response должен считать доверенным внешний сервис?
+This is the backend that answers the questions:
 
-## Типичные логические домены
-На стороне DeKYC API обычно живут модули вроде:
+- who this user is,
+- which service is requesting access,
+- what exactly is allowed,
+- which claims can be returned,
+- which signed response should be considered trusted by an external service?
+
+## Typical logical domains
+
+On the DeKYC API side, modules usually live such as:
 
 - auth
 - service-auth
@@ -79,54 +83,61 @@ DeKYC backend — это authority для identity и permission logic.
 - KYC / identity context
 - signed response logic
 
-## Типичные DeKYC API flows
+## Typical DeKYC API flows
 
 ### Service-auth login
-Используется, когда внешний сервис хочет войти через DeKYC.
+
+Used when an external service wants to log in through DeKYC.
 
 ### Permission-aware service access
-Проверяет, может ли сервис получить доступ к пользователю в конкретном контексте.
+
+Checks whether a service can access a user in a specific context.
 
 ### Signed envelope / signed response
-Возвращает сервису контролируемый ответ с access state и разрешенными claims.
+
+Returns a controlled response to the service with access state and allowed claims.
 
 ---
 
-## Обзор ENERGY API
+## ENERGY API overview
 
-## Основная роль
-ENERGY backend — это product execution layer.
+## Main role
 
-Именно он отвечает на вопросы:
+The ENERGY backend is the product execution layer.
 
-- какие assets существуют,
-- кто чем владеет,
-- может ли пользователь купить,
-- может ли пользователь сделать claim,
-- может ли он создать OTC listing,
-- какую on-chain транзакцию нужно построить,
-- как обновить database projection?
+It is responsible for answering the questions:
+
+- which assets exist,
+- who owns what,
+- whether the user can buy,
+- whether the user can make a claim,
+- whether the user can create an OTC listing,
+- which on-chain transaction needs to be built,
+- how to update the database projection?
 
 ---
 
-## Основные домены ENERGY API
+## Main ENERGY API domains
 
 ## 1. Users
-Используются для:
+
+Used for:
 
 - current user state
 - DeKYC-linked identity entry
 - product profile
 
 ## 2. Wallets
-Используются для:
 
-- создания custodial wallet
-- создания token accounts
-- подготовки пользователя к product actions
+Used for:
+
+- custodial wallet creation
+- token account creation
+- preparing the user for product actions
 
 ## 3. Energy assets
-Используются для:
+
+Used for:
 
 - demo asset creation
 - asset catalog
@@ -134,14 +145,16 @@ ENERGY backend — это product execution layer.
 - list endpoints
 
 ## 4. Positions
-Используются для:
+
+Used for:
 
 - portfolio state
 - bucket-aware positions
-- reconciliation после on-chain действий
+- reconciliation after on-chain actions
 
 ## 5. Payouts
-Используются для:
+
+Used for:
 
 - epoch creation
 - claim payout
@@ -149,127 +162,141 @@ ENERGY backend — это product execution layer.
 - payout records
 
 ## 6. OTC
-Используются для:
+
+Used for:
 
 - listing creation
 - listing fill
 - OTC board data
 
 ## 7. Judge
-Используются для:
+
+Used for:
 
 - judge summary
 - verification page
 
 ## 8. Settings / security
-Используются для:
+
+Used for:
 
 - action password
-- защиту чувствительных пользовательских действий
+- protection of sensitive user actions
 
 ---
 
-## Ключевые ENERGY endpoints по продуктовым flow
+## Key ENERGY endpoints by product flows
 
-Ниже — flow-oriented описание API, а не список всех route path.
+Below is a flow-oriented description of the API, not a list of all route paths.
 
 ---
 
-## Login и user state
+## Login and user state
 
-### Создание сессии через DeKYC
-Логическая цель:
+### Creating a session through DeKYC
 
-- пользователь входит в ENERGY через DeKYC
-- backend создает local product session
-- backend создает или восстанавливает product-side user state
+Logical goal:
+
+- the user logs in to ENERGY through DeKYC
+- the backend creates a local product session
+- the backend creates or restores product-side user state
 
 ### Current user endpoint
-Логическая цель:
 
-- вернуть current user profile
-- вернуть wallet state
-- вернуть role / session state
+Logical goal:
+
+- return current user profile
+- return wallet state
+- return role / session state
 
 ---
 
 ## Wallet setup
 
 ### Ensure custodial wallet
-Логическая цель:
 
-- создать wallet, если его еще нет
-- создать token accounts, если их еще нет
-- подготовить пользователя к product actions
+Logical goal:
+
+- create a wallet if it does not exist yet
+- create token accounts if they do not exist yet
+- prepare the user for product actions
 
 ### Initial KZTE airdrop
-Логическая цель:
 
-- убедиться, что demo user имеет product-ready balance
+Logical goal:
+
+- make sure the demo user has a product-ready balance
 
 ---
 
 ## Asset endpoints
 
 ### List assets
-Логическая цель:
+
+Logical goal:
 
 - marketplace
 - filters
 - asset discovery
 
 ### Asset detail
-Логическая цель:
 
-- показать public asset data
-- показать private docs при наличии доступа
-- показать on-chain references
-- показать proof bundle metadata
+Logical goal:
+
+- show public asset data
+- show private docs if access exists
+- show on-chain references
+- show proof bundle metadata
 
 ### Create demo asset
-Логическая цель:
 
-- создать asset on-chain
-- создать DB projection
-- подготовить demo content
+Logical goal:
+
+- create asset on-chain
+- create DB projection
+- prepare demo content
 
 ---
 
 ## Buy flow
 
 ### Buy shares
-Логическая цель:
 
-- проверить session и permissions
-- подготовить wallet state
-- определить treasury и share accounts
-- отправить on-chain buy
-- обновить DB projection
-- сохранить purchase history
+Logical goal:
+
+- check session and permissions
+- prepare wallet state
+- determine treasury and share accounts
+- send on-chain buy
+- update DB projection
+- save purchase history
 
 ---
 
 ## Payout flow
 
 ### Create epoch
-Логическая цель:
 
-- создать payout event для asset
-- зафиксировать amount per share
-- сохранить epoch projection
-- выдать tx proof
+Logical goal:
+
+- create a payout event for an asset
+- fix amount per share
+- save epoch projection
+- provide tx proof
 
 ### Claim payout
-Логическая цель:
 
-- проверить claimability
-- вычислить payout с учетом bucket logic
-- отправить on-chain claim
-- при необходимости mint ENERGY_POINTS
-- сохранить claim projection
+Logical goal:
+
+- check claimability
+- calculate payout with bucket logic
+- send on-chain claim
+- mint ENERGY_POINTS if needed
+- save claim projection
 
 ### List epochs / claims
-Логическая цель:
+
+Logical goal:
 
 - history
 - UI rendering
@@ -280,100 +307,113 @@ ENERGY backend — это product execution layer.
 ## OTC flow
 
 ### List listings
-Логическая цель:
+
+Logical goal:
 
 - user-facing OTC board
 
 ### Create listing
-Логическая цель:
 
-- переместить shares в escrow
-- создать listing record
-- показать listing на board
+Logical goal:
+
+- move shares into escrow
+- create listing record
+- show listing on the board
 
 ### Fill listing
-Логическая цель:
 
-- провести KZTE settlement
-- освободить shares из escrow
-- обновить positions
-- записать history
+Logical goal:
+
+- perform KZTE settlement
+- release shares from escrow
+- update positions
+- record history
 
 ---
 
 ## History flow
 
 ### User history
-Логическая цель:
 
-- собрать primary buy
+Logical goal:
+
+- collect primary buy
 - OTC created / sold / bought
 - claims
 - tx links
 
-Это не просто raw DB dump.  
-Этот endpoint нужно воспринимать как product-facing activity feed.
+This is not just a raw DB dump.  
+This endpoint should be treated as a product-facing activity feed.
 
 ---
 
 ## Judge flow
 
 ### Judge summary
-Логическая цель:
 
-- отдать current system state для verification
-- показать assets
-- показать positions
-- показать epochs
-- показать claims
-- показать OTC listings
-- показать tx / PDA / escrow data
+Logical goal:
+
+- return current system state for verification
+- show assets
+- show positions
+- show epochs
+- show claims
+- show OTC listings
+- show tx / PDA / escrow data
 
 ---
 
-## Принципы модели данных
+## Data model principles
 
-## API не является единственным источником истины
-API оркестрирует:
+## API is not the only source of truth
+
+The API orchestrates:
 
 - DB projections
 - identity logic
 - on-chain execution
 - access rules
 
-Архитектура намеренно гибридная.
+The architecture is intentionally hybrid.
 
-## Database projections product-friendly
-Chain хранит каноническое состояние для on-chain логики.  
-База данных хранит product-friendly projections для:
+## Database projections are product-friendly
+
+The chain stores canonical state for on-chain logic.  
+The database stores product-friendly projections for:
 
 - UI speed
 - filtering
 - history
 - richer UX
 
-## Sensitive data контролируется отдельно
-Приватные документы и identity-sensitive данные остаются вне публичного chain state.
+## Sensitive data is controlled separately
+
+Private documents and identity-sensitive data remain outside public chain state.
 
 ---
 
-## Принципы проектирования API
+## API design principles
 
-### 1. Product-oriented, а не blockchain-native UX
-API скрывает от пользователя wallet / signer complexity.
+### 1. Product-oriented, not blockchain-native UX
 
-### 2. Backend — оркестратор
-Backend отвечает за transaction building и business coordination.
+The API hides wallet / signer complexity from the user.
 
-### 3. Четкое разделение модулей
-Identity logic и energy investment logic не смешиваются хаотично.
+### 2. Backend is the orchestrator
 
-### 4. Честная trust model
-Backend — trusted zone.  
-Это сознательное решение и оно соответствует MVP-цели.
+The backend is responsible for transaction building and business coordination.
 
-### 5. Проверяемость там, где это важно
-Ключевые действия возвращают:
+### 3. Clear module separation
+
+Identity logic and energy investment logic are not chaotically mixed.
+
+### 4. Honest trust model
+
+The backend is a trusted zone.  
+This is a conscious decision and it matches the MVP goal.
+
+### 5. Verifiability where it matters
+
+Key actions return:
 
 - tx ids
 - PDAs
@@ -383,57 +423,61 @@ Backend — trusted zone.
 
 ---
 
-## Пример flow summary
+## Example flow summary
 
 ## Login flow
-1. Пользователь проходит auth через DeKYC
-2. ENERGY backend создает или восстанавливает local session
-3. Обеспечивается wallet state
-4. Product UI становится доступен
+
+1. The user authenticates through DeKYC
+2. The ENERGY backend creates or restores a local session
+3. Wallet state is ensured
+4. Product UI becomes available
 
 ## Buy flow
-1. Пользователь выбирает asset
-2. Отправляет buy action
-3. Backend валидирует и строит tx
-4. On-chain state обновляется
-5. DB projection обновляется
-6. История пополняется
+
+1. The user selects an asset
+2. Sends a buy action
+3. The backend validates and builds the tx
+4. On-chain state is updated
+5. DB projection is updated
+6. History is updated
 
 ## Claim flow
-1. Существует epoch
-2. Пользователь делает claim
-3. Backend определяет bucket-aware позиции
-4. On-chain claim исполняется
-5. При необходимости mint ENERGY_POINTS
-6. Claim record сохраняется
+
+1. An epoch exists
+2. The user makes a claim
+3. The backend determines bucket-aware positions
+4. On-chain claim is executed
+5. ENERGY_POINTS are minted if needed
+6. Claim record is saved
 
 ## OTC flow
-1. Пользователь создает listing
-2. Shares уходят в escrow
-3. Другой пользователь делает fill
-4. Происходит settlement
-5. Обе стороны получают обновленные history / positions
+
+1. The user creates a listing
+2. Shares go into escrow
+3. Another user fills it
+4. Settlement occurs
+5. Both sides receive updated history / positions
 
 ---
 
-## Как можно усилить API после хакатона
+## How the API can be strengthened after the hackathon
 
-После хакатона API-слой можно усилить через:
+After the hackathon, the API layer can be strengthened through:
 
-- более формальные contracts
+- more formal contracts
 - richer validation docs
 - OpenAPI / Swagger
 - signed proof bundle delivery
-- более строгие permission-aware response standards
-- интеграционные SDK для внешних сервисов
+- stricter permission-aware response standards
+- integration SDKs for external services
 
 ---
 
-## Короткое резюме API
+## Short API summary
 
-API-архитектура DeKYC Energy намеренно разделена на:
+The API architecture of DeKYC Energy is intentionally split into:
 
-- **DeKYC API** для identity и permission logic
-- **ENERGY API** для walletless execution, asset lifecycle, payout logic и OTC flows
+- **DeKYC API** for identity and permission logic
+- **ENERGY API** for walletless execution, asset lifecycle, payout logic, and OTC flows
 
-Именно это разделение позволяет продукту быть цельным, но при этом не смешивать identity и tokenization concerns в один хаотичный backend.
+This separation is what allows the product to be coherent while not mixing identity and tokenization concerns into one chaotic backend.
