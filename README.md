@@ -12,11 +12,11 @@
 
 > **DeKYC Energy** is a product where a user logs in through **DeKYC** (a tokenized EDS key), gets access **without a crypto wallet**, and invests in **tokenized revenue rights from energy projects**.
 
-[🚀 Pitch](https://drive.google.com/file/d/1oClcI4LiEJJVwXUGpS_nMy3RnbLAT6q1/view?usp=drive_link) ·
-[🎥 Video Demo](https://drive.google.com/file/d/1nIkRuN5ldQDLz1fBbjWfGUx_rZdPWLcH/view?usp=drive_link) ·
+[🚀 Pitch](https://youtu.be/hq4fOojhr2c) ·
+[🎥 Video Demo](https://vimeo.com/1191260874?share=copy&fl=sv&fe=ci) ·
 [🖥 Live App](https://dekyc-protocol-platform.vercel.app) ·
 [🖼 Screenshots](#screenshots) ·
-[📑 Presentation](https://docs.google.com/presentation/d/1P_jO0h7JyzIrQUPMACuS093DTZxP-DcS/edit?usp=drive_link&ouid=113841808140956424271&rtpof=true&sd=true) ·
+[📑 Presentation](https://docs.google.com/presentation/d/1VT2mq9yswmiEx-5EBXagIBV6YBl0yEmK/edit?usp=sharing&ouid=113841808140956424271&rtpof=true&sd=true) ·
 [📚 Docs](docs/) ·
 [🛡 DeKYC](docs/DeKYC.md) ·
 [⚡ ENERGY](docs/ENERGY.md)
