@@ -162,37 +162,37 @@ More details: [docs/architecture.md](docs/architecture.md)
 ### 1. Landing
 
 <p align="center">
-  <img src="assets/screenshots/landing.png" alt="Landing" width="600">
+  <img src="assets/screenshots/EN/landing_EN.png" alt="Landing" width="600">
 </p>
 
 ### 2. Marketplace
 
 <p align="center">
-  <img src="assets/screenshots/marketplace.png" alt="Marketplace" width="600">
+  <img src="assets/screenshots/EN/marketplace_EN.png" alt="Marketplace" width="600">
 </p>
 
 ### 3. Asset Detail
 
 <p align="center">
-  <img src="assets/screenshots/asset-detail.png" alt="Asset Detail" width="600">
+  <img src="assets/screenshots/EN/asset-detail_EN.png" alt="Asset Detail" width="600">
 </p>
 
 ### 4. Portfolio
 
 <p align="center">
-  <img src="assets/screenshots/portfolio.png" alt="Portfolio" width="600">
+  <img src="assets/screenshots/EN/portfolio_EN.png" alt="Portfolio" width="600">
 </p>
 
 ### 5. OTC
 
 <p align="center">
-  <img src="assets/screenshots/otc.png" alt="OTC" width="600">
+  <img src="assets/screenshots/EN/otc_EN.png" alt="OTC" width="600">
 </p>
 
 ### 6. Judge Page
 
 <p align="center">
-  <img src="assets/screenshots/judge.png" alt="Judge Page" width="600">
+  <img src="assets/screenshots/EN/judge_EN.png" alt="Judge Page" width="600">
 </p>
 
 ---
