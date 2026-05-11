@@ -1,6 +1,13 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -54,6 +61,30 @@ function DekycConnectCallbackContent() {
 
     return `${window.location.origin}/${locale}/dekyc-connect/callback`;
   }, [locale]);
+
+  const exchangeCode = useCallback(
+    async (input: { code: string; redirectUri: string }): Promise<void> => {
+      try {
+        setStatus('loading');
+        setMessage(null);
+
+        const session = await createEnergySessionViaDekycConnect(input);
+
+        saveEnergySession(session);
+        clearPendingDekycConnectSession();
+
+        setStatus('success');
+        setMessage(t('success'));
+
+        router.replace(`/${locale}`);
+      } catch (err) {
+        exchangeStartedRef.current = false;
+        setStatus('error');
+        setMessage(err instanceof Error ? err.message : t('exchangeError'));
+      }
+    },
+    [locale, router, t],
+  );
 
   useEffect(() => {
     if (exchangeStartedRef.current) {
@@ -112,31 +143,7 @@ function DekycConnectCallbackContent() {
       code,
       redirectUri: pendingSession.redirectUri,
     });
-  }, [code, errorParam, errorDescription, redirectUri, state, t]);
-
-  async function exchangeCode(input: {
-    code: string;
-    redirectUri: string;
-  }): Promise<void> {
-    try {
-      setStatus('loading');
-      setMessage(null);
-
-      const session = await createEnergySessionViaDekycConnect(input);
-
-      saveEnergySession(session);
-      clearPendingDekycConnectSession();
-
-      setStatus('success');
-      setMessage(t('success'));
-
-      router.replace(`/${locale}`);
-    } catch (err) {
-      exchangeStartedRef.current = false;
-      setStatus('error');
-      setMessage(err instanceof Error ? err.message : t('exchangeError'));
-    }
-  }
+  }, [code, errorParam, errorDescription, redirectUri, state, t, exchangeCode]);
 
   return (
     <main className="min-h-screen bg-[var(--background)] px-6 py-10 text-[var(--foreground)]">
