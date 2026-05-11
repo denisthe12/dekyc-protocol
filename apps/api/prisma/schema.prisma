@@ -106,6 +106,14 @@ model Service {
   category             String?
   requiredClaims       Json?
   optionalClaims       Json?
+
+  allowedRedirectUris Json?
+  allowedScopes       Json?
+  assertionAudience   String?
+  webhookSigningMode  String       @default("shared_secret")
+  consentTextVersion  String       @default("dekyc-connect-consent-v1")
+  environment         String       @default("sandbox")
+
   status             String       @default("active")
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
@@ -202,4 +210,189 @@ model ServiceRequestNonce {
 
   @@index([serviceId])
   @@unique([serviceId, nonce], name: "serviceId_nonce")
+}
+
+model DeKycSubject {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  subjectId String   @unique
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  serviceSubjects DeKycServiceSubject[]
+  consentReceipts DeKycConsentReceipt[]
+  assertions      DeKycIdentityAssertion[]
+
+  @@index([subjectId])
+}
+
+model DeKycServiceSubject {
+  id               String   @id @default(cuid())
+  userId           String
+  serviceId         String
+  subjectId         String
+  serviceSubjectId  String   @unique
+  createdAt         DateTime @default(now())
+
+  subject DeKycSubject @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+
+  @@unique([userId, serviceId])
+  @@index([userId])
+  @@index([serviceId])
+  @@index([subjectId])
+  @@index([serviceSubjectId])
+}
+
+model DeKycConsentReceipt {
+  id                 String   @id @default(cuid())
+  consentId          String   @unique
+  userId             String
+  serviceId           String
+  subjectId           String
+  serviceSubjectId    String
+  grantedClaims       Json
+  consentTextVersion  String
+  grantedAt           DateTime @default(now())
+  expiresAt           DateTime?
+  revokedAt           DateTime?
+  receiptHash         String
+  signature           String   @db.Text
+  status              String   @default("active")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  subject DeKycSubject @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+
+  authorizationCodes DeKycAuthorizationCode[]
+  assertions          DeKycIdentityAssertion[]
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([subjectId])
+  @@index([serviceSubjectId])
+  @@index([status])
+  @@index([consentId])
+}
+
+model DeKycAuthorizationCode {
+  id           String    @id @default(cuid())
+  codeHash     String    @unique
+  userId       String
+  serviceId     String
+  redirectUri   String
+  state         String?
+  nonce         String?
+  claimsScope   Json
+  consentId     String
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  consentReceipt DeKycConsentReceipt @relation(fields: [consentId], references: [consentId], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([consentId])
+  @@index([expiresAt])
+  @@index([consumedAt])
+}
+
+model DeKycIdentityAssertion {
+  id                String   @id @default(cuid())
+  assertionId        String   @unique
+  userId             String
+  serviceId           String
+  subjectId           String
+  serviceSubjectId    String
+  consentId           String
+  payloadJson         Json
+  assertionJws        String   @db.Text
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  createdAt           DateTime @default(now())
+
+  subject        DeKycSubject         @relation(fields: [subjectId], references: [subjectId], onDelete: Cascade)
+  consentReceipt DeKycConsentReceipt  @relation(fields: [consentId], references: [consentId], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([subjectId])
+  @@index([serviceSubjectId])
+  @@index([consentId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+model DeKycWebhookEndpoint {
+  id          String   @id @default(cuid())
+  serviceId    String
+  url          String
+  secretHash   String
+  eventTypes   Json
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  deliveries DeKycWebhookDelivery[]
+
+  @@index([serviceId])
+  @@index([status])
+}
+
+model DeKycWebhookDelivery {
+  id          String    @id @default(cuid())
+  endpointId  String
+  eventId     String
+  eventType   String
+  payloadJson Json
+  signature   String    @db.Text
+  status      String    @default("pending")
+  attempts    Int       @default(0)
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  deliveredAt DateTime?
+
+  endpoint DeKycWebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+
+  @@index([endpointId])
+  @@index([eventId])
+  @@index([eventType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model DeKycConnectAuthorizationSession {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  serviceId   String
+  clientId    String
+  redirectUri String
+
+  state       String?
+  nonce       String?
+  claimsScope Json
+
+  status      String   @default("pending")
+
+  userId      String?
+  consentId   String?
+  codeHash    String?
+
+  expiresAt   DateTime
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+  completedAt DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([serviceId])
+  @@index([clientId])
+  @@index([userId])
+  @@index([consentId])
+  @@index([codeHash])
+  @@index([status])
+  @@index([expiresAt])
 }

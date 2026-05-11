@@ -174,7 +174,8 @@
     "errors": {
       "assetRequired": "Select an asset.",
       "invalidEpochAmount": "Enter a valid epoch amount.",
-      "createEpochFailed": "Failed to create revenue epoch."
+      "createEpochFailed": "Failed to create revenue epoch.",
+      "claimFailed": "Failed to claim payout."
     },
     "bucket": "Payout",
     "shares": "Shares",
@@ -207,13 +208,25 @@
     "sellerWallet": "Seller wallet",
     "sellerShareAccount": "Seller share account",
     "sellerKzteAccount": "Seller KZTE account",
+    "claimConfirm": "Claim payout for user {userId}, asset {assetId}, epoch #{epochIndex}?",
     "shareMint": "Share mint",
     "createAssetTx": "Create asset tx",
     "issueSharesTx": "Issue shares tx",
     "createEpochTx": "Create epoch tx",
     "createListingTx": "Create listing tx",
     "fillListingTx": "Fill listing tx",
-    "claimUser": "Claim · User"
+    "claimUser": "Claim · User",
+    "claimAvailableTitle": "Available payout claim",
+    "claimOnlyCurrentUserHint": "The judge page shows claim actions only for the currently logged-in user.",
+    "claimUserId": "Energy User ID",
+    "claimPayoutButton": "Claim payout",
+    "claimingPayout": "Claiming payout...",
+    "claimAlreadyClaimed": "Already claimed",
+    "claimDialogEyebrow": "Claim payout",
+    "claimDialogTitle": "Confirm payout claim",
+    "claimDialogDescription": "This will execute the on-chain claim operation. After success, claim transaction and ClaimReceiptPDA will appear.",
+    "claimDialogCalculation": "Payout calculation",
+    "claimDialogConfirm": "Confirm claim"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",
@@ -439,19 +452,35 @@
     "logout": "Log out",
     "user": "User",
     "nameMissing": "Name not provided",
+    "loginViaDekycConnect": "Login with DeKYC Connect",
+    "loginViaDekycLegacy": "Legacy Face + Code login",
     "email": "Email",
     "notProvided": "not provided",
     "verification": "Verification",
+    "connectProofEyebrow": "DeKYC Connect Proof",
+    "connectProofTitle": "Login verified by signed identity assertion",
+    "connectProofDescription": "ENERGY received a one-time authorization code from DeKYC, exchanged it through the backend, and created a local session from the signed identity assertion and consent receipt.",
+    "connectProofStatus": "Verified",
+    "connectAssertionId": "Assertion ID",
+    "connectConsentId": "Consent ID",
+    "connectServiceSubjectId": "Service Subject ID",
+    "connectAssertionExpiresAt": "Assertion expires",
+    "connectConsentReceiptHash": "Consent Receipt Hash",
+    "legacySessionEyebrow": "Legacy DeKYC Session",
+    "legacySessionTitle": "Session created through the legacy Face + Code flow",
+    "legacySessionDescription": "This login remains available for early MVP compatibility. Use DeKYC Connect for the main demo flow to show authorization code, signed assertion, and consent receipt.",
     "role": "Role",
     "custodialAddress": "Custodial address",
     "kzteAccount": "KZTE token account",
+    "startingDekycConnect": "Opening DeKYC Connect...",
     "notCreated": "not created",
     "walletStatus": "Wallet status",
     "initialAirdrop": "Initial KZTE airdrop",
     "airdropTx": "Airdrop tx",
     "notYet": "not yet",
     "errors": {
-      "loadProfile": "Failed to load profile"
+      "loadProfile": "Failed to load profile",
+      "connectLogin": "Failed to start DeKYC Connect login"
     }
   },
   "FaceScan": {
@@ -482,5 +511,24 @@
       "codeRequired": "Enter the login code",
       "loginFailed": "Login failed"
     }
+  },
+  "DekycConnectCallbackPage": {
+    "eyebrow": "DeKYC Connect",
+    "title": "Completing login",
+    "description": "ENERGY verifies the authorization code through the backend and creates your local product session.",
+    "loading": "Completing DeKYC Connect login...",
+    "missingCode": "Authorization code is missing from the callback URL.",
+    "exchangeError": "Failed to exchange authorization code.",
+    "success": "Login completed. Redirecting to ENERGY.",
+    "statusLabel": "Status",
+    "statusLoading": "Verifying code",
+    "statusSuccess": "Done",
+    "statusError": "Error",
+    "missingPendingSession": "Pending DeKYC Connect session was not found. Start login again from the ENERGY home page.",
+    "pendingSessionExpired": "Pending DeKYC Connect session has expired. Start login again.",
+    "stateMismatch": "Callback state does not match the expected value. Login was stopped to protect against request forgery.",
+    "redirectUriMismatch": "Redirect URI does not match the expected value. Login was stopped.",
+    "backHome": "Back home",
+    "openAssets": "Open assets"
   }
 }

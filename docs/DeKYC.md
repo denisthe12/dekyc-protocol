@@ -4,263 +4,292 @@
 
 ---
 
-## Содержание
+## Contents
 
-- [Что такое DeKYC](#что-такое-dekyc)
-- [Какую проблему решает проект](#какую-проблему-решает-проект)
-- [Ключевая идея](#ключевая-идея)
-- [Почему это не просто ещё один KYC-сервис](#почему-это-не-просто-ещё-один-kyc-сервис)
-- [Как работает система](#как-работает-система)
-- [Основные пользовательские сценарии](#основные-пользовательские-сценарии)
-- [Архитектура проекта](#архитектура-проекта)
-- [Компоненты системы](#компоненты-системы)
-- [On-chain и off-chain границы](#on-chain-и-off-chain-границы)
-- [Модель разрешений](#модель-разрешений)
-- [Модель доступа для сервисов](#модель-доступа-для-сервисов)
-- [Почему в проекте нет пользовательских кошельков](#почему-в-проекте-нет-пользовательских-кошельков)
-- [Роль Solana в проекте](#роль-solana-в-проекте)
-- [Роль Token-2022](#роль-token-2022)
-- [Интеграция с ЭЦП и NCALayer](#интеграция-с-эцп-и-ncalayer)
-- [Биометрия и защита от использования чужого ЭЦП](#биометрия-и-защита-от-использования-чужого-эцп)
-- [KYC Vault и защита персональных данных](#kyc-vault-и-защита-персональных-данных)
-- [Signed Envelope и сервисный вход](#signed-envelope-и-сервисный-вход)
-- [Безопасность](#безопасность)
-- [Публичность блокчейна и честные ограничения](#публичность-блокчейна-и-честные-ограничения)
-- [Технологический стек](#технологический-стек)
-- [Структура репозитория](#структура-репозитория)
-- [MVP и текущий статус](#mvp-и-текущий-статус)
-- [Roadmap после хакатона](#roadmap-после-хакатона)
-- [Почему этот проект важен](#почему-этот-проект-важен)
-
----
-
-## Что такое DeKYC
-
-**DeKYC** — это протокол и платформа для повторно используемой KYC-идентификации, где пользователь один раз подтверждает свою личность, управляет доступом к своим данным и затем может входить в внешние сервисы через **DeKYC**, не проходя каждый раз полный KYC заново.
-
-Проще говоря:
-
-- пользователь проходит идентификацию в доверенной среде DeKYC;
-- подтверждает свою личность через ЭЦП;
-- настраивает биометрию;
-- выдаёт конкретному сервису разрешение на доступ к определённым KYC-атрибутам;
-- сервис получает не “всё подряд”, а только разрешённый набор claims;
-- пользователь может в любой момент отозвать доступ.
-
-DeKYC — это не просто веб-сайт с базой данных. Это **identity + permission layer**, где:
-
-- чувствительные данные хранятся **off-chain** в зашифрованном виде;
-- в блокчейне хранятся **состояния разрешений, хеши, ссылки на доказательства и правила доступа**;
-- сервисы получают доступ через **подписанный ответ платформы** и on-chain-проверяемую permission-модель.
+- [What DeKYC is](#what-dekyc-is)
+- [What problem the project solves](#what-problem-the-project-solves)
+- [Key idea](#key-idea)
+- [Why this is not just another KYC service](#why-this-is-not-just-another-kyc-service)
+- [How the system works](#how-the-system-works)
+- [Main user scenarios](#main-user-scenarios)
+- [Project architecture](#project-architecture)
+- [System components](#system-components)
+- [On-chain and off-chain boundaries](#on-chain-and-off-chain-boundaries)
+- [Permission model](#permission-model)
+- [Access model for services](#access-model-for-services)
+- [Why there are no user wallets in the project](#why-there-are-no-user-wallets-in-the-project)
+- [Role of Solana in the project](#role-of-solana-in-the-project)
+- [Role of Token-2022](#role-of-token-2022)
+- [Integration with EDS and NCALayer](#integration-with-eds-and-ncalayer)
+- [Biometrics and protection against using someone else’s EDS](#biometrics-and-protection-against-using-someone-elses-eds)
+- [KYC Vault and protection of personal data](#kyc-vault-and-protection-of-personal-data)
+- [Signed Envelope and service login](#signed-envelope-and-service-login)
+- [Security](#security)
+- [Blockchain publicity and honest limitations](#blockchain-publicity-and-honest-limitations)
+- [Technology stack](#technology-stack)
+- [Repository structure](#repository-structure)
+- [MVP and current status](#mvp-and-current-status)
+- [Roadmap after the hackathon](#roadmap-after-the-hackathon)
+- [Why this project matters](#why-this-project-matters)
 
 ---
 
-## Какую проблему решает проект
+## What DeKYC is
 
-Сегодня KYC почти всегда означает одно и то же:
+**DeKYC** is a protocol and platform for reusable KYC identity verification, where the user verifies their identity once, manages access to their data, and can then log in to external services through **DeKYC** without going through full KYC again every time.
 
-- пользователь снова и снова загружает документы;
-- передаёт чувствительные персональные данные множеству сервисов;
-- не контролирует, кто и когда именно использует его KYC;
-- не может удобно отозвать уже выданный доступ;
-- вынужден повторять один и тот же процесс идентификации для каждого нового продукта.
+In simple terms:
 
-Это создаёт сразу несколько проблем:
+- the user completes identity verification in the trusted DeKYC environment;
+- confirms their identity through EDS;
+- configures biometrics;
+- grants a specific service permission to access certain KYC attributes;
+- the service receives not “everything at once”, but only the allowed set of claims;
+- the user can revoke access at any time.
 
-### 1. Избыточное распространение персональных данных
-Чем больше сервисов хранят копии документов и биометрии, тем выше риск утечек и злоупотреблений.
+DeKYC is not just a website with a database. It is an **identity + permission layer**, where:
 
-### 2. Плохой пользовательский опыт
-Каждый новый сервис заставляет проходить KYC заново, даже если человек уже был надёжно идентифицирован раньше.
-
-### 3. Отсутствие прозрачного управления доступом
-Обычно пользователь не видит удобной модели:
-- каким сервисам он дал доступ;
-- к каким именно данным;
-- действует ли доступ до сих пор;
-- можно ли отозвать его в один клик.
-
-### 4. Слабая переносимость идентичности
-В традиционной модели личность “заперта” внутри отдельного сервиса. Она не становится reusable asset для экосистемы.
-
-### 5. Слишком web2-модель доверия
-Сервису приходится либо полностью доверять своей внутренней БД, либо строить собственную тяжёлую KYC-инфраструктуру заново.
-
-DeKYC решает это через модель **одноразовой идентификации + управляемых permission’ов + блокчейн-подтверждаемого состояния доступа**.
+- sensitive data is stored **off-chain** in encrypted form;
+- the blockchain stores **permission states, hashes, proof references, and access rules**;
+- services receive access through a **signed platform response** and an on-chain-verifiable permission model.
 
 ---
 
-## Ключевая идея
+## What problem the project solves
 
-Главная идея проекта:
+Today, KYC almost always means the same thing:
 
-**Пользователь не передаёт свои KYC-данные всем подряд. Он управляет доступом к ним через DeKYC.**
+- the user uploads documents again and again;
+- sends sensitive personal data to many services;
+- does not control who exactly uses their KYC and when;
+- cannot conveniently revoke already granted access;
+- is forced to repeat the same identity verification process for every new product.
 
-DeKYC становится доверенным identity gateway между пользователем и сервисами.
+This creates several problems at once:
 
-Это означает:
+### 1. Excessive spread of personal data
 
-- пользователь проходит идентификацию в одном месте;
-- сервис запрашивает только нужные claims;
-- DeKYC проверяет разрешение;
-- DeKYC возвращает сервису подписанный результат;
-- доступ можно отозвать без удаления аккаунта в сервисе.
+The more services store copies of documents and biometrics, the higher the risk of leaks and misuse.
 
-Важный архитектурный принцип проекта:
+### 2. Poor user experience
 
-> В блокчейне не хранятся персональные данные.  
-> В блокчейне хранятся только состояния, хеши, ссылки, правила и permission-логика.
+Every new service forces the user to complete KYC again, even if the person has already been reliably identified before.
+
+### 3. Lack of transparent access management
+
+Usually the user does not see a convenient model:
+- which services they granted access to;
+- exactly which data;
+- whether the access is still active;
+- whether it can be revoked in one click.
+
+### 4. Weak portability of identity
+
+In the traditional model, identity is “locked” inside a separate service. It does not become a reusable asset for the ecosystem.
+
+### 5. Too much of a web2 trust model
+
+The service has to either fully trust its internal database or build its own heavy KYC infrastructure from scratch.
+
+DeKYC solves this through a model of **one-time identity verification + managed permissions + blockchain-confirmed access state**.
 
 ---
 
-## Почему это не просто ещё один KYC-сервис
+## Key idea
 
-DeKYC отличается от обычного KYC-решения по нескольким причинам.
+The main idea of the project:
 
-### 1. Повторно используемая идентичность
-Пользователь не проходит полную идентификацию заново для каждого нового сервиса.
+**The user does not share their KYC data with everyone. They manage access to it through DeKYC.**
 
-### 2. Управление доступом самим пользователем
-Пользователь сам выдаёт и отзывает разрешения.
+DeKYC becomes a trusted identity gateway between the user and services.
 
-### 3. Блокчейн используется по сути
-Solana здесь не “для галочки”. Она хранит permission state, условия доступа и служит независимым уровнем проверяемости.
+This means:
 
-### 4. Нет необходимости в пользовательском криптокошельке
-Это критично для реального UX. Проект построен так, чтобы обычному пользователю не нужно было разбираться в wallet’ах, seed-фразах, Phantom и подписи транзакций.
+- the user completes identity verification in one place;
+- the service requests only the required claims;
+- DeKYC checks the permission;
+- DeKYC returns a signed result to the service;
+- access can be revoked without deleting the account in the service.
 
-### 5. DeKYC может быть основой для других приложений
-Например:
-- marketplace’ы;
-- финтех-сервисы;
+An important architectural principle of the project:
+
+> Personal data is not stored on the blockchain.  
+> The blockchain stores only states, hashes, references, rules, and permission logic.
+
+---
+
+## Why this is not just another KYC service
+
+DeKYC differs from a regular KYC solution for several reasons.
+
+### 1. Reusable identity
+
+The user does not complete full identity verification again for every new service.
+
+### 2. Access management by the user
+
+The user grants and revokes permissions themselves.
+
+### 3. Blockchain is used meaningfully
+
+Solana is not here “for show”. It stores permission state, access conditions, and acts as an independent layer of verifiability.
+
+### 4. No need for a user crypto wallet
+
+This is critical for real UX. The project is built so that an ordinary user does not need to understand wallets, seed phrases, Phantom, and transaction signing.
+
+### 5. DeKYC can become a foundation for other applications
+
+For example:
+- marketplaces;
+- fintech services;
 - tokenization platforms;
 - regulated investment apps;
-- сервисы с обязательной идентификацией.
+- services with mandatory identity verification.
 
 ---
 
-## Как работает система
+## How the system works
 
-Ниже — базовый flow проекта от начала до конца.
+Below is the basic project flow from start to finish.
 
-### Шаг 1. Регистрация в DeKYC
-Пользователь создаёт аккаунт по email и паролю.
+### Step 1. Registration in DeKYC
 
-### Шаг 2. Настройка биометрии
-Перед привязкой ЭЦП пользователь проходит настройку биометрии лица. В MVP это mock-биометрия, но логика уже встроена как обязательный защитный слой.
+The user creates an account with email and password.
 
-### Шаг 3. Подключение ЭЦП через NCALayer
-Пользователь использует локальный NCALayer и подписывает challenge.
+### Step 2. Biometric setup
 
-### Шаг 4. Анализ сертификата и создание KYC-профиля
-Backend DeKYC принимает CMS-подпись, извлекает атрибуты сертификата, сопоставляет их с KYC-профилем и сохраняет результат в защищённом хранилище.
+Before linking EDS, the user completes face biometric setup. In the MVP this is mock biometrics, but the logic is already built in as a mandatory protection layer.
 
-### Шаг 5. Просмотр профиля
-Пользователь видит:
-- базовые KYC-данные;
-- статус биометрии;
-- статус привязки ЭЦП;
-- список выданных разрешений.
+### Step 3. Connecting EDS through NCALayer
 
-### Шаг 6. Выдача разрешения сервису
-Пользователь выбирает сервис и разрешает доступ только к определённым claims.
+The user uses local NCALayer and signs a challenge.
 
-### Шаг 7. Вход в сервис через DeKYC
-Внешний сервис делает запрос в DeKYC и получает подписанный ответ с:
-- разрешён ли доступ;
-- какие claims доступны;
-- когда ответ выдан;
-- когда истекает его срок действия.
+### Step 4. Certificate analysis and KYC profile creation
 
-### Шаг 8. Отзыв разрешения
-Пользователь в любой момент может revoke permission. После этого сервис больше не должен получать разрешённый KYC-ответ.
+The DeKYC backend receives the CMS signature, extracts certificate attributes, maps them to the KYC profile, and saves the result in protected storage.
 
----
+### Step 5. Profile review
 
-## Основные пользовательские сценарии
+The user sees:
+- basic KYC data;
+- biometric status;
+- EDS linking status;
+- list of granted permissions.
 
-### Сценарий 1. Пользователь создаёт свой DeKYC-профиль
-1. Регистрируется.
-2. Подтверждает email.
-3. Настраивает биометрию.
-4. Подключает ЭЦП.
-5. Получает готовый KYC-профиль.
+### Step 6. Granting permission to a service
 
-### Сценарий 2. Пользователь выдаёт доступ сервису
-1. Открывает список сервисов.
-2. Видит, какие claims сервис хочет получить.
-3. Подтверждает выдачу доступа.
-4. Разрешение становится активным.
+The user selects a service and allows access only to specific claims.
 
-### Сценарий 3. Пользователь входит во внешний сервис
-1. Выбирает “Login via DeKYC”.
-2. Проходит сервисный flow.
-3. Сервис получает signed response от DeKYC.
-4. Пользователь заходит без отдельного KYC в этом сервисе.
+### Step 7. Login to a service through DeKYC
 
-### Сценарий 4. Пользователь отзывает разрешение
-1. Открывает список разрешений.
-2. Выбирает нужный сервис.
-3. Нажимает revoke.
-4. Сервис теряет право на доступ к KYC-claims.
+An external service makes a request to DeKYC and receives a signed response with:
+- whether access is allowed;
+- which claims are available;
+- when the response was issued;
+- when it expires.
 
-### Сценарий 5. Сервис получает только минимально нужные данные
-Даже если сервис запросил набор claims, DeKYC возвращает не максимум данных, а только пересечение:
-- что сервис запросил;
-- что пользователь действительно разрешил.
+### Step 8. Revoking permission
 
-Это важный принцип минимизации данных.
+The user can revoke permission at any time. After that, the service should no longer receive the allowed KYC response.
 
 ---
 
-## Архитектура проекта
+## Main user scenarios
 
-DeKYC состоит из нескольких логических слоёв.
+### Scenario 1. The user creates their DeKYC profile
+
+1. Registers.
+2. Confirms email.
+3. Sets up biometrics.
+4. Connects EDS.
+5. Receives a ready KYC profile.
+
+### Scenario 2. The user grants access to a service
+
+1. Opens the list of services.
+2. Sees which claims the service wants to receive.
+3. Confirms granting access.
+4. The permission becomes active.
+
+### Scenario 3. The user logs in to an external service
+
+1. Selects “Login via DeKYC”.
+2. Goes through the service flow.
+3. The service receives a signed response from DeKYC.
+4. The user logs in without separate KYC in that service.
+
+### Scenario 4. The user revokes permission
+
+1. Opens the list of permissions.
+2. Selects the required service.
+3. Clicks revoke.
+4. The service loses the right to access KYC claims.
+
+### Scenario 5. The service receives only the minimum necessary data
+
+Even if the service requested a set of claims, DeKYC returns not the maximum amount of data, but only the intersection of:
+- what the service requested;
+- what the user actually allowed.
+
+This is an important data minimization principle.
+
+---
+
+## Project architecture
+
+DeKYC consists of several logical layers.
 
 ### 1. Platform UI
-Пользовательская платформа, где находятся:
-- регистрация;
-- профиль;
-- биометрия;
-- подключение ЭЦП;
-- список сервисов;
+
+The user platform, where the following are located:
+- registration;
+- profile;
+- biometrics;
+- EDS connection;
+- service catalog;
 - permissions;
-- управление доступом.
+- access management.
 
 ### 2. Service UI
-Внешние сервисы, которые используют вход через DeKYC и получают KYC-claims только при наличии активного permission.
+
+External services that use login through DeKYC and receive KYC claims only if there is an active permission.
 
 ### 3. Backend API
-Центральный policy enforcement gateway:
-- проверяет подпись ЭЦП;
-- хранит KYC off-chain;
-- управляет permissions;
-- формирует signed envelope для сервисов;
-- выполняет on-chain проверки.
+
+The central policy enforcement gateway:
+- verifies the EDS signature;
+- stores KYC off-chain;
+- manages permissions;
+- forms signed envelopes for services;
+- performs on-chain checks.
 
 ### 4. Solana Program
-On-chain слой, который хранит:
+
+The on-chain layer, which stores:
 - permission state;
-- ссылки на связанные сущности;
-- токен-условия и/или ref-данные доступа;
-- служебные состояния для revoke / grant логики.
+- references to related entities;
+- token conditions and/or access reference data;
+- service states for revoke / grant logic.
 
 ### 5. Off-chain storage
-Защищённое хранилище для:
-- зашифрованного KYC payload;
-- журналов доступа;
-- сертификатных данных;
-- служебных ключей;
-- метаданных разрешений.
+
+Protected storage for:
+- encrypted KYC payload;
+- access logs;
+- certificate data;
+- service keys;
+- permission metadata.
 
 ---
 
-## Компоненты системы
+## System components
 
 ### Platform UI
-Frontend платформы для пользователя.
 
-Ключевые разделы:
+Frontend platform for the user.
+
+Key sections:
 - Sign up / Sign in
 - Profile
 - Biometric setup
@@ -270,10 +299,12 @@ Frontend платформы для пользователя.
 - Security settings
 
 ### Consumer Service UI
-Отдельный сервис, который не строит свой KYC заново, а использует DeKYC как identity provider.
+
+A separate service that does not build its own KYC again, but uses DeKYC as an identity provider.
 
 ### Backend Gateway
-Серверная часть DeKYC, где находится вся критичная логика:
+
+The server-side part of DeKYC, where all critical logic is located:
 - auth;
 - verification;
 - KYC processing;
@@ -282,291 +313,321 @@ Frontend платформы для пользователя.
 - audit logging.
 
 ### On-chain Permission Layer
-Solana-программа, которая фиксирует permission-state и обеспечивает проверяемость ключевых состояний.
+
+A Solana program that records permission state and provides verifiability of key states.
 
 ---
 
-## On-chain и off-chain границы
+## On-chain and off-chain boundaries
 
-Это один из самых важных принципов проекта.
+This is one of the most important principles of the project.
 
-### Что хранится on-chain
-В блокчейне хранятся:
-- хеши KYC-состояния;
-- состояние разрешений;
-- служебные идентификаторы;
-- ссылки на связанные on-chain сущности;
-- правила revoke / grant;
-- технические состояния для проверки доступа.
+### What is stored on-chain
 
-### Что хранится off-chain
-Вне блокчейна хранятся:
-- персональные данные;
-- извлечённые KYC-атрибуты;
-- сертификатные детали;
-- биометрические данные или их производные;
-- зашифрованные payload’ы;
-- аудиторские журналы с чувствительными деталями.
+The blockchain stores:
+- KYC state hashes;
+- permission states;
+- service identifiers;
+- references to related on-chain entities;
+- revoke / grant rules;
+- technical states for access verification.
 
-### Почему так
-Потому что:
-- блокчейн публичен;
-- хранить PII on-chain нельзя и архитектурно неправильно;
-- KYC требует защищённой модели хранения;
-- blockchain здесь нужен для правил, состояния и проверяемости, а не для хранения чувствительных данных.
+### What is stored off-chain
+
+Off-chain storage contains:
+- personal data;
+- extracted KYC attributes;
+- certificate details;
+- biometric data or its derivatives;
+- encrypted payloads;
+- audit logs with sensitive details.
+
+### Why this is done
+
+Because:
+- the blockchain is public;
+- storing PII on-chain is impossible and architecturally wrong;
+- KYC requires a protected storage model;
+- blockchain is needed here for rules, state, and verifiability, not for storing sensitive data.
 
 ---
 
-## Модель разрешений
+## Permission model
 
-В основе DeKYC лежит permission-модель.
+DeKYC is based on a permission model.
 
-Каждое разрешение отвечает на вопрос:
+Each permission answers the question:
 
-> Какому сервису пользователь разрешил доступ, к каким данным и действует ли этот доступ сейчас?
+> Which service did the user allow access to, which data did they allow, and is this access still active?
 
-Каждое permission включает:
-- пользователя;
-- сервис;
-- набор разрешённых claims;
-- состояние permission;
-- метку времени создания;
-- статус отзыва;
+Each permission includes:
+- user;
+- service;
+- set of allowed claims;
+- permission state;
+- creation timestamp;
+- revocation status;
 - on-chain reference.
 
-### Возможные состояния
+### Possible states
+
 - `ACTIVE`
 - `REVOKED`
 - `EXPIRED`
-- `PENDING` — если в будущем понадобится асинхронная модель подтверждения
+- `PENDING` — if an asynchronous confirmation model is needed in the future
 
-### Что делает revoke
-Когда пользователь отзывает доступ:
-- on-chain состояние обновляется;
-- сервис больше не должен получать разрешённый signed response;
-- в UI permission перестаёт считаться действующим;
-- критичные операции могут быть заблокированы сразу же.
+### What revoke does
+
+When the user revokes access:
+- the on-chain state is updated;
+- the service should no longer receive the allowed signed response;
+- in the UI, the permission no longer counts as active;
+- critical operations can be blocked immediately.
 
 ---
 
-## Модель доступа для сервисов
+## Access model for services
 
-DeKYC не раскрывает сервисам всё подряд.
+DeKYC does not expose everything to services.
 
-Сервис запрашивает:
-- кто пользователь;
-- нужен ли доступ;
-- какие claims он хотел бы получить.
+The service requests:
+- who the user is;
+- whether access is needed;
+- which claims it would like to receive.
 
-DeKYC отвечает:
-- разрешено или запрещено;
-- какие claims реально можно отдать;
-- подпись платформы;
-- временные метки.
+DeKYC responds:
+- allowed or denied;
+- which claims can actually be returned;
+- platform signature;
+- timestamps.
 
-### Ключевой принцип
-Сервис получает не “всё разрешённое в системе”, а только:
+### Key principle
+
+The service receives not “everything allowed in the system”, but only:
 
 `requestedClaims ∩ allowedClaims(permission)`
 
-Это защищает пользователя от эксцесса привилегий и заставляет сервисы работать по принципу минимально необходимого доступа.
+This protects the user from excessive privileges and forces services to operate according to the minimum necessary access principle.
 
 ---
 
-## Почему в проекте нет пользовательских кошельков
+## Why there are no user wallets in the project
 
-Это осознанное архитектурное решение.
+This is a deliberate architectural decision.
 
-Цель проекта — сделать идентификацию и доступ удобными для обычного пользователя, а не только для web3-native аудитории.
+The goal of the project is to make identity verification and access convenient for ordinary users, not only for a web3-native audience.
 
-Если заставить пользователя:
-- устанавливать wallet;
-- хранить seed phrase;
-- подписывать транзакции;
-- понимать mint/token account/PDA,
+If the user is forced to:
+- install a wallet;
+- store a seed phrase;
+- sign transactions;
+- understand mint/token account/PDA,
 
-то UX сразу становится хуже и проект теряет свою главную ценность как удобный identity layer.
+then UX immediately becomes worse and the project loses its main value as a convenient identity layer.
 
-Поэтому в DeKYC используется **custodial / backend-controlled модель**, где:
-- пользователь взаимодействует с обычным интерфейсом;
-- blockchain-операции выполняются доверенной серверной зоной;
-- смарт-контракт всё равно участвует в хранении состояний и правил;
-- пользователь получает web2-удобство, а система — web3-проверяемость.
-
----
-
-## Роль Solana в проекте
-
-Solana в проекте используется не формально, а содержательно.
-
-### Для чего здесь нужен блокчейн
-- хранение permission state;
-- фиксация ключевых условий доступа;
-- проверяемость revoke / grant событий;
-- прозрачность логики разрешений;
-- расширяемость для следующих consumer apps.
-
-### Что это даёт
-- backend не является единственным источником истины;
-- у permissions появляется независимый слой проверяемости;
-- сервисы могут строить доверие не только к API, но и к on-chain состоянию;
-- архитектура масштабируется на другие use-cases.
+Therefore, DeKYC uses a **custodial / backend-controlled model**, where:
+- the user interacts with a regular interface;
+- blockchain operations are performed by the trusted server zone;
+- the smart contract still participates in storing states and rules;
+- the user gets web2 convenience, while the system gets web3 verifiability.
 
 ---
 
-## Роль Token-2022
+## Role of Solana in the project
 
-В DeKYC Token-2022 используется не как маркетинговая наклейка, а как часть permission-механики и архитектурного задела на будущее.
+Solana is used in the project not formally, but meaningfully.
 
-### Зачем он нужен
-- для гибкого permission layer;
-- для расширяемой токенной логики;
-- для более зрелой Solana-архитектуры;
-- для интеграции с сервисами, где доступ и состояния должны быть формализованы на blockchain-уровне.
+### Why blockchain is needed here
 
-### Почему это важно
-Проект не ограничивается “обычной БД и JWT”.  
-Он строится как инфраструктурный слой, где blockchain участвует в реальных правилах системы.
+- storage of permission state;
+- recording key access conditions;
+- verifiability of revoke / grant events;
+- transparency of permission logic;
+- extensibility for future consumer apps.
 
----
+### What this provides
 
-## Интеграция с ЭЦП и NCALayer
-
-Один из самых сильных элементов DeKYC — интеграция с ЭЦП.
-
-### Как это работает
-1. Frontend запрашивает challenge.
-2. Пользователь подписывает challenge через NCALayer.
-3. Подпись передаётся на backend.
-4. Backend анализирует CMS-подпись.
-5. Извлекаются сертификатные атрибуты.
-6. Формируется KYC-профиль.
-
-### Почему это важно
-Это делает идентификацию:
-- ближе к реальной национальной инфраструктуре;
-- сильнее обычного “загрузите фото паспорта”;
-- более убедительной для B2B-сценариев;
-- более интересной с точки зрения хакатона.
-
-### Почему используется NCALayer
-Потому что проект ориентирован на использование ЭЦП в реальном пользовательском контуре, а NCALayer является естественной точкой интеграции для веб-приложения с локальными ключами ЭЦП.
+- the backend is not the only source of truth;
+- permissions receive an independent layer of verifiability;
+- services can build trust not only in the API, but also in the on-chain state;
+- the architecture scales to other use cases.
 
 ---
 
-## Биометрия и защита от использования чужого ЭЦП
+## Role of Token-2022
 
-Одна из важных проблем любой ЭЦП-модели — нельзя допустить сценарий, при котором человек использует чужой сертификат.
+In DeKYC, Token-2022 is used not as a marketing label, but as part of the permission mechanics and an architectural foundation for the future.
 
-Поэтому в DeKYC есть отдельный этап биометрии.
+### Why it is needed
 
-### В MVP
-Сейчас биометрия реализована как mock-flow:
-- настройка лица;
-- повторный face scan;
-- связка с пользовательским профилем.
+- for a flexible permission layer;
+- for extensible token logic;
+- for a more mature Solana architecture;
+- for integration with services where access and states must be formalized at the blockchain level.
 
-### Зачем это вообще нужно
-Даже в MVP это важно концептуально:
-- показывается второй фактор доверия;
-- демонстрируется защита от злоупотреблений;
-- система не опирается только на один факт наличия ключа.
+### Why this matters
 
-### В production-версии
-Этот слой может быть заменён на:
-- полноценную face verification;
+The project is not limited to “a regular database and JWT”.  
+It is built as an infrastructure layer where blockchain participates in the real rules of the system.
+
+---
+
+## Integration with EDS and NCALayer
+
+One of the strongest elements of DeKYC is EDS integration.
+
+### How it works
+
+1. Frontend requests a challenge.
+2. The user signs the challenge through NCALayer.
+3. The signature is sent to the backend.
+4. The backend analyzes the CMS signature.
+5. Certificate attributes are extracted.
+6. A KYC profile is formed.
+
+### Why this matters
+
+This makes identity verification:
+- closer to real national infrastructure;
+- stronger than regular “upload a passport photo”;
+- more convincing for B2B scenarios;
+- more interesting from a hackathon perspective.
+
+### Why NCALayer is used
+
+Because the project is oriented toward using EDS in a real user environment, and NCALayer is the natural integration point for a web application with local EDS keys.
+
+---
+
+## Biometrics and protection against using someone else’s EDS
+
+One of the important problems of any EDS model is preventing a scenario where a person uses someone else’s certificate.
+
+That is why DeKYC has a separate biometric stage.
+
+### In the MVP
+
+Currently, biometrics are implemented as a mock flow:
+- face setup;
+- repeated face scan;
+- linking to the user profile.
+
+### Why this is needed at all
+
+Even in the MVP, this is conceptually important:
+- it shows a second trust factor;
+- it demonstrates protection against abuse;
+- the system does not rely only on the fact of having a key.
+
+### In the production version
+
+This layer can be replaced with:
+- full face verification;
 - liveness;
-- сравнение embeddings;
+- embedding comparison;
 - enterprise-grade biometric provider.
 
 ---
 
-## KYC Vault и защита персональных данных
+## KYC Vault and protection of personal data
 
-Все персональные данные в DeKYC хранятся во **внеблокчейновом зашифрованном хранилище**.
+All personal data in DeKYC is stored in an **off-chain encrypted storage**.
 
-### Что хранится в KYC Vault
-- профиль пользователя;
-- извлечённые claims;
-- сертификатные данные;
-- служебные ссылки;
-- версия схемы данных;
+### What is stored in the KYC Vault
+
+- user profile;
+- extracted claims;
+- certificate data;
+- service references;
+- data schema version;
 - encrypted payload.
 
-### Подход к защите
-- данные шифруются;
-- в блокчейн отправляются только хеши и служебные ref’ы;
-- прямой доступ к payload имеет только доверенная серверная зона;
-- выдача сервисам идёт через контролируемую policy-модель;
-- в логи не должны попадать чувствительные секреты.
+### Protection approach
 
-### Почему это важно
-DeKYC не притворяется “полностью приватным on-chain KYC”.  
-Напротив, проект честно разделяет:
-- где нужна публичная проверяемость;
-- где нужна закрытая защищённая обработка персональных данных.
+- data is encrypted;
+- only hashes and service refs are sent to the blockchain;
+- only the trusted server zone has direct access to the payload;
+- data issuance to services goes through a controlled policy model;
+- sensitive secrets must not appear in logs.
 
----
+### Why this matters
 
-## Signed Envelope и сервисный вход
-
-Одно из ключевых понятий DeKYC — **signed envelope**.
-
-Это подписанный ответ backend’а, который сервис получает при login via DeKYC.
-
-### Что содержит signed envelope
-- разрешён ли доступ;
-- какие claims доступны;
-- служебные временные метки;
-- срок действия;
-- подпись backend’а;
-- при необходимости — resolved user identity для сервисной сессии.
-
-### Зачем это нужно
-Это превращает ответ DeKYC из “просто JSON” в:
-- проверяемое утверждение;
-- защищённый сервисный ответ;
-- нормальную основу для доверенного логина в consumer app.
-
-### Почему это сильный архитектурный элемент
-Потому что сервис:
-- не хранит у себя весь KYC-пайплайн;
-- не обрабатывает весь KYC с нуля;
-- получает ровно то, что разрешено пользователем;
-- может построить свою локальную session-модель на базе подписанного ответа.
+DeKYC does not pretend to be “fully private on-chain KYC”.  
+On the contrary, the project honestly separates:
+- where public verifiability is needed;
+- where closed protected processing of personal data is needed.
 
 ---
 
-## Безопасность
+## Signed Envelope and service login
 
-Безопасность — одна из центральных тем проекта.
+One of the key concepts of DeKYC is the **signed envelope**.
 
-### Основные принципы
+This is a signed backend response that the service receives during login via DeKYC.
 
-#### 1. PII не хранится on-chain
-Ни ФИО, ни адрес, ни биометрия, ни документы не попадают в блокчейн.
+### What the signed envelope contains
 
-#### 2. Секреты не передаются в query string
-Ключи сервисов, токены и чувствительные параметры должны идти только в заголовках или в защищённом теле запроса.
+- whether access is allowed;
+- which claims are available;
+- service timestamps;
+- expiration time;
+- backend signature;
+- if needed — resolved user identity for the service session.
 
-#### 3. Backend — trusted zone
-Именно backend выполняет:
-- криптографические проверки;
-- хранение ключей;
-- контроль доступа;
-- выдачу signed response.
+### Why this is needed
 
-#### 4. Пользователь управляет доступом
-Без активного permission сервис не должен получать разрешённые claims.
+This turns the DeKYC response from “just JSON” into:
+- a verifiable assertion;
+- a protected service response;
+- a normal foundation for trusted login in a consumer app.
 
-#### 5. Поддерживается отзыв доступа
-Revoke — это не декоративная кнопка, а часть модели безопасности.
+### Why this is a strong architectural element
 
-#### 6. Минимизация выдаваемых данных
-Сервис получает только то, что реально нужно для его сценария.
+Because the service:
+- does not store the entire KYC pipeline itself;
+- does not process all KYC from scratch;
+- receives exactly what the user allowed;
+- can build its own local session model based on the signed response.
 
-#### 7. Чёткое разделение системных ролей
-Нужно различать:
+---
+
+## Security
+
+Security is one of the central topics of the project.
+
+### Main principles
+
+#### 1. PII is not stored on-chain
+
+Neither full name, nor address, nor biometrics, nor documents are placed on the blockchain.
+
+#### 2. Secrets are not passed in the query string
+
+Service keys, tokens, and sensitive parameters must go only in headers or in a protected request body.
+
+#### 3. Backend is the trusted zone
+
+The backend performs:
+- cryptographic checks;
+- key storage;
+- access control;
+- signed response issuance.
+
+#### 4. The user manages access
+
+Without an active permission, the service should not receive the allowed claims.
+
+#### 5. Access revocation is supported
+
+Revoke is not a decorative button, but part of the security model.
+
+#### 6. Minimization of issued data
+
+The service receives only what is actually needed for its scenario.
+
+#### 7. Clear separation of system roles
+
+It is necessary to distinguish:
 - user;
 - service;
 - admin;
@@ -575,59 +636,66 @@ Revoke — это не декоративная кнопка, а часть мо
 
 ---
 
-## Публичность блокчейна и честные ограничения
+## Blockchain publicity and honest limitations
 
-Очень важно честно описывать ограничения проекта.
+It is very important to describe the project’s limitations honestly.
 
-### Что DeKYC делает хорошо
-- не раскрывает PII on-chain;
-- хранит permission logic в blockchain-слое;
-- повышает прозрачность и проверяемость;
-- снижает избыточное распространение персональных данных;
-- даёт управляемый reusable identity flow.
+### What DeKYC does well
 
-### Чего DeKYC не обещает
-- “полной тайны блокчейна”;
-- абсолютной анонимности;
-- магической невидимости всех системных аккаунтов;
-- production-grade юридической полноты в рамках MVP.
+- does not expose PII on-chain;
+- stores permission logic in the blockchain layer;
+- increases transparency and verifiability;
+- reduces excessive spread of personal data;
+- provides a managed reusable identity flow.
 
-### Почему это честно
-Хакатонный MVP должен быть:
-- технически сильным;
-- архитектурно зрелым;
-- демонстрируемым;
-- безопасным в разумных пределах;
-- честным в формулировках.
+### What DeKYC does not promise
 
-DeKYC именно так и построен.
+- “complete secrecy of the blockchain”;
+- absolute anonymity;
+- magical invisibility of all system accounts;
+- production-grade legal completeness within the MVP.
+
+### Why this is honest
+
+A hackathon MVP should be:
+- technically strong;
+- architecturally mature;
+- demonstrable;
+- reasonably secure;
+- honest in its wording.
+
+DeKYC is built exactly this way.
 
 ---
 
-## Технологический стек
+## Technology stack
 
 ### Frontend
+
 - Next.js
 - TypeScript
 - Tailwind CSS
 - shadcn/ui
 - toast / UX feedback
-- модульная структура страниц и компонентов
+- modular page and component structure
 
 ### Backend
+
 - Node.js
 - TypeScript
-- NestJS / модульная серверная архитектура
+- NestJS / modular server architecture
 - DTO / guards / services / repositories
 - JWT / bearer sessions
-- криптографические helper’ы
+- cryptographic helpers
 - audit logging
 
 ### Database
+
 - PostgreSQL
-- структурированное хранение пользователей, permissions, сервисов, логов, KYC-состояний
+- structured storage of users, permissions, services, logs, and KYC states
 
 ### Blockchain
+
 - Solana
 - Anchor
 - PDA-based state model
@@ -635,90 +703,98 @@ DeKYC именно так и построен.
 - on-chain permission state
 
 ### Crypto / Security
+
 - AES-GCM
-- безопасное хранение секретов
-- envelope-like подход к выдаче данных
+- secure secret storage
+- envelope-like approach to data issuance
 - controlled access patterns
 
 ### EDS
+
 - NCALayer
 - challenge → CMS signature → attest → analyze flow
 
 ---
 
-## Структура репозитория
+## Repository structure
 
-Ниже — логика структуры проекта на высоком уровне.
+Below is the high-level logic of the project structure.
 
 ```text
 apps/
-  platform/                 # пользовательская платформа DeKYC
+  platform/                 # DeKYC user platform
   service/                  # demo consumer service
   api/                      # backend gateway
 programs/
   permission_protocol/      # Solana permission program
 packages/
-  shared/                   # общие типы, DTO, helpers
+  shared/                   # shared types, DTO, helpers
 ```
 
-По мере роста экосистемы DeKYC может подключать новые consumer apps, не ломая ядро identity-платформы.
+As the DeKYC ecosystem grows, it can connect new consumer apps without breaking the core identity platform.
 
 ---
 
-## MVP и текущий статус
+## MVP and current status
 
-Текущий MVP DeKYC сфокусирован на том, чтобы показать полный работающий сценарий:
+The current DeKYC MVP focuses on showing a complete working scenario:
 
-- регистрация пользователя;
+- user registration;
 - bearer session;
 - mock biometric setup;
-- подключение ЭЦП через NCALayer;
-- подпись challenge;
-- анализ подписи и формирование KYC;
-- каталог сервисов;
+- EDS connection through NCALayer;
+- challenge signing;
+- signature analysis and KYC formation;
+- service catalog;
 - grant / revoke permissions;
-- service login через DeKYC;
+- service login through DeKYC;
 - signed envelope;
 - on-chain permission model;
-- работа без пользовательских криптокошельков.
+- operation without user crypto wallets.
 
-То есть проект уже демонстрирует главное:  
-**DeKYC — это не идея, а рабочий слой идентичности и контроля доступа.**
+That is, the project already demonstrates the main point:  
+**DeKYC is not an idea, but a working identity and access control layer.**
 
 ---
 
-## Roadmap после хакатона
+## Roadmap after the hackathon
 
-После хакатона проект можно усилить в нескольких направлениях.
+After the hackathon, the project can be strengthened in several directions.
 
 ### 1. Production-grade biometric verification
+
 - liveness;
 - anti-spoofing;
 - real embedding comparison.
 
-### 2. Полноценная серверная криптографическая верификация CMS
-- более глубокая проверка сертификатной цепочки;
-- статус сертификата;
-- расширенные certificate policies.
+### 2. Full server-side cryptographic CMS verification
 
-### 3. Больше consumer services
+- deeper certificate chain verification;
+- certificate status;
+- extended certificate policies.
+
+### 3. More consumer services
+
 - marketplace;
 - fintech;
 - investment platform;
 - regulated onboarding apps.
 
-### 4. Расширение on-chain permission model
-- более сложные политики;
-- временные окна доступа;
+### 4. Expansion of the on-chain permission model
+
+- more complex policies;
+- time windows for access;
 - granular claim scopes;
 - event-driven verification flows.
 
-### 5. Улучшенный audit layer
-- более богатые логи доступа;
-- экспорт событий;
+### 5. Improved audit layer
+
+- richer access logs;
+- event export;
 - judge / compliance dashboards.
 
 ### 6. Enterprise-ready secrets management
+
 - KMS / Vault;
 - rotation;
 - split trust zones;
@@ -726,47 +802,47 @@ packages/
 
 ---
 
-## Почему этот проект важен
+## Why this project matters
 
-DeKYC — это проект про доверие, удобство и архитектурную зрелость.
+DeKYC is a project about trust, convenience, and architectural maturity.
 
-Он важен потому что показывает, как можно совместить:
+It matters because it shows how to combine:
 
-- реальную идентификацию;
-- контроль доступа со стороны пользователя;
-- повторное использование KYC;
-- блокчейн как слой правил и проверяемости;
-- нормальный UX без wallet-барьера;
-- аккуратное обращение с чувствительными данными.
+- real identity verification;
+- user-side access control;
+- KYC reuse;
+- blockchain as a layer of rules and verifiability;
+- normal UX without the wallet barrier;
+- careful handling of sensitive data.
 
-Это не “просто сайт с логином”.  
-Это **инфраструктурный identity-протокол** для новых сервисов, где KYC должен быть:
+It is not “just a website with login”.  
+It is an **infrastructure identity protocol** for new services where KYC must be:
 
-- удобным для пользователя;
-- контролируемым;
-- проверяемым;
-- масштабируемым.
-
----
-
-## Коротко в одной фразе
-
-**DeKYC — это reusable KYC identity layer на Solana, где пользователь подтверждает личность один раз, сам управляет доступом к своим claims и входит во внешние сервисы через подписанный permission-aware протокол, без пользовательских криптокошельков и без хранения персональных данных on-chain.**
+- convenient for the user;
+- controlled;
+- verifiable;
+- scalable.
 
 ---
 
-## Статус проекта
+## In one sentence
 
-DeKYC создаётся как ядро более широкой экосистемы сервисов, где identity и permissions являются общей инфраструктурой, а не локальной логикой одного приложения.
-
-Именно поэтому DeKYC — это не вспомогательный модуль, а фундамент всего решения.
+**DeKYC is a reusable KYC identity layer on Solana, where the user verifies their identity once, manages access to their claims themselves, and logs in to external services through a signed permission-aware protocol, without user crypto wallets and without storing personal data on-chain.**
 
 ---
 
-## Контакт идеи
+## Project status
 
-Если объяснять проект в одном абзаце для жюри, инвестора или технического ревьюера, то формулировка такая:
+DeKYC is created as the core of a broader ecosystem of services where identity and permissions are shared infrastructure, not local logic of one application.
 
-> DeKYC — это протокол и платформа для безопасной повторно используемой KYC-идентификации, где пользователь один раз подтверждает свою личность через ЭЦП и биометрию, управляет доступом к своим данным через permission-модель, а внешние сервисы получают только разрешённые claims через подписанный сервисный ответ и on-chain-проверяемое состояние, без необходимости хранить всю KYC-инфраструктуру у себя и без использования пользовательских криптокошельков.
+This is why DeKYC is not an auxiliary module, but the foundation of the entire solution.
+
+---
+
+## Idea contact
+
+If explaining the project in one paragraph to a judge, investor, or technical reviewer, the wording is:
+
+> DeKYC is a protocol and platform for secure reusable KYC identity verification, where the user verifies their identity once through EDS and biometrics, manages access to their data through a permission model, while external services receive only allowed claims through a signed service response and on-chain-verifiable state, without needing to store the entire KYC infrastructure themselves and without using user crypto wallets.
 
 ---

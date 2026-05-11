@@ -1,5 +1,5 @@
 # DeKYC Energy ⚡  
-### walletless платформа токенизации энергетических прав на доход на Solana
+### walletless platform for tokenizing energy revenue rights on Solana
 
 [![CI Apps](https://github.com/denisthe12/dekyc-protocol/actions/workflows/ci-apps.yml/badge.svg)](https://github.com/denisthe12/dekyc-protocol/actions/workflows/ci-apps.yml)
 [![CI Solana](https://github.com/denisthe12/dekyc-protocol/actions/workflows/ci-solana.yml/badge.svg)](https://github.com/denisthe12/dekyc-protocol/actions/workflows/ci-solana.yml)
@@ -10,20 +10,20 @@
 [![Token--2022](https://img.shields.io/badge/Token--2022-enabled-14F195)](#)
 [![Hackathon](https://img.shields.io/badge/National%20Solana%20Hackathon-2026-14F195)](#)
 
-> **DeKYC Energy** — это продукт, где пользователь входит через **DeKYC** (Токенизированный ЭЦП ключ), получает доступ **без криптокошелька** и инвестирует в **токенизированные права на доход от энергетических проектов**.
+> **DeKYC Energy** is a product where a user logs in through **DeKYC** (a tokenized EDS key), gets access **without a crypto wallet**, and invests in **tokenized revenue rights from energy projects**.
 
 [🚀 Pitch](https://drive.google.com/file/d/1oClcI4LiEJJVwXUGpS_nMy3RnbLAT6q1/view?usp=drive_link) ·
-[🎥 Видео-демо](https://drive.google.com/file/d/1nIkRuN5ldQDLz1fBbjWfGUx_rZdPWLcH/view?usp=drive_link) ·
+[🎥 Video Demo](https://drive.google.com/file/d/1nIkRuN5ldQDLz1fBbjWfGUx_rZdPWLcH/view?usp=drive_link) ·
 [🖥 Live App](https://dekyc-protocol-platform.vercel.app) ·
-[🖼 Скриншоты](#скриншоты) ·
-[📑 Презентация](https://docs.google.com/presentation/d/1P_jO0h7JyzIrQUPMACuS093DTZxP-DcS/edit?usp=drive_link&ouid=113841808140956424271&rtpof=true&sd=true) ·
+[🖼 Screenshots](#screenshots) ·
+[📑 Presentation](https://docs.google.com/presentation/d/1P_jO0h7JyzIrQUPMACuS093DTZxP-DcS/edit?usp=drive_link&ouid=113841808140956424271&rtpof=true&sd=true) ·
 [📚 Docs](docs/) ·
 [🛡 DeKYC](docs/DeKYC.md) ·
 [⚡ ENERGY](docs/ENERGY.md)
 
 ---
 
-Тестовый юзер - л0гин denissnims@gmail.com и пар0ль Den12345
+Test user - l0gin denissnims@gmail.com and p@ssw0rd Den12345
 
 <p align="center">
   <img src="assets/logo/README-logo-placeholder.png" alt="Logo" width="600">
@@ -31,18 +31,18 @@
 
 ---
 
-## Что это за проект?
+## What is this project?
 
-**DeKYC Energy** объединяет два слоя:
+**DeKYC Energy** combines two layers:
 
-- **DeKYC** — identity и permission layer, который использует **ЭЦП / цифровую подпись** как основу доверенной идентичности и контролируемого доступа.
-- **ENERGY** — инвестиционный сервис, где пользователь покупает цифровые доли **в праве на доход**, получает выплаты и может продать позицию через OTC.
+- **DeKYC** — an identity and permission layer that uses an **EDS / digital signature** as the foundation for trusted identity and controlled access.
+- **ENERGY** — an investment service where a user buys digital shares **in revenue rights**, receives payouts, and can sell the position via OTC.
 
-### Чем проект отличается от обычной tokenization demo?
+### How is this project different from a regular tokenization demo?
 
-Потому что здесь есть не только tokenization, но и:
+Because it includes not only tokenization, but also:
 
-- **вход через DeKYC**
+- **login through DeKYC**
 - **walletless UX**
 - **private/public access**
 - **proof bundle**
@@ -52,76 +52,76 @@
 
 ---
 
-## Какую проблему он решает?
+## What problem does it solve?
 
-### Проблема 1 — инвестировать в энергетику сложно
-Для обычного человека это звучит как бюрократический и непонятный процесс.
+### Problem 1 — investing in energy is complicated
+For an ordinary person, it sounds like a bureaucratic and unclear process.
 
-### Проблема 2 — identity и access ломают UX
-Обычные сервисы заставляют пользователя:
+### Problem 2 — identity and access break the UX
+Regular services force the user to:
 
-- проходить KYC снова и снова,
-- передавать личные данные множеству платформ,
-- разбираться в wallet’ах и web3-фрикции.
+- go through KYC again and again,
+- share personal data with many platforms,
+- understand wallets and web3 friction.
 
-### Решение
-**DeKYC Energy** делает инвестиционный сценарий понятным:
+### Solution
+**DeKYC Energy** makes the investment scenario clear:
 
 **DeKYC login → custodial address → buy → epoch → claim → OTC**
 
 ---
 
-## Почему DeKYC здесь — главная фича? 🛡
+## Why is DeKYC the main feature here? 🛡
 
-Большинство проектов по токенизации заканчиваются на связке:
+Most tokenization projects stop at the following flow:
 
-- подключи кошелек,
-- купи токен,
-- посмотри tx.
+- connect a wallet,
+- buy a token,
+- view a tx.
 
-**DeKYC Energy** идет дальше:
+**DeKYC Energy** goes further:
 
-- пользователь входит через **DeKYC**
-- идентичность опирается на **ЭЦП**
-- доступ к данным управляется permission-моделью
-- сервис получает только нужный scope
-- пользователь не обязан пользоваться криптокошельком
+- the user logs in through **DeKYC**
+- identity is based on **EDS**
+- access to data is managed through a permission model
+- the service receives only the required scope
+- the user does not have to use a crypto wallet
 
-> **Коротко:** DeKYC превращает контекст ЭЦП-идентичности в reusable identity layer для сервисов.
-
----
-
-## Почему именно ENERGY? ⚡
-
-Мы выбрали energy use case, потому что:
-
-- для граждан энергетика сегодня выглядит слишком сложной для инвестирования;
-- для небольших операторов и локальных energy-проектов нужен понятный способ привлечения капитала;
-- для B2B-потребителей энергии интересен payout не только в деньгах, но и в **ENERGY_POINTS**.
+> **In short:** DeKYC turns the EDS identity context into a reusable identity layer for services.
 
 ---
 
-## Почему Solana? 🌐
+## Why ENERGY? ⚡
 
-- **Скорость** — подходит для asset creation, buy, claim и OTC flow.
-- **Дешевые транзакции** — важны для частых state transitions.
-- **Composability** — Anchor, PDA и Token-2022 естественно подходят архитектуре проекта.
-- **Token-2022 fit** — отдельные mint’ы для **KZTE**, **share tokens** и **ENERGY_POINTS**.
+We chose the energy use case because:
+
+- for citizens, energy is currently too complicated to invest in;
+- small operators and local energy projects need a clear way to raise capital;
+- B2B energy consumers may be interested in payouts not only in money, but also in **ENERGY_POINTS**.
 
 ---
 
-## Что уже работает? ✅
+## Why Solana? 🌐
 
-- вход через **DeKYC**
+- **Speed** — suitable for asset creation, buy, claim, and OTC flow.
+- **Low transaction costs** — important for frequent state transitions.
+- **Composability** — Anchor, PDA, and Token-2022 naturally fit the project architecture.
+- **Token-2022 fit** — separate mints for **KZTE**, **share tokens**, and **ENERGY_POINTS**.
+
+---
+
+## What already works? ✅
+
+- login through **DeKYC**
 - walletless custodial flow
 - **KZTE** demo settlement
-- несколько on-chain energy assets
+- multiple on-chain energy assets
 - primary buy
 - revenue epochs
 - claim payout
 - OTC listing + fill
 - portfolio
-- history с tx links
+- history with tx links
 - judge page
 - proof bundle / docs flow
 - i18n + dark/light theme
@@ -129,7 +129,7 @@
 
 ---
 
-## Как это устроено? 🧩
+## How is it built? 🧩
 
 ```text
 DeKYC Platform
@@ -143,21 +143,21 @@ ENERGY Backend
 Solana + Anchor + Token-2022
 ```
 
-### Основные части репозитория
+### Main parts of the repository
 
-- `apps/platform` — фронтенд DeKYC
-- `apps/api` — бэкенд DeKYC
-- `apps/energy-web` — фронтенд ENERGY
-- `apps/energy-api` — бэкенд ENERGY
-- `programs/permission_protocol` — Solana-программы:
+- `apps/platform` — DeKYC frontend
+- `apps/api` — DeKYC backend
+- `apps/energy-web` — ENERGY frontend
+- `apps/energy-api` — ENERGY backend
+- `programs/permission_protocol` — Solana programs:
   - `permission_protocol`
   - `tokenization_case`
 
-Подробнее: [docs/architecture.md](docs/architecture.md)
+More details: [docs/architecture.md](docs/architecture.md)
 
 ---
 
-## Скриншоты
+## Screenshots
 
 ### 1. Landing
 
@@ -199,7 +199,7 @@ Solana + Anchor + Token-2022
 
 ## Quick Start 🚀
 
-### Требования
+### Requirements
 - Node.js 20+
 - pnpm 10+
 - Rust stable
@@ -207,9 +207,9 @@ Solana + Anchor + Token-2022
 - Anchor 0.32.1
 - PostgreSQL
 
-### Установка
+### Installation
 
-```Bash
+```bash
 git clone https://github.com/denisthe12/dekyc-protocol.git
 cd dekyc-protocol
 pnpm install
@@ -217,51 +217,51 @@ pnpm install
 
 ### Environment variables
 
-В проекте используются файлы:
+The project uses the following files:
 
 - `apps/api/.env`
 - `apps/energy-api/.env`
 - `apps/platform/.env.local`
 - `apps/energy-web/.env.local`
 
-> Для них нужно использовать `.env.example` (находится в каждой папке) и при необходимости вручную поправить значения.
+> Use the `.env.example` files located in each folder and manually adjust the values if needed.
 
-Перед запуском скопируйте example-файлы:
+Before running the project, copy the example files:
 
-```Bash
+```bash
 cp apps/api/.env.example apps/api/.env
 cp apps/energy-api/.env.example apps/energy-api/.env
 cp apps/platform/.env.local.example apps/platform/.env.local
 cp apps/energy-web/.env.local.example apps/energy-web/.env.local
 ```
 
-После этого замените значения, помеченные как REPLACE_WITH_...
+After that, replace the values marked as REPLACE_WITH_...
 
 ### Prisma
 
-```Bash
+```bash
 pnpm --filter api prisma:generate
 pnpm --filter energy-api prisma:generate
 ```
 
 ### Solana build
 
-```Bash
+```bash
 cd programs/permission_protocol
 anchor build
 cd ../../
 ```
 
-### Запуск
+### Run
 
-```Bash
+```bash
 pnpm dev:platform
 pnpm dev:api
 pnpm dev:energy-web
 pnpm dev:energy-api
 ```
 
-### Локальные адреса
+### Local addresses
 
 - **DeKYC frontend** — `http://localhost:3000`
 - **DeKYC API** — `http://localhost:3001`
@@ -270,7 +270,7 @@ pnpm dev:energy-api
 
 ---
 
-## Документация 📚
+## Documentation 📚
 
 - [docs/DeKYC.md](docs/DeKYC.md)
 - [docs/ENERGY.md](docs/ENERGY.md)
@@ -281,17 +281,17 @@ pnpm dev:energy-api
 
 ---
 
-## Почему это интересно? 💡
+## Why is this interesting? 💡
 
-### Для судей
-- есть полный working flow;
-- есть **Why Solana**;
-- есть CI, docs и judge page;
-- проект выглядит как продукт, а не как набор файлов.
+### For judges
+- there is a full working flow;
+- there is **Why Solana**;
+- there is CI, docs, and a judge page;
+- the project looks like a product, not a collection of files.
 
-### Для рынка
-- DeKYC можно переиспользовать как identity infrastructure;
-- ENERGY можно развивать как vertical product для tokenized energy revenue rights.
+### For the market
+- DeKYC can be reused as identity infrastructure;
+- ENERGY can evolve as a vertical product for tokenized energy revenue rights.
 
 ---
 
@@ -308,8 +308,8 @@ pnpm dev:energy-api
 - [ ] production-grade biometric verification
 - [ ] richer proof bundle
 - [ ] advanced payout automation
-- [ ] pilot в real-world energy scenario
+- [ ] pilot in a real-world energy scenario
 
-Полный roadmap: [docs/roadmap.md](docs/roadmap.md)
+Full roadmap: [docs/roadmap.md](docs/roadmap.md)
 
 ---

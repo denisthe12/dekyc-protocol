@@ -5,8 +5,14 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { loadEnergySession, clearEnergySession } from '@/lib/session';
-import { fetchEnergyMe } from '@/lib/api/energy';
+import {
+  buildDekycConnectRedirectUri,
+  fetchEnergyMe,
+  startDekycConnectAuthorization,
+} from '@/lib/api/energy';
 import { FaceScanModal } from '@/components/auth/face-scan-modal';
+import { savePendingDekycConnectSession } from '@/lib/dekyc-connect-session';
+import type { EnergySession } from '@/lib/types/dekyc';
 
 type MeState = Awaited<ReturnType<typeof fetchEnergyMe>> | null;
 
@@ -20,6 +26,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [scanOpen, setScanOpen] = useState(false);
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [energySession, setEnergySession] = useState<EnergySession | null>(null);
 
   useEffect(() => {
     void loadProfile();
@@ -31,16 +39,21 @@ export default function HomePage() {
       setError(null);
 
       const session = loadEnergySession();
+
       if (!session) {
+        setEnergySession(null);
         setMe(null);
         return;
       }
+
+      setEnergySession(session);
 
       const data = await fetchEnergyMe(session.accessToken);
       setMe(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('errors.loadProfile'));
       setMe(null);
+      setEnergySession(null);
     } finally {
       setLoading(false);
     }
@@ -48,7 +61,39 @@ export default function HomePage() {
 
   function handleLogout(): void {
     clearEnergySession();
+    setEnergySession(null);
+    setMe(null);
     router.push(`/${locale}/login`);
+  }
+
+  async function handleDekycConnectLogin(): Promise<void> {
+    try {
+      setConnectLoading(true);
+      setError(null);
+
+      const state = `energy-${crypto.randomUUID()}`;
+      const nonce = `energy-nonce-${crypto.randomUUID()}`;
+      const redirectUri = buildDekycConnectRedirectUri(locale);
+
+      savePendingDekycConnectSession({
+        state,
+        nonce,
+        redirectUri,
+        createdAt: Date.now(),
+      });
+
+      const authorizationSession = await startDekycConnectAuthorization({
+        locale,
+        state,
+        nonce,
+      });
+
+      window.location.href = authorizationSession.platformConsentUrl;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.connectLogin'));
+    } finally {
+      setConnectLoading(false);
+    }
   }
 
   if (loading) {
@@ -84,10 +129,19 @@ export default function HomePage() {
                   <div className="mt-8 flex flex-wrap gap-4">
                     <button
                       type="button"
-                      onClick={() => setScanOpen(true)}
-                      className="rounded-2xl bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition hover:opacity-90"
+                      onClick={() => void handleDekycConnectLogin()}
+                      disabled={connectLoading}
+                      className="rounded-2xl bg-[var(--foreground)] px-5 py-3 text-sm font-medium text-[var(--background)] transition hover:opacity-90 disabled:opacity-60"
                     >
-                      {t('loginViaDekyc')}
+                      {connectLoading ? t('startingDekycConnect') : t('loginViaDekycConnect')}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setScanOpen(true)}
+                      className="rounded-2xl border border-[var(--border)] px-5 py-3 text-sm font-medium transition hover:bg-[var(--muted)]/40"
+                    >
+                      {t('loginViaDekycLegacy')}
                     </button>
 
                     <Link
@@ -177,6 +231,76 @@ export default function HomePage() {
             </button>
           </div>
         </section>
+
+        {energySession?.dekycConnect ? (
+          <section className="rounded-[32px] border border-emerald-500/30 bg-emerald-950/10 p-8 shadow-sm">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-[0.28em] text-emerald-600">
+                  {t('connectProofEyebrow')}
+                </div>
+
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight">
+                  {t('connectProofTitle')}
+                </h2>
+
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted-foreground)]">
+                  {t('connectProofDescription')}
+                </p>
+              </div>
+
+              <div className="rounded-full border border-emerald-500/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
+                {t('connectProofStatus')}
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <ProofMetricCard
+                label={t('connectAssertionId')}
+                value={energySession.dekycConnect.assertionId}
+              />
+
+              <ProofMetricCard
+                label={t('connectConsentId')}
+                value={energySession.dekycConnect.consentId}
+              />
+
+              <ProofMetricCard
+                label={t('connectServiceSubjectId')}
+                value={energySession.dekycConnect.serviceSubjectId}
+              />
+
+              <ProofMetricCard
+                label={t('connectAssertionExpiresAt')}
+                value={energySession.dekycConnect.assertionExpiresAt}
+              />
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4">
+              <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+                {t('connectConsentReceiptHash')}
+              </div>
+
+              <div className="mt-3 break-all font-mono text-xs leading-6 text-[var(--foreground)]">
+                {energySession.dekycConnect.consentReceiptHash}
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="rounded-[32px] border border-[var(--border)] bg-[var(--card)] p-8 shadow-sm">
+            <div className="text-xs uppercase tracking-[0.28em] text-[var(--muted-foreground)]">
+              {t('legacySessionEyebrow')}
+            </div>
+
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight">
+              {t('legacySessionTitle')}
+            </h2>
+
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted-foreground)]">
+              {t('legacySessionDescription')}
+            </p>
+          </section>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
@@ -268,5 +392,19 @@ export default function HomePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function ProofMetricCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-3xl border border-[var(--border)] bg-[var(--card)] p-5 shadow-sm">
+      <div className="text-xs uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
+        {label}
+      </div>
+
+      <div className="mt-3 break-all font-mono text-xs leading-6 text-[var(--foreground)]">
+        {value}
+      </div>
+    </div>
   );
 }

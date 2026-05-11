@@ -7,9 +7,11 @@ import {
   JudgeAssetOption,
 } from '@/components/judge/create-epoch-dialog';
 import { fetchAssets } from '@/lib/api/assets';
+import { useRouter } from 'next/navigation';
 
 export function JudgeEpochControls() {
   const t = useTranslations('JudgePage');
+  const router = useRouter();
 
   const [epochDialogOpen, setEpochDialogOpen] = useState(false);
   const [assets, setAssets] = useState<JudgeAssetOption[]>([]);
@@ -54,6 +56,7 @@ export function JudgeEpochControls() {
         assets={assets}
         onSuccess={async () => {
           await loadAssets();
+          router.refresh();
         }}
       />
     </>

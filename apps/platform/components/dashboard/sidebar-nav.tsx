@@ -8,6 +8,7 @@ const items = [
   { href: '/permissions', label: 'Permissions' },
   { href: '/services', label: 'Services' },
   { href: '/protocol', label: 'Protocol Monitor' },
+  { href: '/connect-verification', label: 'DeKYC Connect'},
   { href: '/demo-flow', label: 'Demo Flow' },
   { href: '/eds-lab', label: 'EDS Lab' },
 ];

@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { CurrentUserDecorator } from '@/common/decorators/current-user.decorator';
 import { CurrentUser } from '@/modules/users/current-user.type';
 import { UsersService } from '@/modules/users/users.service';
+import { DekycConnectExchangeDto } from './dto/dekyc-connect-exchange.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -29,6 +30,11 @@ export class AuthController {
   @Post('dekyc-login/callback')
   public loginViaDekycCallback(@Body() dto: DekycLoginCallbackDto) {
     return this.authService.loginViaDekycCallback(dto);
+  }
+
+  @Post('dekyc-connect/exchange')
+  public loginViaDekycConnect(@Body() dto: DekycConnectExchangeDto) {
+    return this.authService.loginViaDekycConnect(dto);
   }
 
   @UseGuards(JwtAuthGuard)

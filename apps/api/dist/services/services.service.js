@@ -57,6 +57,8 @@ let ServicesService = class ServicesService {
         const clientSecret = this.generateClientSecret();
         const clientSecretHash = await argon2.hash(clientSecret);
         const responseSigningSecret = this.generateResponseSigningSecret();
+        const requiredClaims = dto.requiredClaims ?? ['fullName', 'iin', 'birthDate'];
+        const optionalClaims = dto.optionalClaims ?? ['email', 'verified', 'age18Plus'];
         const service = await this.prisma.service.create({
             data: {
                 name: dto.name.trim(),
@@ -65,8 +67,14 @@ let ServicesService = class ServicesService {
                 clientId,
                 clientSecretHash,
                 responseSigningSecret,
-                requiredClaims: dto.requiredClaims ?? ['fullName', 'iin', 'birthDate'],
-                optionalClaims: dto.optionalClaims ?? ['email', 'verified', 'age18Plus'],
+                requiredClaims,
+                optionalClaims,
+                allowedRedirectUris: [],
+                allowedScopes: [...new Set([...requiredClaims, ...optionalClaims])],
+                assertionAudience: clientId,
+                webhookSigningMode: 'shared_secret',
+                consentTextVersion: 'dekyc-connect-consent-v1',
+                environment: 'sandbox',
                 status: 'active',
             },
         });

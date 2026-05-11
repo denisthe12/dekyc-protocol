@@ -1,8 +1,12 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { hasPlatformSession } from '@/lib/platform-session';
+import {
+  clearPlatformSession,
+  hasPlatformSession,
+} from '@/lib/platform-session';
 
 type PlatformAuthGuardProps = {
   children: ReactNode;
@@ -10,16 +14,18 @@ type PlatformAuthGuardProps = {
 
 export function PlatformAuthGuard({ children }: PlatformAuthGuardProps) {
   const router = useRouter();
+  const locale = useLocale();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (!hasPlatformSession()) {
-      router.replace('/login');
+      clearPlatformSession();
+      router.replace(`/${locale}/login`);
       return;
     }
 
     setReady(true);
-  }, [router]);
+  }, [locale, router]);
 
   if (!ready) {
     return (

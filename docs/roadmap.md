@@ -2,25 +2,25 @@
 
 # DeKYC Energy — Roadmap
 
-## Зачем нужен этот roadmap
+## Why this roadmap is needed
 
-Этот roadmap — не список случайных хотелок.
+This roadmap is not a random wishlist.
 
-Он нужен, чтобы показать:
+It is needed to show:
 
-- что уже сделано в MVP,
-- что сознательно отложено,
-- как проект может реалистично расти после хакатона.
+- what has already been completed in the MVP,
+- what has been intentionally postponed,
+- how the project can realistically grow after the hackathon.
 
-Сильный roadmap показывает, что проект — это не просто демо, а продукт с направлением развития.
+A strong roadmap shows that the project is not just a demo, but a product with a clear development direction.
 
 ---
 
-## Текущий статус
+## Current status
 
-Проект уже демонстрирует полный рабочий loop:
+The project already demonstrates a complete working loop:
 
-- вход через DeKYC
+- login through DeKYC
 - walletless user state
 - energy asset catalog
 - primary buy
@@ -32,30 +32,30 @@
 - judge page
 - private/public access split
 
-Этого уже достаточно, чтобы доказать core concept.
+This is already enough to prove the core concept.
 
 ---
 
 ## Phase 1 — Hackathon MVP
 
-## Цель
-Показать полный продуктовый цикл от начала до конца в judge-friendly виде.
+## Goal
+Show the full product cycle from start to finish in a judge-friendly format.
 
-## Что входит в MVP
+## What is included in the MVP
 
-### Identity и access
-- [x] вход через DeKYC
+### Identity and access
+- [x] login through DeKYC
 - [x] local product session
 - [x] walletless entry model
 - [x] private/public product-state UX
 
-### Wallet и settlement preparation
-- [x] custodial address на пользователя
-- [x] demo airdrop KZTE
+### Wallet and settlement preparation
+- [x] custodial address per user
+- [x] demo KZTE airdrop
 - [x] token account setup
 
 ### Asset layer
-- [x] несколько реальных demo assets
+- [x] multiple real demo assets
 - [x] asset catalog
 - [x] asset detail
 - [x] on-chain references
@@ -76,10 +76,10 @@
 - [x] OTC fill
 - [x] escrow-based listing model
 
-### Transparency и demoability
-- [x] history с tx links
+### Transparency and demoability
+- [x] history with tx links
 - [x] judge page
-- [x] OTC state на judge page
+- [x] OTC state on the judge page
 - [x] i18n
 - [x] theme support
 - [x] CI
@@ -88,76 +88,76 @@
 
 ## Phase 2 — Post-hackathon stabilization
 
-## Цель
-Сделать текущую систему чище, сильнее и ближе к production-quality.
+## Goal
+Make the current system cleaner, stronger, and closer to production-quality.
 
 ### Engineering
-- [ ] усилить test coverage
-- [ ] добавить richer CI checks
-- [ ] улучшить error handling
-- [ ] улучшить аналитические и monitoring-поверхности
-- [ ] усилить документацию
+- [ ] improve test coverage
+- [ ] add richer CI checks
+- [ ] improve error handling
+- [ ] improve analytics and monitoring surfaces
+- [ ] strengthen documentation
 
 ### Product polish
-- [ ] улучшить onboarding guidance
-- [ ] усилить judge mode
-- [ ] сделать системные сообщения более понятными
-- [ ] добавить более сильные demo assets и storytelling
+- [ ] improve onboarding guidance
+- [ ] strengthen judge mode
+- [ ] make system messages clearer
+- [ ] add stronger demo assets and storytelling
 
-### Data и history
+### Data and history
 - [ ] richer history records
-- [ ] более явные snapshots для claims
-- [ ] улучшить portfolio analytics
+- [ ] more explicit snapshots for claims
+- [ ] improve portfolio analytics
 
 ---
 
-## Phase 3 — Усиление DeKYC identity layer
+## Phase 3 — Strengthening the DeKYC identity layer
 
-## Цель
-Превратить DeKYC из hackathon-differentiator в reusable identity infrastructure product.
+## Goal
+Turn DeKYC from a hackathon differentiator into a reusable identity infrastructure product.
 
 ### Identity
-- [ ] усилить EDS-centered identity flow
-- [ ] сделать claim structure более формальной
-- [ ] улучшить reusable identity model для разных сервисов
+- [ ] strengthen the EDS-centered identity flow
+- [ ] make the claim structure more formal
+- [ ] improve the reusable identity model for different services
 
 ### Access control
-- [ ] более granular permission scopes
+- [ ] more granular permission scopes
 - [ ] richer revoke / grant flows
 - [ ] service-specific access policies
 
-### Trust и verification
-- [ ] усилить signed response model
-- [ ] формализовать service-facing integration layer
-- [ ] улучшить identity verification UX
+### Trust and verification
+- [ ] strengthen the signed response model
+- [ ] formalize the service-facing integration layer
+- [ ] improve the identity verification UX
 
 ### Security
 - [ ] hardened secret management
 - [ ] stronger audit trails
-- [ ] stricter boundary вокруг private data delivery
+- [ ] stricter boundary around private data delivery
 
 ---
 
-## Phase 4 — Усиление ENERGY product layer
+## Phase 4 — Strengthening the ENERGY product layer
 
-## Цель
-Приблизить продукт к серьезной платформе tokenized energy financing.
+## Goal
+Bring the product closer to a serious tokenized energy financing platform.
 
 ### Assets
 - [ ] richer asset metadata
-- [ ] более сильный proof bundle standard
+- [ ] stronger proof bundle standard
 - [ ] better operator / project representation
 
 ### Payouts
-- [ ] более автоматизированный payout cadence
+- [ ] more automated payout cadence
 - [ ] richer epoch administration
 - [ ] payout simulation tools
 
 ### OTC
 - [ ] partial fill support
-- [ ] лучшая price discovery logic
+- [ ] better price discovery logic
 - [ ] listing analytics
-- [ ] более сильный liquidity UX
+- [ ] stronger liquidity UX
 
 ### Portfolio
 - [ ] yield views
@@ -166,123 +166,123 @@
 
 ---
 
-## Phase 5 — Реальная utility-интеграция для energy-сценария
+## Phase 5 — Real utility integration for the energy scenario
 
-## Цель
-Сделать ENERGY use case ближе к реальному сектору.
+## Goal
+Make the ENERGY use case closer to the real sector.
 
-### ENERGY_POINTS направление
-- [ ] более явная utility model для energy-consuming users
+### ENERGY_POINTS direction
+- [ ] more explicit utility model for energy-consuming users
 - [ ] internal consumption / offset logic
 - [ ] enterprise redemption / accounting concept
 
 ### Real asset validation
 - [ ] stronger operator proofs
 - [ ] real operational reporting model
-- [ ] более формальное обновление proof bundle во времени
+- [ ] more formal proof bundle updates over time
 
 ### Industrial scenarios
 - [ ] B2B consumption-linked flows
 - [ ] operator / consumer dual roles
-- [ ] более реалистичная economic interpretation
+- [ ] more realistic economic interpretation
 
 ---
 
-## Phase 6 — Развитие on-chain слоя
+## Phase 6 — Development of the on-chain layer
 
-## Цель
-Усилить Solana-часть там, где это добавляет реальную ценность, не ломая product usability.
+## Goal
+Strengthen the Solana layer where it adds real value without breaking product usability.
 
 ### Token-2022
-- [ ] более продвинутые token behaviors
+- [ ] more advanced token behaviors
 - [ ] richer mint policy design
-- [ ] более формальные transfer / usage constraints там, где это нужно
+- [ ] more formal transfer / usage constraints where needed
 
 ### Program design
 - [ ] stronger event surfaces
-- [ ] более явные state transitions
-- [ ] улучшенная on-chain verifiability для judge / auditor surfaces
+- [ ] more explicit state transitions
+- [ ] improved on-chain verifiability for judge / auditor surfaces
 
 ### Cross-service reuse
 - [ ] more reusable DeKYC-side on-chain permission primitives
-- [ ] cleaner integration points для будущих приложений
+- [ ] cleaner integration points for future applications
 
 ---
 
-## Phase 7 — Путь к production
+## Phase 7 — Path to production
 
-## Цель
-Понять, что потребуется для серьезного rollout path.
+## Goal
+Understand what will be required for a serious rollout path.
 
 ### Infrastructure
 - [ ] hardened deployment model
-- [ ] более зрелое secrets / key management
+- [ ] more mature secrets / key management
 - [ ] stricter ops model
 
 ### Compliance / legal alignment
-- [ ] более явная legal framing для revenue-rights продукта
+- [ ] more explicit legal framing for the revenue-rights product
 - [ ] stronger identity / consent language
-- [ ] более формальные процессы между оператором и инвестором
+- [ ] more formal processes between the operator and the investor
 
 ### Product packaging
-- [ ] multi-tenant service mode для DeKYC
-- [ ] cleaner operator admin flow для ENERGY
+- [ ] multi-tenant service mode for DeKYC
+- [ ] cleaner operator admin flow for ENERGY
 - [ ] external partner onboarding story
 
 ---
 
-## Что сознательно не входит в MVP
+## What is intentionally not included in the MVP
 
-MVP **не пытается** полностью решить:
+The MVP **does not try** to fully solve:
 
 - production-grade biometric verification
-- полноценный legal securities framework
+- full legal securities framework
 - mainnet production deployment
-- реальную live-интеграцию KZTE
+- real live KZTE integration
 - advanced oracle-backed energy settlement
-- полностью автоматизированный external data ingestion
-- глубокую механику вторичного рынка
+- fully automated external data ingestion
+- deep secondary market mechanics
 
-Это сделано специально.
+This is intentional.
 
-Задача MVP — доказать самый сильный loop, а не притворяться full production system.
+The goal of the MVP is to prove the strongest loop, not to pretend to be a full production system.
 
 ---
 
-## Приоритеты после хакатона
+## Priorities after the hackathon
 
-Если развитие проекта продолжится, наиболее разумный порядок такой.
+If the project continues to develop, the most reasonable order is the following.
 
 ### Priority 1
-Усилить DeKYC identity и service access model
+Strengthen the DeKYC identity and service access model
 
 ### Priority 2
-Усилить ENERGY proof bundle и payout logic
+Strengthen the ENERGY proof bundle and payout logic
 
 ### Priority 3
-Улучшить OTC flexibility и portfolio analytics
+Improve OTC flexibility and portfolio analytics
 
 ### Priority 4
-Двинуться в сторону более реальных energy utility scenarios
+Move toward more realistic energy utility scenarios
 
 ---
 
-## Долгосрочное стратегическое направление
+## Long-term strategic direction
 
-В долгосрочной перспективе проект может расти в двух направлениях.
+In the long term, the project can grow in two directions.
 
-## Direction A — DeKYC как reusable identity infrastructure
-DeKYC становится reusable identity и permission layer для множества регулируемых сервисов.
+## Direction A — DeKYC as reusable identity infrastructure
+DeKYC becomes a reusable identity and permission layer for many regulated services.
 
-## Direction B — ENERGY как vertical product
-ENERGY развивается в специализированный продукт для tokenized energy revenue rights и связанных settlement flows.
+## Direction B — ENERGY as a vertical product
+ENERGY evolves into a specialized product for tokenized energy revenue rights and related settlement flows.
 
-Именно сочетание этих двух направлений делает проект стратегически интересным.
+It is the combination of these two directions that makes the project strategically interesting.
 
 ---
 
-## Короткое резюме roadmap
+## Short roadmap summary
 
-**Краткосрочно:** стабилизировать и отполировать текущий MVP.  
-**Среднесрочно:** усилить DeKYC и product layer ENERGY.  
-**Долгосрочно:** превратить архитектуру в reusable identity + tokenization platform с реальной отраслевой релевантностью.
+**Short-term:** stabilize and polish the current MVP.  
+**Mid-term:** strengthen DeKYC and the ENERGY product layer.  
+**Long-term:** turn the architecture into a reusable identity + tokenization platform with real industry relevance.

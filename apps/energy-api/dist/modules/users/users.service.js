@@ -41,11 +41,18 @@ let UsersService = class UsersService {
             include: {
                 profile: true,
                 wallet: true,
+                dekycConnectLogins: {
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                    take: 1,
+                },
             },
         });
         if (!user) {
             return null;
         }
+        const latestDekycConnectLogin = user.dekycConnectLogins[0] ?? null;
         return {
             id: user.id,
             dekycUserId: user.dekycUserId,
@@ -68,6 +75,17 @@ let UsersService = class UsersService {
                     walletStatus: user.wallet.walletStatus,
                     initialKzteAirdropped: user.wallet.initialKzteAirdropped,
                     initialKzteAirdropTx: user.wallet.initialKzteAirdropTx,
+                }
+                : null,
+            latestDekycConnectLogin: latestDekycConnectLogin
+                ? {
+                    id: latestDekycConnectLogin.id,
+                    assertionId: latestDekycConnectLogin.assertionId,
+                    consentId: latestDekycConnectLogin.consentId,
+                    serviceSubjectId: latestDekycConnectLogin.serviceSubjectId,
+                    consentReceiptHash: latestDekycConnectLogin.consentReceiptHash,
+                    assertionExpiresAt: latestDekycConnectLogin.assertionExpiresAt.toISOString(),
+                    createdAt: latestDekycConnectLogin.createdAt.toISOString(),
                 }
                 : null,
         };

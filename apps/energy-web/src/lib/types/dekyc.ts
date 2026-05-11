@@ -36,4 +36,12 @@ export type EnergySession = {
     fullName: string | null;
     role: string;
   };
+  dekycConnect?: {
+    loginRecordId: string;
+    assertionId: string;
+    consentId: string;
+    serviceSubjectId: string;
+    consentReceiptHash: string;
+    assertionExpiresAt: string;
+  };
 };

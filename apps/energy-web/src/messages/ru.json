@@ -174,7 +174,8 @@
     "errors": {
       "assetRequired": "Выберите актив.",
       "invalidEpochAmount": "Введите корректную сумму эпохи.",
-      "createEpochFailed": "Не удалось создать эпоху."
+      "createEpochFailed": "Не удалось создать эпоху.",
+      "claimFailed": "Не удалось получить выплату."
     },
     "bucket": "Тип выплаты",
     "shares": "Доли",
@@ -205,6 +206,7 @@
     "listingPda": "Listing PDA",
     "escrowShareAccount": "Escrow share account",
     "sellerWallet": "Seller wallet",
+    "claimConfirm": "Получить выплату для пользователя {userId}, asset {assetId}, epoch #{epochIndex}?",
     "sellerShareAccount": "Seller share account",
     "sellerKzteAccount": "Seller KZTE account",
     "shareMint": "Share mint",
@@ -213,7 +215,18 @@
     "createEpochTx": "Create epoch tx",
     "createListingTx": "Create listing tx",
     "fillListingTx": "Fill listing tx",
-    "claimUser": "Claim · User"
+    "claimUser": "Claim · User",
+    "claimAvailableTitle": "Доступное получение выплаты",
+    "claimOnlyCurrentUserHint": "На judge page показывается claim только для текущего пользователя, под которым выполнен вход.",
+    "claimUserId": "Energy User ID",
+    "claimPayoutButton": "Получить выплату",
+    "claimingPayout": "Получаем выплату...",
+    "claimAlreadyClaimed": "Уже получено",
+    "claimDialogEyebrow": "Claim payout",
+    "claimDialogTitle": "Подтвердить получение выплаты",
+    "claimDialogDescription": "Сейчас будет выполнена on-chain операция claim. После успеха появится claim transaction и ClaimReceiptPDA.",
+    "claimDialogCalculation": "Расчёт выплаты",
+    "claimDialogConfirm": "Подтвердить claim"
   },
   "OtcPage": {
     "eyebrow": "OTC marketplace",
@@ -442,16 +455,32 @@
     "email": "Email",
     "notProvided": "не указан",
     "verification": "Проверка",
+    "connectProofEyebrow": "DeKYC Connect Proof",
+    "connectProofTitle": "Вход подтверждён signed identity assertion",
+    "connectProofDescription": "ENERGY получил от DeKYC одноразовый authorization code, обменял его через backend и создал локальную сессию на основе подписанного identity assertion и consent receipt.",
+    "connectProofStatus": "Verified",
+    "connectAssertionId": "Assertion ID",
+    "connectConsentId": "Consent ID",
+    "connectServiceSubjectId": "Service Subject ID",
+    "connectAssertionExpiresAt": "Assertion expires",
+    "connectConsentReceiptHash": "Consent Receipt Hash",
+    "legacySessionEyebrow": "Legacy DeKYC Session",
+    "legacySessionTitle": "Сессия создана через legacy Face + Code flow",
+    "legacySessionDescription": "Этот вход работает для совместимости с ранним MVP. Для основного demo-flow используйте DeKYC Connect, чтобы показать authorization code, signed assertion и consent receipt.",
     "role": "Роль",
     "custodialAddress": "Custodial адрес",
     "kzteAccount": "KZTE token account",
     "notCreated": "не создан",
     "walletStatus": "Статус кошелька",
+    "loginViaDekycConnect": "Войти через DeKYC Connect",
+    "loginViaDekycLegacy": "Legacy вход Face + Code", 
     "initialAirdrop": "Стартовый KZTE airdrop",
+    "startingDekycConnect": "Открываем DeKYC Connect...",
     "airdropTx": "Tx начисления",
     "notYet": "ещё нет",
     "errors": {
-      "loadProfile": "Ошибка загрузки профиля"
+      "loadProfile": "Ошибка загрузки профиля",
+      "connectLogin": "Не удалось начать вход через DeKYC Connect"
     }
   },
   "FaceScan": {
@@ -482,5 +511,24 @@
       "codeRequired": "Введите код входа",
       "loginFailed": "Ошибка входа"
     }
+  },
+  "DekycConnectCallbackPage": {
+    "eyebrow": "DeKYC Connect",
+    "title": "Завершение входа",
+    "description": "ENERGY проверяет authorization code через backend и создаёт вашу локальную product-сессию.",
+    "loading": "Завершение входа через DeKYC Connect...",
+    "missingCode": "Authorization code отсутствует в callback URL.",
+    "exchangeError": "Не удалось обменять authorization code.",
+    "success": "Вход успешно завершён. Перенаправляем в ENERGY.",
+    "statusLabel": "Статус",
+    "statusLoading": "Проверяем code",
+    "statusSuccess": "Готово",
+    "statusError": "Ошибка",
+    "missingPendingSession": "Не найдена pending DeKYC Connect session. Начните вход заново с главной страницы ENERGY.",
+    "pendingSessionExpired": "Pending DeKYC Connect session истекла. Начните вход заново.",
+    "stateMismatch": "State из callback URL не совпадает с ожидаемым значением. Вход остановлен для защиты от подмены запроса.",
+    "redirectUriMismatch": "Redirect URI не совпадает с ожидаемым значением. Вход остановлен.",
+    "backHome": "На главную",
+    "openAssets": "Открыть активы"
   }
 }

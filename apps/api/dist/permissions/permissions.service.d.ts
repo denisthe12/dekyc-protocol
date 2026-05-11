@@ -44,7 +44,7 @@ export declare class PermissionsService {
             onchainPermissionPda: string | null;
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
-            allowedClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
+            allowedClaims: import("../../prisma/generated/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
         };
         scopeGrants: MaterializedScopeGrant[];
@@ -75,7 +75,7 @@ export declare class PermissionsService {
             onchainPermissionPda: string | null;
             permissionKeyHash: string | null;
             kycHashSnapshot: string | null;
-            allowedClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
+            allowedClaims: import("../../prisma/generated/client/runtime/library").JsonValue | null;
             scopesHash: string | null;
         };
         burnedScopeGrants: BurnResult[];
@@ -108,7 +108,7 @@ export declare class PermissionsService {
         onchainPermissionPda: string | null;
         permissionKeyHash: string | null;
         kycHashSnapshot: string | null;
-        allowedClaims: import("prisma/generated/client/runtime/library").JsonValue | null;
+        allowedClaims: import("../../prisma/generated/client/runtime/library").JsonValue | null;
         scopesHash: string | null;
     })[]>;
     getUserFacingPermissions(userId: string): Promise<{
@@ -118,15 +118,15 @@ export declare class PermissionsService {
             status: string;
             description: string | null;
             category: string | null;
-            requiredClaims: import("prisma/generated/client/runtime/library").JsonValue;
-            optionalClaims: import("prisma/generated/client/runtime/library").JsonValue;
+            requiredClaims: import("../../prisma/generated/client/runtime/library").JsonValue;
+            optionalClaims: import("../../prisma/generated/client/runtime/library").JsonValue;
         };
         id: string;
         createdAt: Date;
         status: string;
         revokedAt: Date | null;
         requiredTokenAmount: number | null;
-        allowedClaims: import("prisma/generated/client/runtime/library").JsonValue;
+        allowedClaims: import("../../prisma/generated/client/runtime/library").JsonValue;
     }[]>;
     private ensureUserRegisteredOnChain;
     private generateRequiredAmount;

@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import type { DekycConnectTokenResponse } from '@/modules/auth/types/dekyc-connect-token-response.type';
 
 type DekycSignedEnvelope = {
   payload: {
@@ -83,5 +84,46 @@ export class DekycClientService {
     }
 
     return JSON.parse(rawText) as DekycSignedEnvelope;
+  }
+
+  public async exchangeConnectCode(params: {
+    code: string;
+    redirectUri: string;
+  }): Promise<DekycConnectTokenResponse> {
+    if (!this.serviceId || !this.clientId || !this.clientSecret) {
+      throw new UnauthorizedException('DeKYC service credentials are not configured');
+    }
+
+    const timestamp = Date.now();
+    const nonce = `energy-api-connect-token-${timestamp}-${Math.random()
+      .toString(16)
+      .slice(2)}`;
+
+    const response = await fetch(`${this.baseUrl}/connect/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-client-id': this.clientId,
+        'x-client-secret': this.clientSecret,
+        'x-timestamp': String(timestamp),
+        'x-nonce': nonce,
+      },
+      body: JSON.stringify({
+        grant_type: 'authorization_code',
+        code: params.code,
+        redirect_uri: params.redirectUri,
+        client_id: this.clientId,
+      }),
+    });
+
+    const rawText = await response.text();
+
+    if (!response.ok) {
+      throw new UnauthorizedException(
+        `DeKYC Connect token exchange failed: ${response.status} ${rawText}`,
+      );
+    }
+
+    return JSON.parse(rawText) as DekycConnectTokenResponse;
   }
 }

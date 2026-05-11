@@ -42,6 +42,36 @@ let DekycClientService = class DekycClientService {
         }
         return JSON.parse(rawText);
     }
+    async exchangeConnectCode(params) {
+        if (!this.serviceId || !this.clientId || !this.clientSecret) {
+            throw new common_1.UnauthorizedException('DeKYC service credentials are not configured');
+        }
+        const timestamp = Date.now();
+        const nonce = `energy-api-connect-token-${timestamp}-${Math.random()
+            .toString(16)
+            .slice(2)}`;
+        const response = await fetch(`${this.baseUrl}/connect/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-client-id': this.clientId,
+                'x-client-secret': this.clientSecret,
+                'x-timestamp': String(timestamp),
+                'x-nonce': nonce,
+            },
+            body: JSON.stringify({
+                grant_type: 'authorization_code',
+                code: params.code,
+                redirect_uri: params.redirectUri,
+                client_id: this.clientId,
+            }),
+        });
+        const rawText = await response.text();
+        if (!response.ok) {
+            throw new common_1.UnauthorizedException(`DeKYC Connect token exchange failed: ${response.status} ${rawText}`);
+        }
+        return JSON.parse(rawText);
+    }
 };
 exports.DekycClientService = DekycClientService;
 exports.DekycClientService = DekycClientService = __decorate([

@@ -70,6 +70,7 @@ export type JudgeSummary = {
   }>;
   epochs: Array<{
     id: string;
+    energyAssetId: string;
     epochIndex: number;
     revenueEpochPda: string;
     totalAmountKzte: number;
@@ -144,6 +145,21 @@ export type JudgeCreateEpochResponse = {
   };
 };
 
+export type JudgeClaimPayoutResponse = {
+  assetId: string;
+  epochIndex: number;
+  totalKzteClaimAmount: number;
+  totalEnergyPointsClaimAmount: number;
+  claims: Array<{
+    investorPositionPda: string;
+    claimReceiptPda: string;
+    claimAmount: number;
+    payoutMode: 'KZTE' | 'ENERGY_POINTS';
+    tx: string;
+    energyPointsMintTx: string | null;
+  }>;
+};
+
 export async function fetchJudgeSummary(): Promise<JudgeSummary> {
   const response = await fetch(`${ENERGY_API_BASE_URL}/judge/summary`, {
     method: 'GET',
@@ -178,4 +194,26 @@ export async function createRevenueEpoch(params: {
   }
 
   return JSON.parse(rawText) as JudgeCreateEpochResponse;
+}
+
+export async function claimPayout(params: {
+  energyUserId: string;
+  assetId: string;
+  epochIndex: number;
+}): Promise<JudgeClaimPayoutResponse> {
+  const response = await fetch(`${ENERGY_API_BASE_URL}/payouts/claim`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+  });
+
+  const rawText = await response.text();
+
+  if (!response.ok) {
+    throw new Error(`Failed to claim payout: ${response.status} ${rawText}`);
+  }
+
+  return JSON.parse(rawText) as JudgeClaimPayoutResponse;
 }

@@ -1,71 +1,74 @@
-# DeKYC Energy — Продукт
+# DeKYC Energy — Product
 
-## Продукт в одной фразе
+## Product in one sentence
 
-**DeKYC Energy** — это walletless продукт, который позволяет пользователю входить через **DeKYC**, инвестировать в **токенизированные энергетические права на доход**, получать выплаты и торговать позициями через OTC — без личного криптокошелька.
-
----
-
-## Видение продукта
-
-Долгосрочное видение — сделать участие в энергетике таким же понятным, как использование современного цифрового продукта:
-
-- просто войти
-- понятно выбрать актив
-- прозрачно получить доход
-- при необходимости выйти из позиции
-- не страдать от лишней бюрократии и web3-фрикции
-
-Вместо сценария «энергетика — это сложно и не для меня» пользователь должен получить:
-
-- понятный вход через DeKYC
-- контролируемый доступ
-- инвестиционный UX
-- прозрачную историю действий
-- проверяемые on-chain ссылки
+**DeKYC Energy** is a walletless product that allows users to log in through **DeKYC**, invest in **tokenized energy revenue rights**, receive payouts, and trade positions through OTC — without a personal crypto wallet.
 
 ---
 
-## Какую проблему решает продукт
+## Product vision
 
-Продукт решает две связанные проблемы.
+The long-term vision is to make participation in energy as understandable as using a modern digital product:
 
-### Проблема 1 — инвестиции в энергетику слишком сложны
-Для большинства людей энергетический сектор выглядит как:
+- simple login
+- clear asset selection
+- transparent income
+- ability to exit a position when needed
+- no unnecessary bureaucracy or web3 friction
 
-- слишком сложный
-- слишком юридический
-- слишком бюрократический
-- слишком далекий от нормального digital UX
+Instead of the scenario “energy is complicated and not for me”, the user should get:
 
-### Проблема 2 — onboarding и доступ слишком болезненны
-Даже если идея инвестиции хорошая, реальным барьером часто становятся:
+- a clear login through DeKYC
+- controlled access
+- investment UX
+- transparent action history
+- verifiable on-chain links
+
+---
+
+## What problem the product solves
+
+The product solves two connected problems.
+
+### Problem 1 — investing in energy is too complicated
+
+For most people, the energy sector looks:
+
+- too complex
+- too legal-heavy
+- too bureaucratic
+- too far from normal digital UX
+
+### Problem 2 — onboarding and access are too painful
+
+Even if the investment idea is good, the real barriers are often:
 
 - repeated KYC
-- дублирование персональных данных
-- избыточное доверие множеству сервисов
+- duplication of personal data
+- excessive trust in multiple services
 - wallet friction
-- непонятный вход в продукт
+- unclear product entry
 
-### Ответ продукта
-DeKYC Energy делает энергетическое участие:
+### Product answer
 
-- более понятным,
-- более доступным,
-- более проверяемым,
-- более продуктовым.
+DeKYC Energy makes participation in energy:
+
+- more understandable,
+- more accessible,
+- more verifiable,
+- more product-oriented.
 
 ---
 
-## Главный тезис продукта
+## Main product thesis
 
-Ключевой тезис проекта:
+The key thesis of the project:
 
-> Токенизация энергетических прав становится намного сильнее, когда вместе решены идентичность, доступ, расчеты, документы и UX.
+> Tokenization of energy rights becomes much stronger when identity, access, settlement, documents, and UX are solved together.
 
-Именно поэтому проект — это не просто «токенизация».
+This is why the project is not just “tokenization”.
 
-Он объединяет:
+It combines:
 
 - **DeKYC**
 - **walletless UX**
@@ -76,65 +79,69 @@ DeKYC Energy делает энергетическое участие:
 
 ---
 
-## Почему DeKYC — центральная часть продукта
+## Why DeKYC is the central part of the product
 
-DeKYC — главный дифференциатор проекта.
+DeKYC is the main differentiator of the project.
 
-Большинство хакатонных tokenization-проектов сводятся к схеме:
+Most hackathon tokenization projects come down to this pattern:
 
-- подключи кошелек
-- купи токен
-- посмотри транзакцию
+- connect a wallet
+- buy a token
+- view a transaction
 
-DeKYC Energy идет в другую сторону: пользователь входит через **identity и permission layer**.
+DeKYC Energy goes in a different direction: the user enters through an **identity and permission layer**.
 
-### Что это дает продукту
+### What this gives the product
 
-DeKYC приносит в продукт:
+DeKYC brings into the product:
 
 - reusable identity
-- более сильный trust context
+- stronger trust context
 - permission-aware access
-- более реалистичный onboarding
-- более убедительный narrative для реального рынка
+- more realistic onboarding
+- a more convincing narrative for the real market
 
-### Роль ЭЦП в продуктовом позиционировании
+### The role of digital signature in product positioning
 
-Важный акцент проекта — **ЭЦП / цифровая подпись**.
+An important focus of the project is **EDS / digital signature**.
 
-Это важно, потому что:
+This matters because:
 
-- пользователь выглядит не как безличный wallet address
-- продукт ближе к реальной доверенной инфраструктуре
-- identity layer получает более сильный фундамент
-- проект сильнее отличается от обычной web3-токенизации
+- the user does not look like an anonymous wallet address
+- the product is closer to real trusted infrastructure
+- the identity layer gets a stronger foundation
+- the project is more distinct from ordinary web3 tokenization
 
-Если сказать кратко:
+In short:
 
-> DeKYC превращает доверенный контекст ЭЦП в reusable identity layer для сервисов.
+> DeKYC turns the trusted context of EDS into a reusable identity layer for services.
 
 ---
 
-## Для кого этот продукт
+## Who this product is for
 
-## 1. Частный инвестор
-Пользователь, которому нужен:
+## 1. Retail investor
 
-- понятный вход
-- ясный инвестиционный сценарий
-- продукт без кошельков
-- прозрачная история и payout logic
+A user who needs:
 
-## 2. Небольшой энергетический оператор
-Команда, которая строит небольшой solar / wind / distributed energy проект и хочет привлечь капитал через понятный цифровой продукт.
+- clear login
+- a clear investment scenario
+- a product without wallets
+- transparent history and payout logic
 
-## 3. B2B / промышленный потребитель энергии
-Компания, которая потребляет электричество и может быть заинтересована в участии в generation-side economics.
+## 2. Small energy operator
 
-Для этого сегмента особенно интересен payout mode через **ENERGY_POINTS**.
+A team building a small solar / wind / distributed energy project that wants to attract capital through a clear digital product.
 
-## 4. Судья / инвестор / stakeholder
-Проект построен так, чтобы его можно было быстро проверить и понять:
+## 3. B2B / industrial energy consumer
+
+A company that consumes electricity and may be interested in participating in generation-side economics.
+
+For this segment, the payout mode through **ENERGY_POINTS** is especially interesting.
+
+## 4. Judge / investor / stakeholder
+
+The project is built so it can be quickly checked and understood:
 
 - judge page
 - tx links
@@ -146,134 +153,160 @@ DeKYC приносит в продукт:
 
 ---
 
-## Продуктовые pillars
+## Product pillars
 
 ## 1. Walletless UX
-Пользователь не обязан понимать blockchain-примитивы, чтобы использовать продукт.
+
+The user does not have to understand blockchain primitives to use the product.
 
 ## 2. Identity-aware access
-Пользователь входит через DeKYC, а не через raw wallet.
+
+The user logs in through DeKYC, not through a raw wallet.
 
 ## 3. Revenue-rights positioning
-Пользователь покупает не «кусок панели», а **цифровую долю в праве на доход**.
 
-## 4. Гибкие payout modes
-Система поддерживает разные экономические сценарии для разных типов участников.
+The user buys not “a piece of a panel”, but a **digital share in the right to revenue**.
+
+## 4. Flexible payout modes
+
+The system supports different economic scenarios for different types of participants.
 
 ## 5. Secondary liquidity
-Пользователь не должен быть навсегда заперт в позиции.
+
+The user should not be locked in a position forever.
 
 ---
 
-## Основные продуктовые компоненты
+## Core product components
 
 ## Landing
-Объясняет связку DeKYC + Energy.
+
+Explains the connection between DeKYC and Energy.
 
 ## Login / access
+
 Mock biometric + DeKYC-based service entry.
 
 ## Asset marketplace
-Каталог энергетических активов.
+
+Catalog of energy assets.
 
 ## Asset detail
-Страница актива с:
 
-- описанием
-- экономикой
+Asset page with:
+
+- description
+- economics
 - proof bundle
 - public / private split
 - on-chain references
 
 ## Portfolio
-Пользователь видит свои позиции, объединенные по asset, но с учетом payout buckets.
+
+The user sees their positions grouped by asset, but with payout buckets taken into account.
 
 ## Payouts
-Пользователь делает claim из revenue epochs.
+
+The user claims from revenue epochs.
 
 ## OTC
-Пользователь создает listing или покупает чужую позицию.
+
+The user creates a listing or buys someone else’s position.
 
 ## History
-Пользователь понимает, что уже сделал в системе.
+
+The user understands what they have already done in the system.
 
 ## Judge page
-Внешний reviewer может проверить реальную работу продукта.
+
+An external reviewer can verify the real operation of the product.
 
 ---
 
-## Основной пользовательский flow
+## Main user flow
 
-## 1. Вход через DeKYC
-Пользователь начинает не с connect wallet, а с identity-based entry.
+## 1. Login through DeKYC
 
-## 2. Подготовка walletless состояния
-Система готовит:
+The user starts not with connect wallet, but with identity-based entry.
+
+## 2. Preparation of walletless state
+
+The system prepares:
 
 - custodial wallet
 - token accounts
 - KZTE balance
 
-## 3. Изучение marketplace
-Пользователь смотрит активы еще до полного углубления в продукт.
+## 3. Exploring the marketplace
 
-## 4. Открытие asset detail
-На странице актива доступны:
+The user views assets even before going deeper into the product.
 
-- экономический контекст
+## 4. Opening asset detail
+
+On the asset page, the user can access:
+
+- economic context
 - project data
 - proof bundle
 - on-chain refs
-- точка входа в покупку
+- entry point for purchase
 
-## 5. Покупка shares
-Покупка проходит без пользовательских wallet-операций.
+## 5. Buying shares
 
-## 6. Получение payouts
-После создания epoch пользователь может сделать claim.
+The purchase happens without user wallet operations.
 
-## 7. Выход через OTC
-Пользователь может выставить свою позицию на OTC.
+## 6. Receiving payouts
 
-## 8. Проверка истории
-История делает продукт понятным и прозрачным.
+After an epoch is created, the user can claim.
+
+## 7. Exit through OTC
+
+The user can list their position on OTC.
+
+## 8. Checking history
+
+History makes the product understandable and transparent.
 
 ---
 
-## Продуктовые состояния
+## Product states
 
 ## Guest state
-Гость видит:
+
+A guest sees:
 
 - public landing
 - public asset preview
 - marketplace surface
 
 ## Logged-in state
-Пользователь получает:
+
+The user gets:
 
 - session
-- доступ к portfolio/history
+- access to portfolio/history
 - product identity
 - walletless capability
 
 ## Restricted private state
-Пользователь может быть залогинен, но еще ограничен в доступе к части приватных сценариев.
+
+The user may be logged in but still limited in access to some private scenarios.
 
 ## Full product state
-Пользователь получает полный доступ к private asset data и основным flow.
 
-Это важно, потому что доступ в проекте — часть **UX и product state**, а не просто backend switch.
+The user gets full access to private asset data and core flows.
+
+This is important because access in the project is part of **UX and product state**, not just a backend switch.
 
 ---
 
-## Модель актива
+## Asset model
 
-Каждый asset представляет собой реальный экономический объект внутри продукта.
+Each asset represents a real economic object inside the product.
 
-Пользователь покупает не «оборудование по кускам», а **доли в праве на доход**.
+The user buys not “equipment in pieces”, but **shares in the right to revenue**.
 
-Asset включает:
+An asset includes:
 
 - title
 - description
@@ -288,104 +321,115 @@ Asset включает:
 
 ---
 
-## Модель payouts
+## Payout model
 
-Payout model построена вокруг epochs.
+The payout model is built around epochs.
 
-Это означает:
+This means:
 
-- revenue отображается как payout epochs
-- у epoch есть total amount
-- система вычисляет amount per share
-- пользователь делает claim в соответствии со своими shares и payout buckets
+- revenue is represented as payout epochs
+- an epoch has a total amount
+- the system calculates amount per share
+- the user claims according to their shares and payout buckets
 
-Это очень сильная продуктовая модель, потому что ее легко объяснить в demo.
+This is a very strong product model because it is easy to explain in a demo.
 
 ---
 
 ## Payout modes
 
-Система поддерживает как минимум два payout mode.
+The system supports at least two payout modes.
 
 ### KZTE
-Подходит для классического инвестиционного return.
+
+Suitable for classic investment return.
 
 ### ENERGY_POINTS
-Подходит для utility-like или consumption-linked return.
 
-Это важная продуктовая особенность, потому что один и тот же asset становится интересен разным типам участников.
+Suitable for utility-like or consumption-linked return.
+
+This is an important product feature because the same asset becomes interesting to different types of participants.
 
 ---
 
-## OTC-модель
+## OTC model
 
-OTC — это встроенный secondary market.
+OTC is an embedded secondary market.
 
-Он нужен потому, что первичное размещение само по себе недостаточно.
+It is needed because primary issuance alone is not enough.
 
-Пользователь должен иметь возможность:
+The user should be able to:
 
-- выйти из позиции
-- ребалансировать портфель
-- продать долю другому участнику
+- exit a position
+- rebalance a portfolio
+- sell a share to another participant
 
-MVP использует:
+The MVP uses:
 
-- создание listing
+- listing creation
 - escrow-based transfer model
 - fill flow
 - tx-linked history
 
-Это прагматичный и demo-friendly дизайн.
+This is a pragmatic and demo-friendly design.
 
 ---
 
-## Почему продукт выглядит правдоподобно
+## Why the product looks plausible
 
-Продукт выглядит убедительно, потому что он избегает типичных слабостей хакатонных проектов.
+The product looks convincing because it avoids typical weaknesses of hackathon projects.
 
-### Он не заставляет пользователя использовать кошелек
-Это убирает большой UX-барьер.
+### It does not force the user to use a wallet
 
-### Он не делает вид, что private docs должны жить on-chain
-Это честно и архитектурно зрело.
+This removes a major UX barrier.
 
-### Он не пытается притвориться полной legal securities platform
-MVP остается в разумной и честной зоне.
+### It does not pretend that private documents should live on-chain
 
-### Он показывает complete working loop
-А это важнее, чем завышенные обещания.
+This is honest and architecturally mature.
 
----
+### It does not try to pretend to be a complete legal securities platform
 
-## Принципы UX
+The MVP stays within a reasonable and honest zone.
 
-### 1. Сначала объяснить, потом просить действие
-Пользователь должен сначала понять asset.
+### It shows a complete working loop
 
-### 2. Показывать proof, а не только обещания
-Proof bundle, tx links и judge page реально важны.
-
-### 3. Минимизировать web3-фрикцию
-Пользователь должен чувствовать продукт, а не протокол.
-
-### 4. Делать доступ явным
-Private / public mode должен быть понятен.
-
-### 5. Делать историю читаемой
-Пользователь должен понимать, что уже произошло.
+And this matters more than exaggerated promises.
 
 ---
 
-## Чем продукт отличается от обычной tokenization-demo
+## UX principles
 
-Большинство tokenization demo останавливаются на:
+### 1. Explain first, then ask for action
+
+The user should first understand the asset.
+
+### 2. Show proof, not just promises
+
+Proof bundle, tx links, and judge page really matter.
+
+### 3. Minimize web3 friction
+
+The user should feel the product, not the protocol.
+
+### 4. Make access explicit
+
+Private / public mode should be understandable.
+
+### 5. Make history readable
+
+The user should understand what has already happened.
+
+---
+
+## How the product differs from a regular tokenization demo
+
+Most tokenization demos stop at:
 
 - create token
 - buy token
 - show explorer link
 
-DeKYC Energy идет дальше:
+DeKYC Energy goes further:
 
 - identity-aware entry
 - private/public access split
@@ -396,17 +440,17 @@ DeKYC Energy идет дальше:
 - portfolio + history
 - judge verification surface
 
-Именно эта комбинация делает проект похожим на продукт, а не на технодемку.
+This combination is what makes the project look like a product, not a tech demo.
 
 ---
 
 ## MVP scope
 
-Текущий MVP сфокусирован на:
+The current MVP focuses on:
 
 - DeKYC login
 - custodial user state
-- нескольких demo assets
+- several demo assets
 - primary buy
 - manual epoch creation
 - claim payout
@@ -418,18 +462,18 @@ DeKYC Energy идет дальше:
 
 ---
 
-## Post-hackathon направление
+## Post-hackathon direction
 
-Наиболее естественные следующие шаги:
+The most natural next steps:
 
-- усилить DeKYC identity UX
-- сделать proof bundle богаче и ближе к реальному миру
-- добавить investor analytics
-- усилить payout automation
-- протестировать enterprise onboarding / pilot logic
+- strengthen DeKYC identity UX
+- make the proof bundle richer and closer to the real world
+- add investor analytics
+- strengthen payout automation
+- test enterprise onboarding / pilot logic
 
 ---
 
-## Короткое продуктовое резюме
+## Short product summary
 
-**DeKYC Energy** — это walletless, identity-aware инвестиционный продукт для токенизированных энергетических прав на доход, который показывает, что реальная tokenization становится намного сильнее, когда вместе решены идентичность, доступ, документы, расчеты и UX.
+**DeKYC Energy** is a walletless, identity-aware investment product for tokenized energy revenue rights, showing that real tokenization becomes much stronger when identity, access, documents, settlement, and UX are solved together.
